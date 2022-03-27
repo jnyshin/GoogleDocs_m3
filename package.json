@@ -1,0 +1,13 @@
+{
+  "name": "googledocs-clone",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "concurrently \"yarn workspace server start\" \"yarn workspace client start\""
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+
+  
+}
