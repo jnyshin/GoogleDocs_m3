@@ -2,12 +2,17 @@
   "name": "googledocs-clone",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=16.0.0 < 17.0.0",
+    "yarn": ">=1.21.0 <2.0.0"
+  },
   "scripts": {
     "start": "concurrently \"yarn workspace server start\" \"yarn workspace client start\""
   },
   "workspaces": [
     "packages/*"
   ]
+  
 
   
 }
