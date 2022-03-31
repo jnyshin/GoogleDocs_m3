@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 import cors from "cors";
-import userRouter from "./routes/user";
+import connRouter from "./routes/connection";
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
   console.log("client connected", socket.id);
 });
 
-app.use("/", userRouter);
+app.use("/", connRouter);
 
 server.listen(8000, () => {
   console.log("server started at port 8000");

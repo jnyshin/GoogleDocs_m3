@@ -23,6 +23,9 @@ function App() {
       setLoading(false);
     };
     getData();
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const handleBody = (e) => {
