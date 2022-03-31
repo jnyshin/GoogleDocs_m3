@@ -22,6 +22,9 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
+  socket.on("send-changes", (delta) => {
+    console.log(delta);
+  });
 });
 
 app.use("/", connRouter);
