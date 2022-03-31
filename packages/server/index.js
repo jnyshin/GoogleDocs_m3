@@ -5,6 +5,19 @@ import cors from "cors";
 import connRouter from "./routes/connection";
 const app = express();
 const server = http.createServer(app);
+import mongoose from "mongoose";
+
+mongoose
+  .connect("mongodb://localhost/docs_clone", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("mongoose connected");
+  })
+  .catch((err) => {
+    console.error("failed to connect with MongoDB", err);
+  });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -22,6 +35,9 @@ const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
+  socket.on("send-changes", (delta) => {
+    console.log(delta);
+  });
 });
 
 app.use("/", connRouter);
