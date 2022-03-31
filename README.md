@@ -7,6 +7,7 @@ Google Docs clone for CSE 356
 #### In Local:
 
 - `yarn workspace (client || server) start` in the very highest folder.
+- To add a package: `yarn workspace (client || server) add {package_name}`
 
 #### In Cloud:
 
