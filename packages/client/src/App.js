@@ -32,12 +32,8 @@ function App() {
   useEffect(() => {
     if (socket == null || quill == null) return;
     const textChangeHandler = (delta, oldDelta, source) => {
-      if (source == 1234) {
-        console.log("A Change Occured with This Connection ID ", params.id);
-        socket.emit("send changes", delta);
-      } else {
-        return;
-      }
+      console.log("A Change Occured with This Connection ID ", params.id);
+      socket.emit("send changes", delta);
     };
     quill.on("text-change", textChangeHandler);
     return () => {
