@@ -16,10 +16,7 @@ ReactDOM.render(
     <Router>
       <Switch>
         <Route path="/" exact>
-          <Redirect to={`/connect/${uuidV4()}`} />
-        </Route>
-        <Route path="/connect/:id">
-          <App />
+          <App id={uuidV4()} />
         </Route>
       </Switch>
     </Router>
