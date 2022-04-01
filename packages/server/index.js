@@ -3,7 +3,6 @@ import express from "express";
 import cors from "cors";
 import connRouter from "./routes/connection";
 import mongoose from "mongoose";
-import Conn from "./schema_conn";
 const app = express();
 const server = http.createServer(app);
 

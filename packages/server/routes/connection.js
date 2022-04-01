@@ -31,8 +31,11 @@ router.get("/connect/:id", (req, res) => {
       constructSSE(res, 1000);
     });
   };
+  counter = 1;
   const constructSSE = (res) => {
-    res.write("message sent at ", new Date());
+    res.write("message: ", counter);
+    counter += 1;
+    console.log("message sent");
   };
   sendmsg(req, res);
   //res.send("this is test body");
