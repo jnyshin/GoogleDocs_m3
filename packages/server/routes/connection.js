@@ -1,6 +1,5 @@
 import express from "express";
 import Conn from "../schema_conn";
-
 const router = express.Router();
 
 router.get("/connect/:id", (req, res) => {
@@ -22,6 +21,20 @@ router.get("/connect/:id", (req, res) => {
       res.send("ERROR");
     }
   });
+  const sendmsg = (req, res) => {
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+    setInterval(function () {
+      constructSSE(res, 1000);
+    });
+  };
+  const constructSSE = (res) => {
+    res.write("message sent at ", new Date());
+  };
+  sendmsg(req, res);
   //res.send("this is test body");
 });
 export default router;
