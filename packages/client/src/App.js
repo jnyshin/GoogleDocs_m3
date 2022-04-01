@@ -1,58 +1,79 @@
-import React, { useEffect, useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import React, { useCallback, useEffect, useState } from "react";
+import Quill from "quill";
+import "quill/dist/quill.snow.css";
 import { useParams } from "react-router-dom";
-import { io } from "socket.io-client";
 import API from "./api";
+const TOOLBAR = [
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+  [{ size: [] }],
+  ["bold", "italic", "underline", "strike", "blockquote"],
+  [{ list: "ordered" }, { list: "bullet" }],
+  ["link", "image", "video"],
+  ["clean"],
+  ["code-block"],
+];
+
+const FORMAT = [
+  "header",
+  "font",
+  "size",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "blockquote",
+  "list",
+  "image",
+  "video",
+  "code-block",
+];
 function App() {
-  const [body, setBody] = useState("");
-  const [title, setTitle] = useState("");
   const [quill, setQuill] = useState();
+  const [id, setId] = useState("");
+  const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  const [socket, setSocket] = useState();
 
   const params = useParams();
+
+  // create or get user data
   useEffect(() => {
+    if (!quill) return;
     setLoading(true);
-    const socket = io("http://localhost:8000");
-    setSocket(socket);
-
-    const getData = async () => {
-      const response = await API.get(`connect/${params.id}`);
+    setId(params.id);
+    const createConnection = async () => {
+      const response = await API.get(`/connect/${params.id}`);
       const { data } = response;
-      setBody(data);
-      setLoading(false);
+      quill.setContents(data);
+      quill.enable();
     };
-    getData();
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+    createConnection();
+  }, [quill, id]);
 
+  // update
   useEffect(() => {
-    if (socket == null || quill == null) return;
-    const textChangeHandler = (delta, oldDelta, source) => {
-      console.log("A Change Occured with This Connection ID ", params.id);
-      socket.emit("send changes", delta);
-    };
-    quill.on("text-change", textChangeHandler);
-    return () => {
-      quill.off("text-change", textChangeHandler);
-    };
-  }, [socket, quill]);
-
-  const handleBody = (e) => {
-    setBody(e);
-    console.log(e);
-  };
+    if (!quill) return;
+    const handler = (delta, content, source) => {};
+    quill.on("text-change", handler);
+  }, [quill]);
 
   function onTitleChange(e) {
     setTitle(e.target.value);
   }
 
-  if (loading) {
-    return <div className="loading">Loading</div>;
-  }
+  const quillRef = useCallback((wrapper) => {
+    if (!wrapper) return;
+    wrapper.innerHTML = "";
+    const editor = document.createElement("div");
+    wrapper.append(editor);
+    const q = new Quill(editor, {
+      modules: { toolbar: TOOLBAR },
+      formats: FORMAT,
+      theme: "snow",
+    });
+    q.disable();
+    q.setText("loading..");
+    setQuill(q);
+  }, []);
 
   return (
     <div className="App">
@@ -73,43 +94,9 @@ function App() {
           </div>
         </div>
       </div>
-      <ReactQuill
-        placeholder="Start writing..."
-        modules={App.modules}
-        formats={App.formats}
-        onChange={handleBody}
-        style={{ height: "80vh" }}
-        value={body}
-      />
+      <div ref={quillRef} style={{ height: "1000px" }}></div>
     </div>
   );
 }
-
-App.modules = {
-  toolbar: [
-    [{ header: "1" }, { header: "2" }, { header: [3, 4, 5, 6] }, { font: [] }],
-    [{ size: [] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [{ list: "ordered" }, { list: "bullet" }],
-    ["link", "image", "video"],
-    ["clean"],
-    ["code-block"],
-  ],
-};
-
-App.formats = [
-  "header",
-  "font",
-  "size",
-  "bold",
-  "italic",
-  "underline",
-  "strike",
-  "blockquote",
-  "list",
-  "image",
-  "video",
-  "code-block",
-];
 
 export default App;

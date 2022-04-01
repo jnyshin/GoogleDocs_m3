@@ -3,16 +3,25 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./Home";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import { v4 as uuidV4 } from "uuid";
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} exact/>
-        <Route path="/connect/:id" element={<App />}/>
-      </Routes>
+      <Switch>
+        <Route path="/" exact>
+          <Redirect to={`/connect/${uuidV4()}`} />
+        </Route>
+        <Route path="/connect/:id">
+          <App />
+        </Route>
+      </Switch>
     </Router>
   </React.StrictMode>,
   document.getElementById("root")
