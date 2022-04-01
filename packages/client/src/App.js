@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
-import { useParams } from "react-router-dom";
 import API from "./api";
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -27,27 +26,26 @@ const FORMAT = [
   "video",
   "code-block",
 ];
-function App() {
+function App({ id }) {
   const [quill, setQuill] = useState();
-  const [id, setId] = useState("");
   const [title, setTitle] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const params = useParams();
-
-  // create or get user data
   useEffect(() => {
     if (!quill) return;
-    setLoading(true);
-    setId(params.id);
-    const createConnection = async () => {
-      const response = await API.get(`/connect/${params.id}`);
-      const { data } = response;
-      quill.setContents(data);
-      quill.enable();
+    const startConnection = async () => {
+      const evtSource = new EventSource(`http://localhost:8000/connect/${id}`, {
+        withCredentials: true,
+      });
+      evtSource.onopen = function () {
+        console.log("connection establised");
+      };
+      evtSource.onmessage = function (event) {
+        quill.setContents(JSON.parse(event.data));
+      };
     };
-    createConnection();
-  }, [quill, id]);
+    startConnection();
+    quill.enable();
+  }, [quill]);
 
   // update
   useEffect(() => {

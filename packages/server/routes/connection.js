@@ -3,25 +3,30 @@ import Conn from "../schema_conn";
 
 const router = express.Router();
 
-router.get("/connect/:id", (req, res) => {
+router.get("/connect/:id", async (req, res) => {
   const id = req.params.id;
-
-  //query from id and get body;
-  Conn.findById(id, function (err, doc) {
-    try {
-      if (doc) {
-        doc.save();
-        res.send(doc.data);
-      } else {
-        const newConn = new Conn({ _id: id, data: "" }); //make a new Conn document with connection ID
-        newConn.save();
-        res.send(newConn.data);
-      }
-    } catch (err) {
-      console.log(err);
-      res.send("ERROR");
-    }
+  console.log(`start ending event stream for ${id}... `);
+  res.set({
+    "Cache-Control": "no-cache",
+    "Content-Type": "text/event-stream",
+    Connection: "keep-alive",
   });
-  //res.send("this is test body");
+  res.flushHeaders();
+
+  while (true) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const document = await findOrCreateDocument(id);
+    const data = `data: ${JSON.stringify(document.data)}\n\n`;
+    res.write(data);
+  }
 });
+
+const findOrCreateDocument = async (id) => {
+  if (id == null) return;
+
+  const document = await Conn.findById(id);
+  if (document) return document;
+  return await Conn.create({ _id: id, data: { ops: [{ insert: "test" }] } });
+};
+
 export default router;
