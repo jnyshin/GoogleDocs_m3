@@ -63,9 +63,11 @@ function App({ id }) {
   useEffect(() => {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
+      console.log(source);
       if (source === "user") {
         const contents = quill.getContents();
         console.log(delta);
+        //API.post(`op/${id}`, { contents: contents, delta: delta });
         API.post(`op/${id}`, { contents: contents, delta: delta });
       }
     };

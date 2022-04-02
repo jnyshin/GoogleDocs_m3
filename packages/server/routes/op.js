@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/:id", async (req, res) => {
   const id = req.params.id;
   const contents = req.body.contents;
-  console.log(contents);
+  console.log("server received");
   const delta = req.body.delta;
   const payload = { action: "update", data: delta };
   clients.forEach((client) => {
