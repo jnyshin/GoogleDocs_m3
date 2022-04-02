@@ -67,8 +67,8 @@ function App({ id }) {
       if (source === "user") {
         const contents = quill.getContents();
         console.log(delta);
-        //API.post(`op/${id}`, { contents: contents, delta: delta });
         API.post(`op/${id}`, { contents: contents, delta: delta });
+        //API.post(`op/${id}`, { delta: delta });
       }
     };
     quill.on("text-change", update);
