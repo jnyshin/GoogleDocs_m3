@@ -7512,6 +7512,13 @@ quick-lru@^5.1.1:
   resolved "https://registry.npmjs.org/quick-lru/-/quick-lru-5.1.1.tgz"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
+quill-delta-to-html@^0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/quill-delta-to-html/-/quill-delta-to-html-0.12.0.tgz#ee572cfa208390d99d7646795358ddb81eaea17c"
+  integrity sha512-Yy6U2e7ov+ZlrFbj5/GbqOBCRjyNu+vuphy0Pk+7668zIMTVHJglZY2JNa++1/zkSiqptPBmP/CpsDzC4Wznsw==
+  dependencies:
+    lodash.isequal "^4.5.0"
+
 quill-delta@^3.6.2:
   version "3.6.3"
   resolved "https://registry.npmjs.org/quill-delta/-/quill-delta-3.6.3.tgz"
