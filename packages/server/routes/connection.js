@@ -1,6 +1,6 @@
 import express from "express";
 import Conn from "../schema_conn";
-import clients from "../store";
+import { clients, DOCUMENT_ID } from "../store";
 
 const router = express.Router();
 router.get("/:id", async (req, res) => {
@@ -14,27 +14,30 @@ router.get("/:id", async (req, res) => {
 
   res.flushHeaders();
 
-  const document = await findOrCreateDocument(id);
-  const data = `data: ${JSON.stringify(document.data)}\n\n`;
+  const document = await findOrCreateDocument();
+  const payload = { action: "set", data: document.data };
+  const data = `data: ${JSON.stringify(payload)}\n\n`;
   res.write(data);
-
+  console.log("length: " + clients.length);
   const newClient = {
     id: id,
     res,
   };
-  clients.push({ ...newClient });
+
+  clients.push(newClient);
+
   req.on("close", () => {
-    console.log(`${id} Connection closed`);
-    clients.filter((c) => id !== c.id);
+    console.log("why close?");
   });
 });
 
-const findOrCreateDocument = async (id) => {
-  if (id == null) return;
-
-  const document = await Conn.findById(id);
+const findOrCreateDocument = async () => {
+  const document = await Conn.findById(DOCUMENT_ID);
   if (document) return document;
-  return await Conn.create({ _id: id, data: { ops: [{ insert: "test" }] } });
+  return await Conn.create({
+    _id: DOCUMENT_ID,
+    data: { ops: [{ insert: "test" }] },
+  });
 };
 
 export default router;

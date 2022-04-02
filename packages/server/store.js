@@ -1,2 +1,3 @@
-const clients = [];
-export default clients;
+export const clients = [];
+export const deltas = [];
+export const DOCUMENT_ID = "ONE_DOC";
