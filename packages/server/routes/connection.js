@@ -1,9 +1,9 @@
 import express from "express";
 import Conn from "../schema_conn";
+import clients from "../store";
 
 const router = express.Router();
-
-router.get("/connect/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = req.params.id;
   console.log(`start ending event stream for ${id}... `);
   res.set({
@@ -11,14 +11,22 @@ router.get("/connect/:id", async (req, res) => {
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
   });
+
   res.flushHeaders();
 
-  while (true) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const document = await findOrCreateDocument(id);
-    const data = `data: ${JSON.stringify(document.data)}\n\n`;
-    res.write(data);
-  }
+  const document = await findOrCreateDocument(id);
+  const data = `data: ${JSON.stringify(document.data)}\n\n`;
+  res.write(data);
+
+  const newClient = {
+    id: id,
+    res,
+  };
+  clients.push({ ...newClient });
+  req.on("close", () => {
+    console.log(`${id} Connection closed`);
+    clients.filter((c) => id !== c.id);
+  });
 });
 
 const findOrCreateDocument = async (id) => {

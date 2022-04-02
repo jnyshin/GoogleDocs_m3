@@ -1,9 +1,10 @@
 import http from "http";
 import express from "express";
 import cors from "cors";
-import connRouter from "./routes/connection";
 import mongoose from "mongoose";
-import Conn from "./schema_conn";
+import connRouter from "./routes/connection";
+import opRouter from "./routes/op";
+
 const app = express();
 const server = http.createServer(app);
 
@@ -27,8 +28,8 @@ app.use(
     credentials: true,
   })
 );
-
-app.use("/", connRouter);
+app.use("/connect", connRouter);
+app.use("/op", opRouter);
 
 server.listen(8000, () => {
   console.log("server started at port 8000");

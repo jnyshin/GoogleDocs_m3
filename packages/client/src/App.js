@@ -39,20 +39,39 @@ function App({ id }) {
       evtSource.onopen = function () {
         console.log("connection establised");
       };
+
       evtSource.onmessage = function (event) {
-        quill.setContents(JSON.parse(event.data));
+        console.log("message from server event push");
+        const data = JSON.parse(event.data);
+        quill.setContents(data);
+        quill.enable();
       };
     };
     startConnection();
-    quill.enable();
   }, [quill]);
 
   // update
   useEffect(() => {
     if (!quill) return;
-    const handler = (delta, content, source) => {};
-    quill.on("text-change", handler);
+    const update = (delta, oldDelta, source) => {
+      if (source === "user") {
+        // const contents = quill.getContents();
+        console.log(delta);
+        API.post(`op/${id}`, delta);
+      }
+    };
+    quill.on("text-change", update);
   }, [quill]);
+
+  // useEffect(() => {
+  //   if (!quill) return;
+  //   const interval = setInterval(() => {
+  //     console.log(quill.getContents());
+  //   }, 2000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
   function onTitleChange(e) {
     setTitle(e.target.value);
