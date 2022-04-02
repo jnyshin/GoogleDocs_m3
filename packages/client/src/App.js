@@ -114,7 +114,6 @@ function App({ id }) {
             placeholder="Untitled"
             disabled
           />
-          <button onClick={() => console.log(listening)}>Test</button>
           <div className="header-btns">
             <a href="/">File</a>
             <a href="/">Edit</a>
