@@ -26,7 +26,11 @@ const findOrCreateDocument = async (id) => {
 
   const document = await Conn.findById(id);
   if (document) return document;
-  return await Conn.create({ _id: id, data: { ops: [{ insert: "test" }] } });
+  return await Conn.create({
+    _id: id,
+    data: { ops: [{ insert: "test" }] },
+    doc: "<p>Check /doc/id</p>",
+  });
 };
 
 export default router;

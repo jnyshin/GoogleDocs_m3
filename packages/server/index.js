@@ -2,6 +2,7 @@ import http from "http";
 import express from "express";
 import cors from "cors";
 import connRouter from "./routes/connection";
+import docRouter from "./routes/doc";
 import mongoose from "mongoose";
 const app = express();
 const server = http.createServer(app);
@@ -28,6 +29,9 @@ app.use(
 );
 
 app.use("/", connRouter);
+app.get("/doc", (req, res) => {
+  console.log("reached doc connection");
+});
 
 server.listen(8000, () => {
   console.log("server started at port 8000");
