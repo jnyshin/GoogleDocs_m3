@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import connRouter from "./routes/connection";
+import docRouter from "./routes/doc";
 import opRouter from "./routes/op";
 
 const app = express();
@@ -29,6 +30,7 @@ app.use(
   })
 );
 app.use("/connect", connRouter);
+app.use("/doc", docRouter);
 app.use("/op", opRouter);
 
 server.listen(8000, () => {

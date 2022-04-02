@@ -34,7 +34,26 @@ const findOrCreateDocument = async (id) => {
 
   const document = await Conn.findById(id);
   if (document) return document;
-  return await Conn.create({ _id: id, data: { ops: [{ insert: "test" }] } });
+  return await Conn.create({
+    _id: id,
+    data: { ops: [{ insert: "test" }] },
+    doc: "<p>Check /doc/id</p>",
+  });
 };
+
+router.get("/doc/:id", async (req, res) => {
+  console.log("doc router reached");
+  const id = req.params.id;
+  //console.log(id);
+  Conn.findOne({ _id: id }).exec((err, doc) => {
+    if (doc) {
+      //console.log(doc);
+      res.send(doc);
+    } else {
+      //console.log(err);
+      res.send("ERROR");
+    }
+  });
+});
 
 export default router;
