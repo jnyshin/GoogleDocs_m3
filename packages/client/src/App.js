@@ -29,25 +29,34 @@ const FORMAT = [
 function App({ id }) {
   const [quill, setQuill] = useState();
   const [title, setTitle] = useState("");
+  const [listening, setListening] = useState(false);
 
   useEffect(() => {
-    if (!quill) return;
-    const startConnection = async () => {
+    if (quill && !listening) {
       const evtSource = new EventSource(`http://localhost:8000/connect/${id}`, {
         withCredentials: true,
       });
       evtSource.onopen = function () {
         console.log("connection establised");
+        setListening(true);
       };
 
       evtSource.onmessage = function (event) {
         console.log("message from server event push");
-        const data = JSON.parse(event.data);
-        quill.setContents(data);
-        quill.enable();
+        const dataFromServer = JSON.parse(event.data);
+        const { action, data } = dataFromServer;
+        console.log(data);
+        if (action === "set") {
+          quill.setContents(data);
+          quill.enable();
+        } else {
+          quill.updateContents(data);
+        }
       };
-    };
-    startConnection();
+      evtSource.onerror = function (event) {
+        console.log("Error occured");
+      };
+    }
   }, [quill]);
 
   // update
@@ -55,7 +64,7 @@ function App({ id }) {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
       if (source === "user") {
-        // const contents = quill.getContents();
+        const contents = quill.getContents();
         console.log(delta);
         API.post(`op/${id}`, delta);
       }
@@ -103,6 +112,7 @@ function App({ id }) {
             placeholder="Untitled"
             disabled
           />
+          <button onClick={() => console.log(listening)}>Test</button>
           <div className="header-btns">
             <a href="/">File</a>
             <a href="/">Edit</a>

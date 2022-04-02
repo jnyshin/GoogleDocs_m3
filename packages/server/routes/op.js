@@ -1,15 +1,18 @@
 import express from "express";
-import clients from "../store";
+import { clients } from "../store";
 const router = express.Router();
 
 router.post("/:id", async (req, res) => {
   const id = req.params.id;
-  const client = clients.filter((c) => c.id === id)[0];
   const delta = req.body;
-  const data = `data: ${JSON.stringify(delta)}\n\n`;
-  client.res.write(data);
-  // res.json(delta);
+
   res.send("hello");
+  const payload = { action: "update", data: delta };
+  clients.forEach((client) => {
+    if (client.id !== id) {
+      client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    }
+  });
 });
 
 export default router;
