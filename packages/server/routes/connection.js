@@ -33,4 +33,19 @@ const findOrCreateDocument = async (id) => {
   });
 };
 
+router.get("/doc/:id", async (req, res) => {
+  console.log("doc router reached");
+  const id = req.params.id;
+  //console.log(id);
+  Conn.findOne({ _id: id }).exec((err, doc) => {
+    if (doc) {
+      //console.log(doc);
+      res.send(doc);
+    } else {
+      //console.log(err);
+      res.send("ERROR");
+    }
+  });
+});
+
 export default router;

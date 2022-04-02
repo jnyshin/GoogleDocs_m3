@@ -29,9 +29,6 @@ app.use(
 );
 
 app.use("/", connRouter);
-app.get("/doc", (req, res) => {
-  console.log("reached doc connection");
-});
 
 server.listen(8000, () => {
   console.log("server started at port 8000");
