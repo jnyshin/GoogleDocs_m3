@@ -103,6 +103,10 @@ function App({ id }) {
     setQuill(q);
   }, []);
 
+  const handleTest = async () => {
+    const html = await API.get(`/doc/${id}`);
+    console.log(html);
+  };
   return (
     <div className="App">
       <div className="header">
@@ -114,7 +118,7 @@ function App({ id }) {
             placeholder="Untitled"
             disabled
           />
-          <button onClick={() => console.log(listening)}>Test</button>
+          <button onClick={handleTest}>Test</button>
           <div className="header-btns">
             <a href="/">File</a>
             <a href="/">Edit</a>
