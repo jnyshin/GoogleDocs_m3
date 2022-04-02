@@ -25,9 +25,13 @@ router.get("/:id", async (req, res) => {
   };
 
   clients.push(newClient);
+  clients.forEach((client) => {
+    console.log(client.id);
+  });
 
   req.on("close", () => {
-    console.log("why close?");
+    console.log(`${id} Connection closed`);
+    clients.filter((c) => id !== c.id);
   });
 });
 
@@ -45,7 +49,7 @@ router.get("/doc/:id", async (req, res) => {
   console.log("doc router reached");
   const id = req.params.id;
   //console.log(id);
-  Conn.findOne({ _id: id }).exec((err, doc) => {
+  Conn.findOne({ _id: DOCUMENT_ID }).exec((err, doc) => {
     if (doc) {
       //console.log(doc);
       res.send(doc);
