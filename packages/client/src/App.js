@@ -3,6 +3,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import API from "./api";
 import DOMAIN_NAME from "./store";
+import { useParams } from "react-router-dom";
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -27,11 +28,20 @@ const FORMAT = [
   "video",
   "code-block",
 ];
-function App({ id }) {
+function App(props) {
+  const params = useParams();
   const [quill, setQuill] = useState();
+  const [id, setId] = useState();
   const [title, setTitle] = useState("");
   const [listening, setListening] = useState(false);
-
+  useEffect(() => {
+    console.log(props.id);
+    if (!props.id) {
+      setId(params.id);
+    } else {
+      setId(props.id);
+    }
+  }, []);
   useEffect(() => {
     if (quill && !listening) {
       const evtSource = new EventSource(
@@ -51,7 +61,8 @@ function App({ id }) {
           quill.setContents(data);
           quill.enable();
         } else {
-          quill.updateContents(data);
+          console.log(data);
+          quill.setContents(data);
         }
       };
       evtSource.onerror = function (event) {
@@ -68,7 +79,7 @@ function App({ id }) {
       if (source === "user") {
         const contents = quill.getContents();
         console.log(delta);
-        API.post(`op/${id}`, { contents: contents, delta: delta });
+        API.post(`op/${id}`, delta);
         //API.post(`op/${id}`, { delta: delta });
       }
     };

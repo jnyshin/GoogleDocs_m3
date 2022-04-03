@@ -5,6 +5,7 @@ import { clients, DOCUMENT_ID } from "../store";
 const router = express.Router();
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
+  console.log("connection: ", id);
   console.log(`start ending event stream for ${id}... `);
   res.set({
     "Cache-Control": "no-cache",
@@ -41,7 +42,7 @@ const findOrCreateDocument = async () => {
   return await Conn.create({
     _id: DOCUMENT_ID,
     doc: "<p>Check /doc/id</p>",
-    data: { ops: [{ insert: "test" }] },
+    data: { ops: [{ insert: "" }] },
   });
 };
 
