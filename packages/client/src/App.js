@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import API from "./api";
+import DOMAIN_NAME from "./store";
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -33,9 +34,9 @@ function App({ id }) {
 
   useEffect(() => {
     if (quill && !listening) {
-      const evtSource = new EventSource(`http://localhost:8000/connect/${id}`, {
-        withCredentials: true,
-      });
+      const evtSource = new EventSource(
+        `http://${DOMAIN_NAME}:8000/connect/${id}`
+      );
       evtSource.onopen = function () {
         console.log("connection establised");
         setListening(true);

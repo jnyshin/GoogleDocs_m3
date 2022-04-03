@@ -1,6 +1,5 @@
 import axios from "axios";
-
+import DOMAIN_NAME from "./store";
 export default axios.create({
-  baseURL: "http://localhost:8000",
-  withCredentials: true,
+  baseURL: `http://${DOMAIN_NAME}:8000`,
 });
