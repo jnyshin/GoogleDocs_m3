@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import API from "./api";
+import DOMAIN_NAME from "./store";
+import { useParams } from "react-router-dom";
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -26,16 +28,23 @@ const FORMAT = [
   "video",
   "code-block",
 ];
-function App({ id }) {
+function App(props) {
+  const params = useParams();
   const [quill, setQuill] = useState();
+  const [id, setId] = useState();
   const [title, setTitle] = useState("");
   const [listening, setListening] = useState(false);
-
+  useEffect(() => {
+    console.log(props.id);
+    if (!props.id) {
+      setId(params.id);
+    } else {
+      setId(props.id);
+    }
+  }, []);
   useEffect(() => {
     if (quill && !listening) {
-      const evtSource = new EventSource(`http://localhost:8000/connect/${id}`, {
-        withCredentials: true,
-      });
+      const evtSource = new EventSource(`http://${DOMAIN_NAME}/connect/${id}`);
       evtSource.onopen = function () {
         console.log("connection establised");
         setListening(true);
@@ -44,13 +53,14 @@ function App({ id }) {
       evtSource.onmessage = function (event) {
         console.log("message from server event push");
         const dataFromServer = JSON.parse(event.data);
-        const { action, data } = dataFromServer;
-        console.log(data);
-        if (action === "set") {
-          quill.setContents(data);
+
+        console.log("message from server event push (event.data): ");
+        console.log(dataFromServer);
+        if (dataFromServer.content) {
+          quill.setContents(dataFromServer.content);
           quill.enable();
         } else {
-          quill.updateContents(data);
+          quill.setContents(dataFromServer[0]);
         }
       };
       evtSource.onerror = function (event) {
@@ -63,26 +73,12 @@ function App({ id }) {
   useEffect(() => {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
-      console.log(source);
       if (source === "user") {
-        const contents = quill.getContents();
-        console.log(delta);
-        API.post(`op/${id}`, { contents: contents, delta: delta });
-        //API.post(`op/${id}`, { delta: delta });
+        API.post(`op/${id}`, [delta]);
       }
     };
     quill.on("text-change", update);
   }, [quill]);
-
-  // useEffect(() => {
-  //   if (!quill) return;
-  //   const interval = setInterval(() => {
-  //     console.log(quill.getContents());
-  //   }, 2000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, []);
 
   function onTitleChange(e) {
     setTitle(e.target.value);
@@ -104,8 +100,17 @@ function App({ id }) {
   }, []);
 
   const handleTest = async () => {
-    const html = await API.get(`/doc/${id}`);
-    console.log(html);
+    console.log("triggered");
+    console.log(
+      quill.setContents([
+        {
+          attributes: { bold: true },
+          insert: "57fdf96c-8dac-4694-8ddd-d081181728ab",
+        },
+        { insert: "\n" },
+        { delete: 6999936 },
+      ])
+    );
   };
   return (
     <div className="App">

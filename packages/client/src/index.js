@@ -3,20 +3,17 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { v4 as uuidV4 } from "uuid";
-
 ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Switch>
         <Route path="/" exact>
           <App id={uuidV4()} />
+        </Route>
+        <Route path="/connect/:id">
+          <App />
         </Route>
       </Switch>
     </Router>
