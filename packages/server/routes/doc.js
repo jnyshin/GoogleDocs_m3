@@ -2,11 +2,10 @@ import express from "express";
 import Conn from "../schema_conn";
 import { DOCUMENT_ID } from "../store";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import e from "express";
 const router = express.Router();
 
 router.get("/:id", async (req, res) => {
-  console.log("doc router reached");
+  console.log("[doc route]");
 
   await Conn.findById(DOCUMENT_ID).exec((err, doc) => {
     if (err) {
@@ -17,21 +16,10 @@ router.get("/:id", async (req, res) => {
     const ops = doc.data.ops;
     console.log(ops);
     const converter = new QuillDeltaToHtmlConverter(ops, {});
-    const html = converter.convert();
+    var html = converter.convert();
+    console.log("converted to: " + html);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(html);
-
-    // if () {
-    //   console.log("not found doc");
-    //   const ops = err.data.ops;
-    //   var cfg = {};
-    //   const converter = new QuillDeltaToHtmlConverter(ops, cfg);
-    //   const html = converter.convert();
-    //   console.log(html);
-    //   res.send(html);
-    // } else {
-    //   console.log("found doc", ops);
-    //   res.send(doc);
-    // }
   });
 });
 export default router;

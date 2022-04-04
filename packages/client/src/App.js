@@ -44,9 +44,7 @@ function App(props) {
   }, []);
   useEffect(() => {
     if (quill && !listening) {
-      const evtSource = new EventSource(
-        `http://${DOMAIN_NAME}:8000/connect/${id}`
-      );
+      const evtSource = new EventSource(`http://${DOMAIN_NAME}/connect/${id}`);
       evtSource.onopen = function () {
         console.log("connection establised");
         setListening(true);
@@ -55,14 +53,14 @@ function App(props) {
       evtSource.onmessage = function (event) {
         console.log("message from server event push");
         const dataFromServer = JSON.parse(event.data);
-        const { action, data } = dataFromServer;
-        console.log(data);
-        if (action === "set") {
-          quill.setContents(data);
+
+        console.log("message from server event push (event.data): ");
+        console.log(dataFromServer);
+        if (dataFromServer.content) {
+          quill.setContents(dataFromServer.content);
           quill.enable();
         } else {
-          console.log(data);
-          quill.setContents(data);
+          quill.setContents(dataFromServer[0]);
         }
       };
       evtSource.onerror = function (event) {
@@ -75,26 +73,12 @@ function App(props) {
   useEffect(() => {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
-      console.log(source);
       if (source === "user") {
-        const contents = quill.getContents();
-        console.log(delta);
-        API.post(`op/${id}`, delta);
-        //API.post(`op/${id}`, { delta: delta });
+        API.post(`op/${id}`, [delta]);
       }
     };
     quill.on("text-change", update);
   }, [quill]);
-
-  // useEffect(() => {
-  //   if (!quill) return;
-  //   const interval = setInterval(() => {
-  //     console.log(quill.getContents());
-  //   }, 2000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, []);
 
   function onTitleChange(e) {
     setTitle(e.target.value);
@@ -116,8 +100,17 @@ function App(props) {
   }, []);
 
   const handleTest = async () => {
-    const html = await API.get(`/doc/${id}`);
-    console.log(html);
+    console.log("triggered");
+    console.log(
+      quill.setContents([
+        {
+          attributes: { bold: true },
+          insert: "57fdf96c-8dac-4694-8ddd-d081181728ab",
+        },
+        { insert: "\n" },
+        { delete: 6999936 },
+      ])
+    );
   };
   return (
     <div className="App">

@@ -4,60 +4,35 @@ import { clients, DOCUMENT_ID } from "../store";
 
 const router = express.Router();
 router.get("/:id", async (req, res) => {
+  const document = await Conn.findById(DOCUMENT_ID);
+
   const id = req.params.id;
   console.log("connection: ", id);
   console.log(`start ending event stream for ${id}... `);
-  res.set({
-    "Cache-Control": "no-cache",
+  res.status(200).set({
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+    "X-CSE356": "61f9f57373ba724f297db6ba",
   });
 
-  res.flushHeaders();
+  const payload = { content: document.data.ops };
 
-  const document = await findOrCreateDocument();
-  const payload = { action: "set", data: document.data };
-  const data = `data: ${JSON.stringify(payload)}\n\n`;
-  res.write(data);
-  console.log("length: " + clients.length);
+  res.write(`data: ${JSON.stringify(payload)}\n\n`);
+  console.log("check format: ", JSON.stringify(payload));
   const newClient = {
     id: id,
     res,
   };
 
   clients.push(newClient);
-  clients.forEach((client) => {
-    console.log(client.id);
-  });
 
   req.on("close", () => {
     console.log(`${id} Connection closed`);
-    clients.filter((c) => id !== c.id);
-  });
-});
-
-const findOrCreateDocument = async () => {
-  const document = await Conn.findById(DOCUMENT_ID);
-  if (document) return document;
-  return await Conn.create({
-    _id: DOCUMENT_ID,
-    doc: "<p>Check /doc/id</p>",
-    data: { ops: [{ insert: "" }] },
-  });
-};
-
-router.get("/doc/:id", async (req, res) => {
-  console.log("doc router reached");
-  const id = req.params.id;
-  //console.log(id);
-  Conn.findOne({ _id: DOCUMENT_ID }).exec((err, doc) => {
-    if (doc) {
-      //console.log(doc);
-      res.send(doc);
-    } else {
-      //console.log(err);
-      res.send("ERROR");
-    }
+    clients.map((c, index) =>
+      c.id === id ? clients.splice(index, 1) : clients
+    );
+    console.log("remaining clients = " + clients.length);
   });
 });
 
