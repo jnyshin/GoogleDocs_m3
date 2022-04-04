@@ -7,6 +7,7 @@ router.get("/:id", async (req, res) => {
   const document = await Conn.findById(DOCUMENT_ID);
 
   const id = req.params.id;
+  console.log("connection: ", id);
   console.log(`start ending event stream for ${id}... `);
   res.status(200).set({
     "Content-Type": "text/event-stream",
