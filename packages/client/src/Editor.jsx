@@ -28,7 +28,7 @@ const FORMAT = [
   "video",
   "code-block",
 ];
-function App(props) {
+const Editor = (props) => {
   const params = useParams();
   const [quill, setQuill] = useState();
   const [id, setId] = useState();
@@ -114,27 +114,9 @@ function App(props) {
   };
   return (
     <div className="App">
-      <div className="header">
-        <img src={require("./docs.png")} alt="homepage" width="40px" />
-        <div className="header-options">
-          <input
-            type="text"
-            onChange={onTitleChange}
-            placeholder="Untitled"
-            disabled
-          />
-          <button onClick={handleTest}>Test</button>
-          <div className="header-btns">
-            <a href="/">File</a>
-            <a href="/">Edit</a>
-            <a href="/">View</a>
-            <a href="/">Help</a>
-          </div>
-        </div>
-      </div>
       <div ref={quillRef} style={{ height: "1000px" }}></div>
     </div>
   );
-}
+};
 
-export default App;
+export default Editor;

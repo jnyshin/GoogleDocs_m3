@@ -4,17 +4,17 @@ import mongoose from "mongoose";
 import connRouter from "./routes/connection";
 import docRouter from "./routes/doc";
 import opRouter from "./routes/op";
-
-const app = express();
 import path from "path";
 import { fileURLToPath } from "url";
+
+const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 
 // 👇️ "/home/john/Desktop/javascript"
 const __dirname = path.dirname(__filename);
-console.log(__dirname);
-const client_path = path.join(__dirname, "../client/build");
+
+const client_path = path.join(__dirname, "../client/dist");
 
 app.use(express.static(client_path));
 app.use(cors());
@@ -40,6 +40,6 @@ mongoose
   .catch((err) => {
     console.error("failed to connect with MongoDB", err);
   });
-app.listen(80, () => {
+app.listen(8000, () => {
   console.log("server started at port 80");
 });
