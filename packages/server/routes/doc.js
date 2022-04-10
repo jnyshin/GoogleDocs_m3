@@ -1,11 +1,11 @@
 import express from "express";
 import Docs from "../schema/docs";
-import { DOCUMENT_ID } from "../store";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 const router = express.Router();
 
 router.get("/:id", async (req, res) => {
-  await Docs.findById(DOCUMENT_ID).exec((err, doc) => {
+  const id = req.params.id;
+  await Docs.findById(id).exec((err, doc) => {
     if (err) {
       // console.log("not found doc");
       res.send("wrong");

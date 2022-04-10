@@ -4,6 +4,7 @@ import "./index.css";
 import Editor from "./Editor";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import DocsList from "./DocsList";
+import { v4 as uuidV4 } from "uuid";
 ReactDOM.render(
   <React.StrictMode>
     <Router>

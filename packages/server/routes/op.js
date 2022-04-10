@@ -1,5 +1,5 @@
 import express from "express";
-import { clients, DOCUMENT_ID } from "../store";
+import { clients } from "../store";
 import Delta from "quill-delta";
 import Docs from "../schema/docs";
 
@@ -12,18 +12,20 @@ router.post("/:id", async (req, res) => {
   const id = req.params.id;
   for (const delta of req.body) {
     const incomming = new Delta(delta);
-    const document = await Docs.findById(DOCUMENT_ID);
+    const document = await Docs.findById(id);
     const old = new Delta(document.data);
     const newDelta = old.compose(incomming);
-    await Docs.findByIdAndUpdate(DOCUMENT_ID, { data: newDelta }).then(
+    await Docs.findByIdAndUpdate(id, { data: newDelta }).then(
       console.log("Document saved")
     );
   }
   clients.forEach((client) => {
     if (client.id !== id) {
-      client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      client.res.write(`data: ${JSON.stringify(req.body)}\n\n`);
+      //console.log(`sent message: ${JSON.stringify(req.body)}\n\n`);
     }
   });
+  res.send("success");
 });
 
 export default router;

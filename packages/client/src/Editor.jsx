@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import API from "./api";
+import DOMAIN_NAME from "./store";
+import { useParams } from "react-router-dom";
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -26,12 +28,20 @@ const FORMAT = [
   "video",
   "code-block",
 ];
-function App({ id }) {
+const Editor = (props) => {
+  const params = useParams();
   const [quill, setQuill] = useState();
   const [id, setId] = useState();
   const [docId, setDocId] = useState();
   const [listening, setListening] = useState(false);
-
+  useEffect(() => {
+    console.log(props.id);
+    if (!props.id) {
+      setId(params.id);
+    } else {
+      setId(props.id);
+    }
+  }, []);
   useEffect(() => {
     setId(params.id);
     setDocId(params.docId);
@@ -50,13 +60,14 @@ function App({ id }) {
       evtSource.onmessage = function (event) {
         console.log("message from server event push");
         const dataFromServer = JSON.parse(event.data);
-        const { action, data } = dataFromServer;
-        console.log(data);
-        if (action === "set") {
-          quill.setContents(data);
+
+        console.log("message from server event push (event.data): ");
+        console.log(dataFromServer);
+        if (dataFromServer.content) {
+          quill.setContents(dataFromServer.content);
           quill.enable();
         } else {
-          quill.updateContents(data);
+          quill.setContents(dataFromServer[0]);
         }
       };
       evtSource.onerror = function (event) {
@@ -70,9 +81,7 @@ function App({ id }) {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
       if (source === "user") {
-        const contents = quill.getContents();
-        console.log(delta);
-        API.post(`op/${id}`, delta);
+        API.post(`op/${id}`, [delta]);
       }
     };
     quill.on("text-change", update);
@@ -93,29 +102,24 @@ function App({ id }) {
     setQuill(q);
   }, []);
 
+  const handleTest = async () => {
+    console.log("triggered");
+    console.log(
+      quill.setContents([
+        {
+          attributes: { bold: true },
+          insert: "57fdf96c-8dac-4694-8ddd-d081181728ab",
+        },
+        { insert: "\n" },
+        { delete: 6999936 },
+      ])
+    );
+  };
   return (
     <div className="App">
-      <div className="header">
-        <img src={require("./docs.png")} alt="homepage" width="40px" />
-        <div className="header-options">
-          <input
-            type="text"
-            onChange={onTitleChange}
-            placeholder="Untitled"
-            disabled
-          />
-          <button onClick={() => console.log(listening)}>Test</button>
-          <div className="header-btns">
-            <a href="/">File</a>
-            <a href="/">Edit</a>
-            <a href="/">View</a>
-            <a href="/">Help</a>
-          </div>
-        </div>
-      </div>
       <div ref={quillRef} style={{ height: "1000px" }}></div>
     </div>
   );
-}
+};
 
-export default App;
+export default Editor;

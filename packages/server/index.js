@@ -1,11 +1,10 @@
-import http from "http";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import connRouter from "./routes/connection";
+import docRouter from "./routes/doc";
 import opRouter from "./routes/op";
 import authRouter from "./routes/auth";
-import docRouter from "./routes/doc";
 import Docs from "./schema/docs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,7 +15,6 @@ const PORT = 8000;
 const sessionStore = new session.MemoryStore();
 
 const app = express();
-const server = http.createServer(app);
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -82,6 +80,6 @@ mongoose
     console.error("failed to connect with MongoDB", err);
   });
 
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`server started at port ${PORT}`);
 });

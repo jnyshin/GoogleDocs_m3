@@ -13,6 +13,8 @@ router.get("/:id/:docId", async (req, res) => {
   res.status(200).set({
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+    "X-CSE356": "61f9f57373ba724f297db6ba",
   });
   const payload = { content: document.data.ops };
 
