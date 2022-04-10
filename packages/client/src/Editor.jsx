@@ -34,14 +34,7 @@ const Editor = (props) => {
   const [id, setId] = useState();
   const [docId, setDocId] = useState();
   const [listening, setListening] = useState(false);
-  useEffect(() => {
-    console.log(props.id);
-    if (!props.id) {
-      setId(params.id);
-    } else {
-      setId(props.id);
-    }
-  }, []);
+
   useEffect(() => {
     setId(params.id);
     setDocId(params.docId);
@@ -50,7 +43,7 @@ const Editor = (props) => {
   useEffect(() => {
     if (quill && !listening) {
       const evtSource = new EventSource(
-        `http://${DOMAIN_NAME}/connect/${id}/${docId}`
+        `http://${DOMAIN_NAME}/connect/${docId}/${id}`
       );
       evtSource.onopen = function () {
         console.log("connection establised");
@@ -67,7 +60,7 @@ const Editor = (props) => {
           quill.setContents(dataFromServer.content);
           quill.enable();
         } else {
-          quill.setContents(dataFromServer[0]);
+          quill.updateContents(dataFromServer[0]);
         }
       };
       evtSource.onerror = function (event) {
@@ -81,7 +74,7 @@ const Editor = (props) => {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
       if (source === "user") {
-        API.post(`op/${id}`, [delta]);
+        API.post(`op/${docId}/${id}`, [delta]);
       }
     };
     quill.on("text-change", update);

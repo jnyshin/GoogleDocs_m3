@@ -3,9 +3,10 @@ import Docs from "../schema/docs";
 import { clients } from "../store";
 
 const router = express.Router();
-router.get("/:id/:docId", async (req, res) => {
+router.get("/:docId/:id", async (req, res) => {
   const docId = req.params.docId;
   const id = req.params.id;
+
   const document = await Docs.findById(docId);
 
   // console.log("connection: ", id);
@@ -17,7 +18,6 @@ router.get("/:id/:docId", async (req, res) => {
     "X-CSE356": "61f9f57373ba724f297db6ba",
   });
   const payload = { content: document.data.ops };
-
   res.write(`data: ${JSON.stringify(payload)}\n\n`);
   // console.log("check format: ", JSON.stringify(payload));
   const newClient = {
