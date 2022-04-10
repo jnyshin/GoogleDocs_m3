@@ -28,14 +28,20 @@ const FORMAT = [
 ];
 function App({ id }) {
   const [quill, setQuill] = useState();
-  const [title, setTitle] = useState("");
+  const [id, setId] = useState();
+  const [docId, setDocId] = useState();
   const [listening, setListening] = useState(false);
 
   useEffect(() => {
+    setId(params.id);
+    setDocId(params.docId);
+  }, []);
+
+  useEffect(() => {
     if (quill && !listening) {
-      const evtSource = new EventSource(`http://localhost:8000/connect/${id}`, {
-        withCredentials: true,
-      });
+      const evtSource = new EventSource(
+        `http://${DOMAIN_NAME}/connect/${id}/${docId}`
+      );
       evtSource.onopen = function () {
         console.log("connection establised");
         setListening(true);
@@ -71,20 +77,6 @@ function App({ id }) {
     };
     quill.on("text-change", update);
   }, [quill]);
-
-  // useEffect(() => {
-  //   if (!quill) return;
-  //   const interval = setInterval(() => {
-  //     console.log(quill.getContents());
-  //   }, 2000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, []);
-
-  function onTitleChange(e) {
-    setTitle(e.target.value);
-  }
 
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;

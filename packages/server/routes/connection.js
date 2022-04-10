@@ -1,43 +1,36 @@
 import express from "express";
-import Conn from "../schema_conn";
-import { clients, DOCUMENT_ID } from "../store";
+import Docs from "../schema/docs";
+import { clients } from "../store";
 
 const router = express.Router();
-router.get("/:id", async (req, res) => {
+router.get("/:id/:docId", async (req, res) => {
+  const docId = req.params.docId;
   const id = req.params.id;
-  console.log(`start ending event stream for ${id}... `);
-  res.set({
-    "Cache-Control": "no-cache",
+  const document = await Docs.findById(docId);
+
+  // console.log("connection: ", id);
+  // console.log(`start ending event stream for ${id}... `);
+  res.status(200).set({
     "Content-Type": "text/event-stream",
     Connection: "keep-alive",
   });
+  const payload = { content: document.data.ops };
 
-  res.flushHeaders();
-
-  const document = await findOrCreateDocument();
-  const payload = { action: "set", data: document.data };
-  const data = `data: ${JSON.stringify(payload)}\n\n`;
-  res.write(data);
-  console.log("length: " + clients.length);
+  res.write(`data: ${JSON.stringify(payload)}\n\n`);
+  // console.log("check format: ", JSON.stringify(payload));
   const newClient = {
     id: id,
+    docId: docId,
     res,
   };
-
   clients.push(newClient);
-
   req.on("close", () => {
-    console.log("why close?");
+    // console.log(`${id} Connection closed`);
+    clients.map((c, index) =>
+      c.id === id ? clients.splice(index, 1) : clients
+    );
+    // console.log("remaining clients = " + clients.length);
   });
 });
-
-const findOrCreateDocument = async () => {
-  const document = await Conn.findById(DOCUMENT_ID);
-  if (document) return document;
-  return await Conn.create({
-    _id: DOCUMENT_ID,
-    data: { ops: [{ insert: "test" }] },
-  });
-};
 
 export default router;
