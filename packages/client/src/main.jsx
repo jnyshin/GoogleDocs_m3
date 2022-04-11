@@ -14,7 +14,7 @@ ReactDOM.render(
         <Route path="/collection/list" exact>
           <DocsList />
         </Route>
-        <Route path="/showdoc/:docId/:id">
+        <Route path="/doc/edit/:docId/:id">
           <Editor />
         </Route>
         <Route path="/users/signup" exact>
