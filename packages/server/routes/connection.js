@@ -3,10 +3,9 @@ import Docs from "../schema/docs";
 import { clients } from "../store";
 
 const router = express.Router();
-router.get("/:docId/:id", async (req, res) => {
+router.get("/:docID/:id", async (req, res) => {
   const docId = req.params.docId;
   const id = req.params.id;
-
   const document = await Docs.findById(docId);
 
   // console.log("connection: ", id);
