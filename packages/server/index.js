@@ -5,13 +5,12 @@ import connRouter from "./routes/connection";
 import docRouter from "./routes/doc";
 import opRouter from "./routes/op";
 import authRouter from "./routes/auth";
-import Docs from "./schema/docs";
+import collectionRouter from "./routes/collection";
 import mediaRouter from "./routes/media";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import session from "express-session";
-import { v4 as uuidv4 } from "uuid";
 const PORT = 8000;
 const sessionStore = new session.MemoryStore();
 
@@ -42,33 +41,11 @@ app.use(
   })
 );
 
-app.post("/addDoc", async (req, res) => {
-  if (req.params.id) {
-    //In case it requires id from param
-    await Docs.create({
-      _id: req.params.id,
-      data: { ops: [{ insert: "" }] },
-    });
-  } else {
-    await Docs.create({
-      _id: uuidv4(),
-      data: { ops: [{ insert: "" }] },
-    });
-  }
-
-  const documents = await Docs.find();
-  res.send(documents);
-});
-
-app.get("/showlist", async (req, res) => {
-  const documents = await Docs.find();
-
-  res.send(documents);
-});
 app.use("/connect", connRouter);
 app.use("/doc", docRouter);
 app.use("/op", opRouter);
 app.use("/media", mediaRouter);
+app.use("/collection", collectionRouter);
 app.use("/", authRouter);
 mongoose
   .connect("mongodb://localhost/docs_clone", {

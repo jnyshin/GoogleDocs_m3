@@ -9,7 +9,7 @@ ReactDOM.render(
   <React.StrictMode>
     <Router>
       <Switch>
-        <Route path="/" exact>
+        <Route path="/collection/list" exact>
           <DocsList />
         </Route>
         <Route path="/showdoc/:docId/:id">
