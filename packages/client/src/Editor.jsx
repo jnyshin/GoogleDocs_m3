@@ -4,6 +4,7 @@ import "quill/dist/quill.snow.css";
 import API from "./api";
 import DOMAIN_NAME from "./store";
 import { useParams } from "react-router-dom";
+import QuillCursors from 'quill-cursors';
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -34,6 +35,10 @@ const Editor = (props) => {
   const [id, setId] = useState();
   const [docId, setDocId] = useState();
   const [listening, setListening] = useState(false);
+  const [cursor, setCursor] = useState();
+  const [username, setUsername] = useState();
+  
+  Quill.register('modules/cursors', QuillCursors);
 
   useEffect(() => {
     setId(params.id);
@@ -81,16 +86,55 @@ const Editor = (props) => {
     quill.on("text-change", update);
   }, [quill]);
 
+  useEffect(() => {
+    if (!quill) return;
+    if (cursor){
+      cursor.createCursor('cursor', 'user1', 'blue');
+      function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+          const context = this;
+          const later = function() {
+            timeout = null;
+            func.apply(context, args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+      function selectionChangeHandler(cursors) {
+        const debouncedUpdate = debounce(updateCursor, 500);
+        return function(range, oldRange, source) {
+          if (source === 'user') {
+            updateCursor(range);
+          } else {
+            debouncedUpdate(range);
+          }
+        };
+        function updateCursor(range) {
+          setTimeout(() => cursors.moveCursor('cursor', range), 10);
+        }
+      }
+      quill.on("selection-change", selectionChangeHandler(cursor));
+    }
+  }, [quill])
+
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;
     wrapper.innerHTML = "";
     const editor = document.createElement("div");
     wrapper.append(editor);
     const q = new Quill(editor, {
-      modules: { toolbar: TOOLBAR },
+      modules: { toolbar: TOOLBAR , cursors: {
+        hideDelayMs: 5000,
+        hideSpeedMs: 0,
+        selectionChangeSource: null,
+        transformOnTextChange: true,
+        }},
       formats: FORMAT,
       theme: "snow",
     });
+    setCursor(q.getModule('cursors'))
     q.disable();
     q.setText("loading..");
     setQuill(q);
@@ -109,6 +153,8 @@ const Editor = (props) => {
       ])
     );
   };
+
+  
   return (
     <div className="App">
       <div ref={quillRef} style={{ height: "1000px" }}></div>
