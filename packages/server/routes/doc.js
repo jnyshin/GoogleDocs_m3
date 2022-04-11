@@ -3,7 +3,7 @@ import Docs from "../schema/docs";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 const router = express.Router();
 
-router.get("/:id", async (req, res) => {
+router.get("/get/:id", async (req, res) => {
   const id = req.params.id;
   await Docs.findById(id).exec((err, doc) => {
     if (err) {

@@ -22,7 +22,12 @@ const DocsList = () => {
       name: name,
     };
     const newDoc = await API.post("/collection/create", data);
-    setDocs([{ id: newDoc.data, name: data.name }, ...docs]);
+
+    if (newDoc.data.error) {
+      console.log(newDoc.data.message);
+    } else {
+      setDocs([{ id: newDoc.data, name: data.name }, ...docs]);
+    }
   };
 
   const handleDelete = async (id) => {
