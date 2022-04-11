@@ -41,7 +41,7 @@ router.post("/logout", (req, res) => {
   }
 });
 
-router.post("/adduser", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     let testAccount = await nodemailer.createTestAccount();
     let transporter = nodemailer.createTransport({

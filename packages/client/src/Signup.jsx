@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import API from "./api";
 
-const Adduser = () => {
+const Signup = () => {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
@@ -13,7 +13,7 @@ const Adduser = () => {
             password: password,
             email: email
         };
-        const newUser = await API.post("/adduser", body)
+        const newUser = await API.post("/users/signup", body)
         if (newUser.data.error) {
             console.log(newUser.data.message);
         }
@@ -23,7 +23,7 @@ const Adduser = () => {
     return(
         <div class="wrapper">
             <div class="container">
-                <form method="post" action="/adduser" onSubmit={handleSubmit}>
+                <form method="post" action="/users/signup" onSubmit={handleSubmit}>
                     <lable for="username">Username:</lable>
                     <input type="text" id="username" name="username" onChange={e => setUsername(e.target.value)} />
                     <lable for="password">Password:</lable>
@@ -36,4 +36,4 @@ const Adduser = () => {
         </div>
     )
 }
-export default Adduser;
+export default Signup;

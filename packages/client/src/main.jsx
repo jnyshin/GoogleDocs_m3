@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import Editor from "./Editor";
-import Adduser from "./Adduser";
+import Signup from "./Signup";
 import Login from "./Login";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import DocsList from "./DocsList";
@@ -17,10 +17,10 @@ ReactDOM.render(
         <Route path="/showdoc/:docId/:id">
           <Editor />
         </Route>
-        <Route path="/adduser" exact>
-          <Adduser />
+        <Route path="/users/signup" exact>
+          <Signup />
         </Route>
-        <Route path="/login" exact>
+        <Route path="/users/login" exact>
           <Login />
         </Route>
       </Switch>
