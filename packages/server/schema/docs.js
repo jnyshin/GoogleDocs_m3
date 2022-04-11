@@ -5,6 +5,7 @@ const docs = new mongoose.Schema(
     id: String,
     data: Object,
     name: String,
+    version: Number,
   },
   { timestamps: true }
 );
