@@ -73,6 +73,7 @@ const Editor = (props) => {
   useEffect(() => {
     if (!quill) return;
     const update = (delta, oldDelta, source) => {
+      console.log(delta.ops);
       if (source === "user") {
         API.post(`op/${docId}/${id}`, [delta]);
       }

@@ -6,6 +6,7 @@ import docRouter from "./routes/doc";
 import opRouter from "./routes/op";
 import authRouter from "./routes/auth";
 import Docs from "./schema/docs";
+import mediaRouter from "./routes/media";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -67,6 +68,7 @@ app.get("/showlist", async (req, res) => {
 app.use("/connect", connRouter);
 app.use("/doc", docRouter);
 app.use("/op", opRouter);
+app.use("/media", mediaRouter);
 app.use("/", authRouter);
 mongoose
   .connect("mongodb://localhost/docs_clone", {
