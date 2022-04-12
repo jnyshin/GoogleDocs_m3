@@ -7,30 +7,36 @@ import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
 const router = express.Router();
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email: email }, async (err, doc) => {
-    if (err) {
-      console.log("doc was not found");
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user.enable) {
+      //not verified
+      logging.error("failed to verify");
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send({ status: "ERROR" });
-    } else if (doc && doc.password === password) {
+      res.send(ERROR_MESSAGE("did not verify"));
+    } else {
+      //verified
       if (req.session.authenticated) {
-        console.log("Already logged in");
+        logging.info("User already logged in");
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "OK" });
-      } else {
+      } else if (user.password === password) {
         req.session.authenticated = true;
         req.session.user = req.body;
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "OK" });
+      } else {
+        logging.info(`${email} failed to logged in (mismatch password)`);
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send(ERROR_MESSAGE("password not matched"));
       }
-    } else {
-      logging.error("password didn't match");
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE(`incorrect password`));
     }
-  });
+  } catch (err) {
+    logging.error(err);
+    res.send(ERROR_MESSAGE("Error in logged in"));
+  }
 });
 
 router.post("/logout", (req, res) => {

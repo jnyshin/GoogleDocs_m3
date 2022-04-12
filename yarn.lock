@@ -7776,6 +7776,11 @@ quick-lru@^5.1.1:
   resolved "https://registry.npmjs.org/quick-lru/-/quick-lru-5.1.1.tgz"
   integrity sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==
 
+quill-cursors@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/quill-cursors/-/quill-cursors-3.1.2.tgz#e6be37fa33330dce05fb32ec4b0d06c8e2c504c9"
+  integrity sha512-oyANfYhqYiRp7OIrX/BurBPb0bvcpqSiS042fGm+T9FNy9UR6MCBzXpCyG7RmnK6OrV2idsdxMbogJ1XSktN5Q==
+
 quill-delta-to-html@^0.12.0:
   version "0.12.0"
   resolved "https://registry.npmjs.org/quill-delta-to-html/-/quill-delta-to-html-0.12.0.tgz"
