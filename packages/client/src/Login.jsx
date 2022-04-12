@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import API from "./api";
-
+import { useHistory } from "react-router-dom";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const history = useHistory();
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const body = {
       email: email,
       password: password,
@@ -16,28 +15,30 @@ const Login = () => {
     if (user.data.error) {
       console.log(user.data.message);
     }
-    console.log(user);
+    if (user.data.status === "OK") {
+      history.push("/home");
+    }
   };
 
   return (
-    <div class="wrapper">
-      <div class="container">
+    <div className="wrapper">
+      <div className="container">
         <form method="post" action="/users/login" onSubmit={handleSubmit}>
-          <lable for="email">email:</lable>
+          <label htmlFor="email">email:</label>
           <input
             type="text"
             id="email"
             name="email"
             onChange={(e) => setEmail(e.target.value)}
           />
-          <lable for="password">Password:</lable>
+          <label htmlFor="password">Password:</label>
           <input
             type="text"
             id="password"
             name="password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <input type="submit" value="Login" />
+          <button type="submit">Login</button>
         </form>
         <form method="post" action="/users/logout">
           <button type="submit">LOGOUT</button>
