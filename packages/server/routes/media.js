@@ -2,56 +2,67 @@ import express from "express";
 import { v4 as uuidv4 } from "uuid";
 import { ERROR_MESSAGE } from "../store";
 import multer from "multer";
-import { GridFsStorage } from "multer-gridfs-storage";
+import Images from "../schema/images";
 import logging from "../logging";
-import mongoose from "mongoose";
+import { __dirname } from "../store";
+import path from "path";
 const router = express.Router();
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
 
-const fileStorage = new GridFsStorage({
-  url: mongoose.connection,
-  options: { newUrlParser: true, useUnifiedTopology: true },
-  file: (req, file) => {
-    var mediaID = uuidv4();
-    if (file.size > 10 * 1024 * 1024) {
-      throw new Error("File size exceeded 10MB");
-    }
-    if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
-      console.log("saving with this name...", mediaID);
-      return { bucketName: "photos", filename: `${mediaID}` };
-    } else {
-      throw new Error("File type is different");
-    }
+  filename: function (req, file, cb) {
+    cb(null, new Date().toISOString() + file.originalname);
   },
 });
-
-router.post("/upload", async (req, res) => {
-  //res.send(req.file);
-  const upload = multer({ fileStorage });
-  upload.single("file")(req, res, (err) => {
-    console.log(req.file);
-    if (err) {
-      res.send(ERROR_MESSAGE(err.message));
-    } else {
-      console.log("check MEDIAID", res.req.file.filename);
-      res.send(res.req.file.filename);
-    }
-  });
+const upload = multer({ storage: storage });
+router.post("/upload", upload.single("file"), async (req, res) => {
+  logging.info("[media/upload] Route");
+  const file = req.file;
+  if (!file) {
+    logging.error("Did not upload a file");
+    res.send(ERROR_MESSAGE("Please upload a file"));
+  }
+  try {
+    const mediaId = uuidv4();
+    await Images.create({
+      _id: mediaId,
+      file: file.path,
+      mime: file.mimetype,
+    });
+    logging.info(`Created image with _id = ${mediaId}`);
+    res.send(mediaId);
+  } catch (err) {
+    logging.error(err);
+    res.send(ERROR_MESSAGE("Error while creating Image Object"));
+  }
 });
 
 router.get("/access/:mediaID", async (req, res) => {
-  const files = mongoose.connection.db.collection("photos.files");
+  logging.info("[media/access/:mediaID] Route");
+  try {
+    const mediaID = req.params.mediaID;
+    const image = await Images.findById(mediaID);
+    const pathToImage = path.join(__dirname, image.file);
+    logging.info(`requested Image path = ${pathToImage}`);
+    res.sendFile(pathToImage);
+  } catch (err) {
+    logging.error("Error while sending image");
+    res.send(ERROR_MESSAGE("Error while sending image"));
+  }
+  // const files = mongoose.connection.db.collection("photos.files");
   //const fileChunks = mongoose.connection.db.collection("photos.chunks");
-  const mediaID = req.params.mediaID;
-  const file = files.find({ filename: mediaID }).toArray((err, docs) => {
-    if (err) {
-      res.send(ERROR_MESSAGE("error finding chunks"));
-    }
-    if (!docs) {
-      res.send(ERROR_MESSAGE("file not found"));
-    }
-    logging.info(file);
-    res.send(file);
-  });
+  // const file = files.find({ filename: mediaID }).toArray((err, docs) => {
+  //   if (err) {
+  //     res.send(ERROR_MESSAGE("error finding chunks"));
+  //   }
+  //   if (!docs) {
+  //     res.send(ERROR_MESSAGE("file not found"));
+  //   }
+  //   logging.info(file);
+  //   res.send(file);
+  // });
 });
 // router.post("/upload", async (req, res) => {
 //   //const file = req.body.ops[0].insert.image;

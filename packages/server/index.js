@@ -6,16 +6,14 @@ import authRouter from "./routes/auth";
 import collectionRouter from "./routes/collection";
 import mediaRouter from "./routes/media";
 import path from "path";
-import { fileURLToPath } from "url";
-import session from "express-session";
 
+import session from "express-session";
+import { __dirname } from "./store";
 const PORT = 8000;
 const sessionStore = new session.MemoryStore();
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
 
 // 👇️ "/home/john/Desktop/javascript"
-const __dirname = path.dirname(__filename);
 
 const client_path = path.join(__dirname, "../client/dist");
 
