@@ -49,7 +49,10 @@ const DocsList = () => {
             to={`/doc/edit/${doc.id}/${uuidV4()}`}
             key={i}
             className="doc"
-            onContextMenu={() => handleDelete(doc.id)}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              handleDelete(doc.id);
+            }}
           >
             {doc.name}
           </Link>

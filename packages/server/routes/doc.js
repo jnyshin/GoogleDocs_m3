@@ -72,6 +72,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
   const docId = req.params.DOCID;
   const version = req.body.version;
   const op = req.body.op;
+  console.log(op);
   let oldVersion;
   logging.info(`Incoming Version = ${version}`);
   logging.info(op);
@@ -89,7 +90,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       version: version + 1,
     });
     const ack = { ack: op[op.length - 1] };
-
+    // if (version !== oldVersion) {
+    //   res.send({ status: "retry" });
+    // }
     clients.forEach((client) => {
       if (client.id !== id && client.docId === docId) {
         client.res.write(`data: ${JSON.stringify(op)}\n\n`);
@@ -99,11 +102,8 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info(`sent: ${JSON.stringify(op)}`);
       }
     });
-    if (version !== oldVersion) {
-      res.send({ status: "retry" });
-    } else {
-      res.send({ status: "OK" });
-    }
+
+    res.send({ status: "OK" });
   } catch (err) {
     // conso
     logging.error("failed to update OP");
