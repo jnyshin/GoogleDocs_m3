@@ -1,14 +1,14 @@
 import express from "express";
 import Docs from "../schema/docs";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { ERROR_MESSAGE } from "../store";
 const router = express.Router();
 
 router.get("/get/:id", async (req, res) => {
   const id = req.params.id;
   await Docs.findById(id).exec((err, doc) => {
     if (err) {
-      // console.log("not found doc");
-      res.send("wrong");
+      res.send(ERROR_MESSAGE(`not found doc`));
     }
     // console.log("found doc");
     const ops = doc.data.ops;

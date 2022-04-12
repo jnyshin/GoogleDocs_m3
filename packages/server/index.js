@@ -46,7 +46,7 @@ app.use("/doc", docRouter);
 app.use("/op", opRouter);
 app.use("/media", mediaRouter);
 app.use("/collection", collectionRouter);
-app.use("/", authRouter);
+app.use("/users", authRouter);
 mongoose
   .connect("mongodb://localhost/docs_clone", {
     useNewUrlParser: true,

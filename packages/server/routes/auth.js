@@ -1,7 +1,10 @@
 import express from "express";
 import User from "../schema/user";
-const router = express.Router();
 import nodemailer from "nodemailer";
+import logging from "../logging";
+import { ERROR_MESSAGE } from "../store";
+
+const router = express.Router();
 
 router.post("/login", (req, res) => {
   const { username, password } = req.body;
@@ -22,9 +25,9 @@ router.post("/login", (req, res) => {
         res.send({ status: "OK" });
       }
     } else {
-      console.log("password didn't match");
+      logging.error("password didn't match");
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send({ status: "ERROR" });
+      res.send(ERROR_MESSAGE(`incorrect password`));
     }
   });
 });
@@ -32,12 +35,12 @@ router.post("/login", (req, res) => {
 router.post("/logout", (req, res) => {
   if (req.session.authenticated) {
     req.session.destroy();
-    console.log("logged out");
+    logging.info("logged out");
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.json({ status: "OK" });
   } else {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.json({ status: "ERROR" });
+    res.send(ERROR_MESSAGE(`failed to logout`));
   }
 });
 
@@ -87,26 +90,26 @@ router.post("/signup", async (req, res) => {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     console.log("Sending OK");
     res.send({ status: "OK" });
-  } catch (err){
+  } catch (err) {
     console.log("There was an error: ", err);
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send({ status: "ERROR " });
+    res.send(ERROR_MESSAGE(`failed to sign up`));
   }
 });
 
 router.post("/verify", async (req, res) => {
   const { email, key } = req.body;
-  console.log(email, key);
+  logging.info(email, key);
   const filter = { email: email };
   let update = false;
   await User.findOne(filter, (err, doc) => {
     if (doc) {
-      console.log("income data: ", doc);
+      logging.info("income data: ", doc);
       if (key === doc.verificationCode || key === "abracadabra") {
         update = true;
       }
     } else {
-      console.log(err);
+      logging.error(err);
     }
   }).clone();
 
@@ -126,9 +129,8 @@ router.post("/verify", async (req, res) => {
     res.send({ status: "OK" });
   } else {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send({ status: "ERROR" });
+    res.send(ERROR_MESSAGE(`email verification failed`));
   }
 });
-
 
 export default router;
