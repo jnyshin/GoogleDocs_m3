@@ -1,11 +1,15 @@
 import express from "express";
 import User from "../schema/user";
-const router = express.Router();
 import nodemailer from "nodemailer";
+import url from "url";
+import logging from "../logging";
+import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
+import { v4 as uuid } from "uuid";
+const router = express.Router();
 
 router.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  User.findOne({ username: username }, async (err, doc) => {
+  const { email, password } = req.body;
+  User.findOne({ email: email }, async (err, doc) => {
     if (err) {
       console.log("doc was not found");
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
@@ -42,93 +46,70 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
-  try {
-    let testAccount = await nodemailer.createTestAccount();
-    let transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: testAccount.user, // generated ethereal user
-        pass: testAccount.pass, // generated ethereal password
-      },
-    });
+  const { name, email, password } = req.body;
+  const user = await User.findOne({ email: email });
+  if (user) {
+    console.log("HERE");
+    res.send(ERROR_MESSAGE("already registered with same email"));
+  } else {
+    try {
+      let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true, // true for 465, false for other ports
+        auth: {
+          user: "experiment10103@gmail.com", // generated ethereal user
+          pass: "tuvqit-cusVif-kodto5", // generated ethereal password
+        },
+      });
 
-    console.log("received new user with this username: ", req.body.username);
-    const verificationCode = Math.floor(Math.random() * 9999).toString();
-    const new_user = new User({
-      username: req.body.username,
-      password: req.body.password,
-      email: req.body.email,
-      enable: false,
-      verificationCode: verificationCode,
-    });
-    await new_user.save();
+      console.log("received new user with this username: ", name);
+      const key = Math.floor(Math.random() * 9999).toString();
+      const userId = uuid();
+      await User.create({
+        _id: userId,
+        name: name,
+        email: email,
+        password: password,
+        enable: false,
+        key: key,
+      });
 
-    const info = await transporter.sendMail({
-      from: "<foo@example.com>",
-      to: req.body.email,
-      subject: "test",
-      text: `You just created email and your verification cold is ${verificationCode}`,
-      html: `<b>You just created email and your verification cold is ${verificationCode}</b>`,
-    });
-    console.log("Message sent: %s", info.messageId);
+      const info = await transporter.sendMail({
+        from: "experiment10103@gmail.com",
+        to: email,
+        subject: "Verification Code",
+        text: `${key}`,
+        html: `<b>http://${DOMAIN_NAME}/users/verify?_id=${userId}&email=${email}&key=${key}</b>`,
+      });
+      logging.info("Message sent: %s", info.messageId);
 
-    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-
-    User.create(new_user, async (err, doc) => {
-      if (err) console.log(err);
-      else {
-        if (doc) {
-          console.log(doc);
-        }
-      }
-    });
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    console.log("Sending OK");
-    res.send({ status: "OK" });
-  } catch (err){
-    console.log("There was an error: ", err);
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send({ status: "ERROR " });
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send({ status: "OK" });
+    } catch (err) {
+      console.log(err);
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE("failed to send email"));
+    }
   }
 });
 
-router.post("/verify", async (req, res) => {
-  const { email, key } = req.body;
-  console.log(email, key);
-  const filter = { email: email };
-  let update = false;
-  await User.findOne(filter, (err, doc) => {
-    if (doc) {
-      console.log("income data: ", doc);
-      if (key === doc.verificationCode || key === "abracadabra") {
-        update = true;
-      }
-    } else {
-      console.log(err);
-    }
-  }).clone();
+router.get("/verify", async (req, res) => {
+  console.log(req.query);
+  const { _id, email, key } = req.query;
 
-  // await Users.findOne(filter).then((err, doc) =>{
-  //   console.log(err)
-  //   console.log(doc)
-  //   if (doc) {
-  //     //console.log("income data: ", doc)
-  //     if (key === doc.verificationCode || key === "abracadabra") {
-  //       update = true;
-  //     }
-  //   }
-  // }).clone();
-  if (update) {
-    await User.findOneAndUpdate(filter, { enable: true });
+  let user = await User.findById(_id);
+  if (!user) {
+    user = await User.findOne({ email: email });
+  }
+  if (key === user.key) {
+    await User.findByIdAndUpdate(_id, { enable: true });
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send({ status: "OK" });
   } else {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send({ status: "ERROR" });
+    res.send(ERROR_MESSAGE("Key is not valid"));
   }
 });
-
 
 export default router;
