@@ -46,7 +46,7 @@ const DocsList = () => {
       <div className="list">
         {docs.map((doc, i) => (
           <Link
-            to={`/showdoc/${doc.id}/${uuidV4()}`}
+            to={`/doc/edit/${doc.id}/${uuidV4()}`}
             key={i}
             className="doc"
             onContextMenu={() => handleDelete(doc.id)}

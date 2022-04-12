@@ -1,21 +1,17 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import connRouter from "./routes/connection";
 import docRouter from "./routes/doc";
-import opRouter from "./routes/op";
 import authRouter from "./routes/auth";
 import collectionRouter from "./routes/collection";
 import mediaRouter from "./routes/media";
 import path from "path";
 import { fileURLToPath } from "url";
-
 import session from "express-session";
+
 const PORT = 8000;
 const sessionStore = new session.MemoryStore();
-
 const app = express();
-
 const __filename = fileURLToPath(import.meta.url);
 
 // 👇️ "/home/john/Desktop/javascript"
@@ -41,9 +37,7 @@ app.use(
   })
 );
 
-app.use("/connect", connRouter);
 app.use("/doc", docRouter);
-app.use("/op", opRouter);
 app.use("/media", mediaRouter);
 app.use("/collection", collectionRouter);
 app.use("/users", authRouter);
