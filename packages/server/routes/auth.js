@@ -49,7 +49,6 @@ router.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
   const user = await User.findOne({ email: email });
   if (user) {
-    console.log("HERE");
     res.send(ERROR_MESSAGE("already registered with same email"));
   } else {
     try {
