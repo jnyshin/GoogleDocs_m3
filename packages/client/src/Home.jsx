@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import ReactDOM from "react-dom";
 import API from "./api";
 import { v4 as uuidV4 } from "uuid";
 
-const Home = () =>{
-    const [docs, setDocs] = useState([]);
+const Home =()=> {
+  const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   useEffect(() => {
@@ -31,7 +32,7 @@ const Home = () =>{
   };
 
   const handleDelete = async (id) => {
-    console.log()
+    console.log();
     const data = { docid: id };
     await API.post("/collection/delete", data);
     setDocs(docs.filter((doc) => doc.id !== id));
@@ -40,27 +41,26 @@ const Home = () =>{
     return <div>Loading..</div>;
   }
 
-  const handleLogout = async() =>{
-      await API.post("/users/logout");
-  }
+  const handleLogout = async () => {
+    await API.post("/users/logout");
+  };
   return (
     <>
       <input onChange={(e) => setName(e.target.value)}></input>
       <button onClick={handleAddDocs}>Add Docs</button>
       <div className="list">
-
-          <ol>
-        {docs.map((doc, i) => (
+        <ol>
+          {docs.map((doc, i) => (
             <li>
-            <Link to={`/doc/edit/${doc.id}`} key={i} className="doc">
-            {doc.name}
-          </Link>
-          <button onClick={() => handleDelete(doc.id)}>Delete</button>
-          </li>
-        ))}
+              <Link to={`/doc/edit/${doc.id}`} key={i} className="doc">
+                {doc.name}
+              </Link>
+              <button onClick={() => handleDelete(doc.id)}>Delete</button>
+            </li>
+          ))}
         </ol>
       </div>
-      <button onClick={()=> handleLogout()}>Logout</button>
+      <button onClick={() => handleLogout()}>Logout</button>
     </>
   );
 }

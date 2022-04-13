@@ -8,7 +8,7 @@ import collectionRouter from "./routes/collection";
 import mediaRouter from "./routes/media";
 import path from "path";
 import session from "express-session";
-//import Home from "../client/src/Home";
+import homeRouter from "./routes/home";
 import { __dirname } from "./store";
 dotenv.config();
 
@@ -43,10 +43,10 @@ app.use("/media", mediaRouter);
 app.use("/collection", collectionRouter);
 app.use("/users", authRouter);
 // app.get("/home", (req, res) => {
-//   const homeToHtml = Home();
-//   console.log(homeToHtml);
-//   res.send("OK");
+//   const newPath = path.join(__dirname, "..", "client", "src", "Home.jsx");
+//   res.sendFile(newPath);
 // });
+app.use("/home", homeRouter);
 
 mongoose
   .connect("mongodb://localhost/docs_clone", {
