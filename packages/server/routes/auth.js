@@ -50,7 +50,9 @@ const sendEmail = async (emailOptions) => {
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
+  logging.info("[/user/login] Route");
   const { email, password } = req.body;
+  logging.info(`Requested Login for email=${email} password=${password}`);
   try {
     const user = await User.findOne({ email: email });
     if (!user.enable) {
@@ -82,6 +84,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
+  logging.info("[/user/logout] Route");
   if (req.session.authenticated) {
     req.session.destroy();
     logging.info("logged out");
@@ -94,7 +97,11 @@ router.post("/logout", (req, res) => {
 });
 
 router.post("/signup", async (req, res) => {
+  logging.info("[/user/signup] Route");
   const { name, email, password } = req.body;
+  logging.info(
+    `Signing up for name=${name} email=${email} password=${password}`
+  );
   const user = await User.findOne({ email: email });
   if (user) {
     res.send(ERROR_MESSAGE("already registered with same email"));
@@ -132,8 +139,9 @@ router.post("/signup", async (req, res) => {
 });
 
 router.get("/verify", async (req, res) => {
-  console.log(req.query);
+  logging.info("[/user/verify] Route");
   const { _id, email, key } = req.query;
+  logging.info(`Requested querystring is id=${_id} email=${email} key=${key}`);
 
   let user = await User.findById(_id);
   if (!user) {
