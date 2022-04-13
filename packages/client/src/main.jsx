@@ -7,7 +7,6 @@ import Login from "./Login";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import DocsList from "./DocsList";
 import Home from "./Home";
-import { v4 as uuidV4 } from "uuid";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -16,7 +15,7 @@ ReactDOM.render(
         <Route path="/collection/list" exact>
           <DocsList />
         </Route>
-        <Route path="/doc/edit/:docId/:id">
+        <Route path="/doc/edit/:docId/">
           <Editor />
         </Route>
         <Route path="/users/signup" exact>

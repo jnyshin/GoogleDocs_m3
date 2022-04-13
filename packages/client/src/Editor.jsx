@@ -5,7 +5,8 @@ import API from "./api";
 import DOMAIN_NAME from "./store";
 import { useParams } from "react-router-dom";
 import QuillCursors from "quill-cursors";
-import useStore from "./useStore";
+import { v4 as uuidv4 } from "uuid";
+// import useStore from "./useStore";
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -40,14 +41,14 @@ const Editor = (props) => {
   const [cursor, setCursor] = useState();
   const [currRange, setCurrRange] = useState();
   const [docsData, setDocsData] = useState();
-  const currUsername = useStore();
+  // const currUsername = useStore();
   const [username, setUsername] = useState();
 
-  Quill.register("modules/cursors", QuillCursors);
+  // Quill.register("modules/cursors", QuillCursors);
 
   const [ack, setAck] = useState();
   useEffect(() => {
-    setId(params.id);
+    setId(uuidv4());
     setDocId(params.docId);
   }, []);
 
@@ -66,20 +67,16 @@ const Editor = (props) => {
         const dataFromServer = JSON.parse(event.data);
         console.log("message from server event push (event.data): ");
         console.log(dataFromServer);
-        console.log("cursors: ", dataFromServer.cursors);
-        if (dataFromServer.cursors) {
-          Object.entries(dataFromServer.cursors).forEach(([key, value]) => {
-            //value == range object
-            cursor.createCursor(key, key, "green");
-            cursor.moveCursor(key, value);
-          });
-        }
+
         if (dataFromServer.content) {
           quill.setContents(dataFromServer.content);
           version = dataFromServer.version;
           quill.enable();
         } else if (dataFromServer.ack) {
           setAck(dataFromServer.ack);
+        } else if (dataFromServer.presence) {
+          const { index, length, name } = dataFromServer.presence.cursor;
+          console.log(index, length, name);
         } else {
           quill.updateContents(dataFromServer[0]);
           version += 1;
@@ -114,52 +111,46 @@ const Editor = (props) => {
 
   useEffect(() => {
     if (!quill) return;
-    if (cursor) {
-      cursor.createCursor("cursor", "user1", "blue");
-      function debounce(func, wait) {
-        let timeout;
-        return function (...args) {
-          const context = this;
-          const later = function () {
-            timeout = null;
-            func.apply(context, args);
-          };
-          clearTimeout(timeout);
-          timeout = setTimeout(later, wait);
-        };
-      }
-      function selectionChangeHandler(cursors) {
-        const debouncedUpdate = debounce(updateCursor, 500);
-        return function (range, oldRange, source) {
-          setCurrRange(range);
-          if (source === "user") {
-            updateCursor(range);
-          } else {
-            debouncedUpdate(range);
-          }
-        };
-        function updateCursor(range) {
-          setTimeout(() => cursors.moveCursor(currUsername, range), 10);
-        }
-      }
-      quill.on("selection-change", selectionChangeHandler(cursor));
-    }
-  }, [quill]);
 
-  useEffect(() => {
-    if (currRange) {
-      const sendCursor = async () => {
-        const data = {
-          username: currUsername,
-          range: currRange,
-          docId: docId,
-          id: id,
+    // function debounce(func, wait) {
+    //   let timeout;
+    //   return function (...args) {
+    //     const context = this;
+    //     const later = function () {
+    //       timeout = null;
+    //       func.apply(context, args);
+    //     };
+    //     clearTimeout(timeout);
+    //     timeout = setTimeout(later, wait);
+    //   };
+    // }
+    const selectionChangeHandler = async (range, oldRange, source) => {
+      if (source === "user") {
+        const presence = {
+          index: range.index,
+          length: range.length,
         };
-        const response = await API.post("/doc/sendcursors", data).then();
-      };
-      sendCursor();
-    }
-  }, [currRange]);
+        const response = await API.post(
+          `/doc/presence/${docId}/${id}`,
+          presence
+        );
+        console.log(response);
+      }
+      // const debouncedUpdate = debounce(updateCursor, 500);
+      // return function (range, oldRange, source) {
+      //   setCurrRange(range);
+      //   if (source === "user") {
+      //     updateCursor(range);
+      //   } else {
+      //     debouncedUpdate(range);
+      //   }
+      // };
+      // function updateCursor(range) {
+      //   setTimeout(() => cursors.moveCursor(currUsername, range), 10);
+      // }
+    };
+    quill.on("selection-change", selectionChangeHandler);
+  }, [quill]);
 
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;
@@ -169,18 +160,18 @@ const Editor = (props) => {
     const q = new Quill(editor, {
       modules: {
         toolbar: TOOLBAR,
-        cursors: {
-          hideDelayMs: 5000,
-          hideSpeedMs: 0,
-          selectionChangeSource: null,
-          transformOnTextChange: true,
-        },
+        // cursors: {
+        //   hideDelayMs: 5000,
+        //   hideSpeedMs: 0,
+        //   selectionChangeSource: null,
+        //   transformOnTextChange: true,
+        // },
       },
       formats: FORMAT,
       theme: "snow",
     });
-    setCursor(q.getModule("cursors"));
-    q.getModule("cursors").createCursor(currUsername, currUsername, "red");
+    // setCursor(q.getModule("cursors"));
+    // q.getModule("cursors").createCursor(currUsername, currUsername, "red");
     q.disable();
     q.setText("loading..");
     setQuill(q);
