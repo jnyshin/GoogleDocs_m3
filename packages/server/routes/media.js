@@ -22,6 +22,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   const file = req.file;
   if (!file) {
     logging.error("Did not upload a file");
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Please upload a file"));
   }
   try {
@@ -32,9 +33,11 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       mime: file.mimetype,
     });
     logging.info(`Created image with _id = ${mediaId}`);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(mediaId);
   } catch (err) {
     logging.error(err);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Error while creating Image Object"));
   }
 });
@@ -46,56 +49,13 @@ router.get("/access/:mediaID", async (req, res) => {
     const image = await Images.findById(mediaID);
     const pathToImage = path.join(__dirname, image.file);
     logging.info(`requested Image path = ${pathToImage}`);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.sendFile(pathToImage);
   } catch (err) {
     logging.error("Error while sending image");
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Error while sending image"));
   }
-  // const files = mongoose.connection.db.collection("photos.files");
-  //const fileChunks = mongoose.connection.db.collection("photos.chunks");
-  // const file = files.find({ filename: mediaID }).toArray((err, docs) => {
-  //   if (err) {
-  //     res.send(ERROR_MESSAGE("error finding chunks"));
-  //   }
-  //   if (!docs) {
-  //     res.send(ERROR_MESSAGE("file not found"));
-  //   }
-  //   logging.info(file);
-  //   res.send(file);
-  // });
 });
-// router.post("/upload", async (req, res) => {
-//   //const file = req.body.ops[0].insert.image;
-//   // Need to check the income data's format
-//   try {
-//     const file = req.body;
-//     var imagePattern = new RegExp("/9j/[a-zA-z0-9@:%_/+.~#?&//=]*");
-//     var mimePattern = new RegExp("image/jpg|image/png");
-//     var mime = mimePattern.exec(file)[0];
-//     var image = imagePattern.exec(file)[0];
-//     var mediaID = uuidv4();
-//     await Images.create({
-//       _id: mediaID,
-//       file: image,
-//       mime: mime,
-//     });
-//     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-//     res.send(mediaID);
-//   } catch {
-//     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-//     res.send(ERROR_MESSAGE(`Invalid Media Input`));
-//   }
-// });
 
-// router.get("/access/:MEDIAID", async (req, res) => {
-//   const mediaID = req.params.MEDIAID;
-//   await Images.findById(mediaID).exec((err, doc) => {
-//     if (err) {
-//       res.send(ERROR_MESSAGE(`No matching doc found`));
-//     }
-//     const file = { image: `data:${doc.mime};base64,${doc.file}` };
-//     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-//     res.send(file);
-//   });
-// });
 export default router;

@@ -1,7 +1,6 @@
 import express from "express";
 import User from "../schema/user";
 import nodemailer from "nodemailer";
-import url from "url";
 import logging from "../logging";
 import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
@@ -68,7 +67,7 @@ router.post("/signup", async (req, res) => {
         },
       });
 
-      console.log("received new user with this username: ", name);
+      logging.info(`received new user with this email: ${email}`);
       const key = Math.floor(Math.random() * 9999).toString();
       const userId = uuid();
       await User.create({
