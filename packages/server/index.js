@@ -13,7 +13,7 @@ import { __dirname } from "./store";
 dotenv.config();
 
 const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
-const sessionStore = new session.MemoryStore();
+
 const app = express();
 
 // 👇️ "/home/john/Desktop/javascript"
@@ -29,12 +29,13 @@ app.use(
   session({
     secret: "docs-session",
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
     },
-    saveUninitialized: true,
     resave: true,
-    store: sessionStore,
+    saveUninitialized: true,
   })
 );
 

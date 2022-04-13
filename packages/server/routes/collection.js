@@ -53,6 +53,7 @@ router.post("/delete", async (req, res) => {
   }
 });
 router.get("/list", async (req, res) => {
+  console.log(req.session);
   if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));

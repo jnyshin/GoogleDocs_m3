@@ -7,8 +7,6 @@ export const DOMAIN_NAME =
 export const ERROR_MESSAGE = (message) => {
   return { error: true, message: message };
 };
-
 const __filename = fileURLToPath(import.meta.url);
-
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
