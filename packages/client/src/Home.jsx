@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import ReactDOM from "react-dom";
 import API from "./api";
-import { v4 as uuidV4 } from "uuid";
 
 const Home =()=> {
   const [docs, setDocs] = useState([]);
@@ -64,5 +62,5 @@ const Home =()=> {
     </>
   );
 }
-
+//console.log(ReactDOM.renderToString(<Home />));
 export default Home;
