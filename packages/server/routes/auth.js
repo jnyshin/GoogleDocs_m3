@@ -4,6 +4,49 @@ import nodemailer from "nodemailer";
 import logging from "../logging";
 import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
+import { google } from "googleapis";
+const OAuth2 = google.auth.OAuth2;
+
+const createTransporter = async () => {
+  const oauth2Client = new OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    "https://developers.google.com/oauthplayground"
+  );
+
+  oauth2Client.setCredentials({
+    refresh_token: process.env.REFRESH_TOKEN,
+  });
+
+  const accessToken = await new Promise((resolve, reject) => {
+    oauth2Client.getAccessToken((err, token) => {
+      if (err) {
+        reject("Failed to create access token :(");
+      }
+      resolve(token);
+    });
+  });
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      type: "OAuth2",
+      user: process.env.EMAIL,
+      accessToken,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
+    },
+  });
+
+  return transporter;
+};
+
+const sendEmail = async (emailOptions) => {
+  let emailTransporter = await createTransporter();
+  await emailTransporter.sendMail(emailOptions);
+};
+
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -57,16 +100,6 @@ router.post("/signup", async (req, res) => {
     res.send(ERROR_MESSAGE("already registered with same email"));
   } else {
     try {
-      let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true, // true for 465, false for other ports
-        auth: {
-          user: "experiment10103@gmail.com", // generated ethereal user
-          pass: "tuvqit-cusVif-kodto5", // generated ethereal password
-        },
-      });
-
       logging.info(`received new user with this email: ${email}`);
       const key = Math.floor(Math.random() * 9999).toString();
       const userId = uuid();
@@ -79,13 +112,14 @@ router.post("/signup", async (req, res) => {
         key: key,
       });
 
-      const info = await transporter.sendMail({
-        from: "experiment10103@gmail.com",
+      const info = {
+        from: process.env.EMAIL,
         to: email,
         subject: "Verification Code",
         text: `${key}`,
         html: `<b>http://${DOMAIN_NAME}/users/verify?_id=${userId}&email=${email}&key=${key}</b>`,
-      });
+      };
+      await sendEmail(info);
       logging.info("Message sent: %s", info.messageId);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send({ status: "OK" });

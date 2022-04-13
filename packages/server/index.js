@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -6,10 +7,11 @@ import authRouter from "./routes/auth";
 import collectionRouter from "./routes/collection";
 import mediaRouter from "./routes/media";
 import path from "path";
-
 import session from "express-session";
 import { __dirname } from "./store";
-const PORT = 8000;
+dotenv.config();
+
+const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
 const sessionStore = new session.MemoryStore();
 const app = express();
 
