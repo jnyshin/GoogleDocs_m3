@@ -61,6 +61,7 @@ router.post("/login", async (req, res) => {
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send(ERROR_MESSAGE("did not verify"));
     } else {
+      console.log(req.session.user);
       //verified
       if (req.session.authenticated) {
         logging.info("User already logged in");

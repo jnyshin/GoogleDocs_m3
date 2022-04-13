@@ -18,43 +18,52 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 router.post("/upload", upload.single("file"), async (req, res) => {
-  logging.info("[media/upload] Route");
-  const file = req.file;
-  if (!file) {
-    logging.error("Did not upload a file");
+  if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Please upload a file"));
-  }
-  try {
-    const mediaId = uuidv4();
-    await Images.create({
-      _id: mediaId,
-      file: file.path,
-      mime: file.mimetype,
-    });
-    logging.info(`Created image with _id = ${mediaId}`);
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(mediaId);
-  } catch (err) {
-    logging.error(err);
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Error while creating Image Object"));
+    res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
+    logging.info("[media/upload] Route");
+    const file = req.file;
+    if (!file) {
+      logging.error("Did not upload a file");
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE("Please upload a file"));
+    }
+    try {
+      const mediaId = uuidv4();
+      await Images.create({
+        _id: mediaId,
+        file: file.path,
+        mime: file.mimetype,
+      });
+      logging.info(`Created image with _id = ${mediaId}`);
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(mediaId);
+    } catch (err) {
+      logging.error(err);
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE("Error while creating Image Object"));
+    }
   }
 });
 
 router.get("/access/:mediaID", async (req, res) => {
-  logging.info("[media/access/:mediaID] Route");
-  try {
-    const mediaID = req.params.mediaID;
-    const image = await Images.findById(mediaID);
-    const pathToImage = path.join(__dirname, image.file);
-    logging.info(`requested Image path = ${pathToImage}`);
+  if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.sendFile(pathToImage);
-  } catch (err) {
-    logging.error("Error while sending image");
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Error while sending image"));
+    res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
+    try {
+      const mediaID = req.params.mediaID;
+      const image = await Images.findById(mediaID);
+      const pathToImage = path.join(__dirname, image.file);
+      logging.info(`requested Image path = ${pathToImage}`);
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.sendFile(pathToImage);
+    } catch (err) {
+      logging.error("Error while sending image");
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE("Error while sending image"));
+    }
   }
 });
 
