@@ -4,9 +4,8 @@ import "quill/dist/quill.snow.css";
 import API from "./api";
 import DOMAIN_NAME from "./store";
 import { useParams } from "react-router-dom";
-import QuillCursors from "quill-cursors";
 import { v4 as uuidv4 } from "uuid";
-// import useStore from "./useStore";
+
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -38,13 +37,7 @@ const Editor = (props) => {
   const [id, setId] = useState();
   const [docId, setDocId] = useState();
   const [listening, setListening] = useState(false);
-  const [cursor, setCursor] = useState();
-  const [currRange, setCurrRange] = useState();
-  const [docsData, setDocsData] = useState();
   // const currUsername = useStore();
-  const [username, setUsername] = useState();
-
-  // Quill.register("modules/cursors", QuillCursors);
 
   const [ack, setAck] = useState();
   useEffect(() => {
@@ -96,7 +89,6 @@ const Editor = (props) => {
           version: version,
           op: [delta],
         };
-        setDocsData(data);
         const response = await API.post(`/doc/op/${docId}/${id}`, data);
         if (response.data.status === "retry") {
           //do something
@@ -134,18 +126,11 @@ const Editor = (props) => {
     const q = new Quill(editor, {
       modules: {
         toolbar: TOOLBAR,
-        // cursors: {
-        //   hideDelayMs: 5000,
-        //   hideSpeedMs: 0,
-        //   selectionChangeSource: null,
-        //   transformOnTextChange: true,
-        // },
       },
       formats: FORMAT,
       theme: "snow",
     });
-    // setCursor(q.getModule("cursors"));
-    // q.getModule("cursors").createCursor(currUsername, currUsername, "red");
+
     q.disable();
     q.setText("loading..");
     setQuill(q);

@@ -3,10 +3,7 @@ import Docs from "../schema/docs";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging";
 import { ERROR_MESSAGE } from "../store";
-import path from "path";
-import { __dirname } from "../store";
 
-const client_path = path.join(__dirname, "../client/dist");
 const router = express.Router();
 
 router.post("/create", async (req, res) => {

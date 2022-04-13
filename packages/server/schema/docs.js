@@ -9,4 +9,4 @@ const docs = new mongoose.Schema(
   },
   { timestamps: true }
 );
-export default mongoose.model("Docs", docs); //= mongoose.model("Conn", conn);
+export default mongoose.model("Docs", docs);
