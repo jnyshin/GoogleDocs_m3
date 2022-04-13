@@ -19,7 +19,7 @@ const Login = () => {
       console.log(user.data.message);
     }
     if (user.data.status === "OK") {
-      history.push("/home");
+      history.push("/collection/list");
     }
   };
 

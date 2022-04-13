@@ -15,13 +15,14 @@ router.post("/presence/:DOCID/:UID", async (req, res) => {
   const id = req.params.UID;
   const { index, length } = req.body;
   try {
-    console.log(req.session);
+    const _id = req.session.user.id;
+    const user = await User.findById(_id);
     const presence = {
       id: id,
       cursor: {
         index: index,
         length: length,
-        // name: user.name,
+        name: user.name,
       },
     };
     clients.forEach((client) => {
@@ -35,15 +36,6 @@ router.post("/presence/:DOCID/:UID", async (req, res) => {
     logging.error("Failed to send presence");
     res.send(ERROR_MESSAGE("Failed to send presence"));
   }
-
-  // const { username, range, docId, id } = req.body;
-  // cursors[username] = range;
-  // clients.forEach((client) => {
-  //   if (client.id !== id && client.docId === docId) {
-  //     client.res.write(`data: ${JSON.stringify(cursors)}\n\n`);
-  //   }
-  // });
-  // res.send({ cursors: cursors });
 });
 
 router.get("/get/:DOCID/:UID", async (req, res) => {
@@ -83,7 +75,6 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
       "Access-Control-Allow-Origin": "*",
       "X-CSE356": "61f9f57373ba724f297db6ba",
     });
-    //{ content, version }, { presence }, { ack },
     const payload = {
       content: document.data.ops,
       version: document.version,

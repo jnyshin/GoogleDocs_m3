@@ -69,7 +69,7 @@ router.post("/login", async (req, res) => {
         res.send({ status: "OK" });
       } else if (user.password === password) {
         req.session.authenticated = true;
-        req.session.user = req.body;
+        req.session.user = { id: user._id, email: email };
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "OK" });
       } else {
