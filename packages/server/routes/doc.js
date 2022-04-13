@@ -67,40 +67,48 @@ router.get("/get/:DOCID/:UID", async (req, res) => {
 });
 
 router.get("/connect/:DOCID/:UID", async (req, res) => {
+  if (!req.session.user) {
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    res.send(ERROR_MESSAGE("Not logged in"));
+  }
   logging.info("[/doc/connect/:DOCID/:UID] Route");
   const docId = req.params.DOCID;
   const id = req.params.UID;
   try {
     const document = await Docs.findById(docId);
-    logging.info(`Found doc id = ${docId}`);
-    res.status(200).set({
-      "Content-Type": "text/event-stream",
-      Connection: "keep-alive",
-      "Access-Control-Allow-Origin": "*",
-      "X-CSE356": "61f9f57373ba724f297db6ba",
-    });
-    const payload = {
-      content: document.data.ops,
-      version: document.version,
-    };
-    res.write(`data: ${JSON.stringify(payload)}\n\n`);
-    logging.info(`Event Stream connection open for UID = ${id}`);
-    logging.info(`[Pushed data]`);
-    logging.info(payload);
-    const newClient = {
-      id: id,
-      docId: docId,
-      res,
-    };
-    clients.push(newClient);
-    logging.info(`Current connected clients = ${clients.length}`);
-    req.on("close", () => {
-      logging.info(`UID = ${id} connection closed`);
-      clients.map((c, index) =>
-        c.id === id ? clients.splice(index, 1) : clients
-      );
-      logging.info(`remaining clients = ${clients.length}`);
-    });
+    if (document) {
+      logging.info(`Found doc id = ${docId}`);
+      res.status(200).set({
+        "Content-Type": "text/event-stream",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "X-CSE356": "61f9f57373ba724f297db6ba",
+      });
+      const payload = {
+        content: document.data.ops,
+        version: document.version,
+      };
+      res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      logging.info(`Event Stream connection open for UID = ${id}`);
+      logging.info(`[Pushed data]`);
+      logging.info(payload);
+      const newClient = {
+        id: id,
+        docId: docId,
+        res,
+      };
+      clients.push(newClient);
+      logging.info(`Current connected clients = ${clients.length}`);
+      req.on("close", () => {
+        logging.info(`UID = ${id} connection closed`);
+        clients.map((c, index) =>
+          c.id === id ? clients.splice(index, 1) : clients
+        );
+        logging.info(`remaining clients = ${clients.length}`);
+      });
+    } else {
+      res.send(ERROR_MESSAGE(`Did not find matching doc for id =${docId}`));
+    }
   } catch (err) {
     logging.error("fail to create event stream connection");
     logging.error(err);
