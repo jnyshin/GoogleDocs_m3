@@ -10,6 +10,10 @@ import Delta from "quill-delta";
 const router = express.Router();
 
 router.post("/presence/:DOCID/:UID", async (req, res) => {
+  if (!req.session.user) {
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    res.send(ERROR_MESSAGE("Not logged in"));
+  }
   logging.info("[/doc/presence/:DOCID/:UID] Route");
   const docId = req.params.DOCID;
   const id = req.params.UID;
@@ -113,7 +117,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    console.log(op);
     let oldVersion;
     logging.info(`Incoming Version = ${version}`);
     logging.info(op);

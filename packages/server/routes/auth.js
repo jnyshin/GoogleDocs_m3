@@ -68,13 +68,15 @@ router.post("/login", async (req, res) => {
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send(ERROR_MESSAGE("did not verify"));
     } else {
-      console.log(req.session.user);
+      logging.info(`Req ressions: `);
+      logging.info(req.session);
       //verified
       if (req.session.authenticated) {
         logging.info("User already logged in");
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "OK" });
       } else if (user.password === password) {
+        logging.info("User first time logging in");
         req.session.authenticated = true;
         req.session.user = { id: user._id, email: email };
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");

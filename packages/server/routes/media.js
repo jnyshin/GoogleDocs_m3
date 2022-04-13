@@ -53,6 +53,7 @@ router.get("/access/:mediaID", async (req, res) => {
     res.send(ERROR_MESSAGE("Not logged in"));
   } else {
     try {
+      logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
       const image = await Images.findById(mediaID);
       const pathToImage = path.join(__dirname, image.file);
