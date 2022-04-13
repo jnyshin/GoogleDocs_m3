@@ -32,28 +32,43 @@ const createTransporter = async () => {
     });
   });
 
-  const transporter = nodemailer.createTransport(
-    smtpTransport({
-      host: "smtp.gmail.com",
-      secure: false, // TLS requires secureConnection to be false
-      port: 25, // port for secure SMTP
-      // tls: {
-      //   ciphers: "SSLv3",
-      // },
-      // requireTLS: true, //this parameter solved problem for me
-      auth: {
-        type: "OAuth2",
-        user: process.env.EMAIL,
-        accessToken,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    })
-  );
+  // const transporter = nodemailer.createTransport(
+  //   smtpTransport({
+  //     host: "smtp.gmail.com",
+  //     secure: false, // TLS requires secureConnection to be false
+  //     port: 25, // port for secure SMTP
+  //     // tls: {
+  //     //   ciphers: "SSLv3",
+  //     // },
+  //     //requireTLS: true, //this parameter solved problem for me
+  //     auth: {
+  //       type: "OAuth2",
+  //       user: process.env.EMAIL,
+  //       accessToken,
+  //       clientId: process.env.CLIENT_ID,
+  //       clientSecret: process.env.CLIENT_SECRET,
+  //       refreshToken: process.env.REFRESH_TOKEN,
+  //     },
+  //     tls: {
+  //       rejectUnauthorized: false,
+  //     },
+  //   })
+  // );
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 25,
+    auth: {
+      type: "OAuth2",
+      user: process.env.EMAIL,
+      accessToken,
+      clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
 
   return transporter;
 };
