@@ -40,7 +40,8 @@ const Editor = (props) => {
   const [cursor, setCursor] = useState();
   const [currRange, setCurrRange] = useState();
   const [docsData, setDocsData] = useState();
-  const currUsername = useStore()
+  const currUsername = useStore();
+  const [username, setUsername] = useState();
 
   Quill.register("modules/cursors", QuillCursors);
 
@@ -65,14 +66,14 @@ const Editor = (props) => {
         const dataFromServer = JSON.parse(event.data);
         console.log("message from server event push (event.data): ");
         console.log(dataFromServer);
-        console.log("cursors: ", dataFromServer.cursors)
-        if (dataFromServer.cursors){
+        console.log("cursors: ", dataFromServer.cursors);
+        if (dataFromServer.cursors) {
           Object.entries(dataFromServer.cursors).forEach(([key, value]) => {
             //value == range object
-            cursor.createCursor(key, key, "green")
+            cursor.createCursor(key, key, "green");
             cursor.moveCursor(key, value);
-          })
-        };
+          });
+        }
         if (dataFromServer.content) {
           quill.setContents(dataFromServer.content);
           version = dataFromServer.version;
@@ -114,6 +115,7 @@ const Editor = (props) => {
   useEffect(() => {
     if (!quill) return;
     if (cursor) {
+      cursor.createCursor("cursor", "user1", "blue");
       function debounce(func, wait) {
         let timeout;
         return function (...args) {
@@ -144,20 +146,20 @@ const Editor = (props) => {
     }
   }, [quill]);
 
-  useEffect(()=> {
-    if (currRange){
-      const sendCursor = async() => {
+  useEffect(() => {
+    if (currRange) {
+      const sendCursor = async () => {
         const data = {
           username: currUsername,
           range: currRange,
           docId: docId,
-          id: id
-        }
-      const response = await API.post("/doc/sendcursors", data).then()
+          id: id,
+        };
+        const response = await API.post("/doc/sendcursors", data).then();
+      };
+      sendCursor();
     }
-    sendCursor();
-    }
-  }, [currRange])
+  }, [currRange]);
 
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;

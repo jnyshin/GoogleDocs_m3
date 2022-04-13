@@ -1,22 +1,4 @@
 import express from "express";
-<<<<<<< Updated upstream
-import Conn from "../schema_conn";
-
-const router = express.Router();
-router.get("/:id", async (req, res) => {
-  console.log("doc router reached");
-  const id = req.params.id;
-  console.log(id);
-  await Conn.findOne({ _id: id }, (err, doc) => {
-    if (doc) {
-      console.log(doc);
-      res.send(doc);
-    } else {
-      console.log(err);
-      res.send("ERROR");
-    }
-  });
-=======
 import Docs from "../schema/docs";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { ERROR_MESSAGE } from "../store";
@@ -34,7 +16,7 @@ router.post("/sendcursors", async (req, res) => {
       client.res.write(`data: ${JSON.stringify(cursors)}\n\n`);
     }
   });
-  res.send({cursors: cursors})
+  res.send({ cursors: cursors });
 });
 
 router.get("/get/:DOCID/:UID", async (req, res) => {
@@ -70,7 +52,11 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
       "X-CSE356": "61f9f57373ba724f297db6ba",
     });
     //{ content, version }, { presence }, { ack },
-    const payload = { content: document.data.ops, version: document.version, cursors: cursors };
+    const payload = {
+      content: document.data.ops,
+      version: document.version,
+      cursors: cursors,
+    };
     res.write(`data: ${JSON.stringify(payload)}\n\n`);
     logging.info(`Event Stream connection open for UID = ${id}`);
     logging.info(`[Pushed data]`);
@@ -138,6 +124,5 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     res.send(ERROR_MESSAGE("failed to update OP"));
     console.error(err);
   }
->>>>>>> Stashed changes
 });
 export default router;
