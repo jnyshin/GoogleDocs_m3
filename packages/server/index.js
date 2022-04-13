@@ -27,33 +27,22 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret: "docs-session",
+    secret: "some secret",
+    resave: false,
+    saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      // httpOnly: true,
+      // secure: true,
+      // sameSite: "none",
     },
-    resave: true,
-    saveUninitialized: true,
   })
 );
-
+app.use("/users", authRouter);
 app.use("/doc", docRouter);
 app.use("/media", mediaRouter);
 app.use("/collection", collectionRouter);
-app.use("/users", authRouter);
-// app.get("/home", (req, res) => {
-//   const newPath = path.join(__dirname, "..", "client", "src", "Home.jsx");
-//   res.sendFile(newPath);
-// });
 app.use("/home", homeRouter);
-app.get("/makeList.js", (req, res) => {
-  res.sendFile(path.join(__dirname, "routes", "makeList.js"));
-});
-app.get("/collection.js", (req, res) => {
-  res.sendFile(path.join(__dirname, "routes", "collection.js"));
-});
 
 mongoose
   .connect("mongodb://localhost/docs_clone", {

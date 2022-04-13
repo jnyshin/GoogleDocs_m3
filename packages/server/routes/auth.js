@@ -5,6 +5,10 @@ import logging from "../logging";
 import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
 import { google } from "googleapis";
+import path from "path";
+import { __dirname } from "../store";
+
+const client_path = path.join(__dirname, "../client/dist");
 const OAuth2 = google.auth.OAuth2;
 
 const createTransporter = async () => {
@@ -48,6 +52,9 @@ const sendEmail = async (emailOptions) => {
 };
 
 const router = express.Router();
+router.get("/login", async (req, res) => {
+  res.sendFile(path.join(client_path, "index.html"));
+});
 
 router.post("/login", async (req, res) => {
   logging.info("[/user/login] Route");

@@ -110,19 +110,6 @@ const Editor = (props) => {
 
   useEffect(() => {
     if (!quill) return;
-
-    // function debounce(func, wait) {
-    //   let timeout;
-    //   return function (...args) {
-    //     const context = this;
-    //     const later = function () {
-    //       timeout = null;
-    //       func.apply(context, args);
-    //     };
-    //     clearTimeout(timeout);
-    //     timeout = setTimeout(later, wait);
-    //   };
-    // }
     const selectionChangeHandler = async (range, oldRange, source) => {
       if (source === "user") {
         const presence = {
@@ -135,36 +122,9 @@ const Editor = (props) => {
         );
         console.log(response);
       }
-      // const debouncedUpdate = debounce(updateCursor, 500);
-      // return function (range, oldRange, source) {
-      //   setCurrRange(range);
-      //   if (source === "user") {
-      //     updateCursor(range);
-      //   } else {
-      //     debouncedUpdate(range);
-      //   }
-      // };
-      // function updateCursor(range) {
-      //   setTimeout(() => cursors.moveCursor(currUsername, range), 10);
-      // }
     };
     quill.on("selection-change", selectionChangeHandler);
   }, [quill]);
-
-  // useEffect(() => {
-  //   if (currRange) {
-  //     const sendCursor = async () => {
-  //       const data = {
-  //         username: currUsername,
-  //         range: currRange,
-  //         docId: docId,
-  //         id: id,
-  //       };
-  //       const response = await API.post("/doc/sendcursors", data).then();
-  //     };
-  //     sendCursor();
-  //   }
-  // }, [currRange]);
 
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;

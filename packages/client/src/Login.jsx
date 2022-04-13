@@ -13,13 +13,14 @@ const Login = () => {
       email: email,
       password: password,
     };
-    localStorage.setItem("email", email);
+
     const user = await API.post("/users/login", body);
     if (user.data.error) {
       console.log(user.data.message);
     }
     if (user.data.status === "OK") {
-      history.push("/collection/list");
+      console.log(user.data);
+      history.push("/home");
     }
   };
 
