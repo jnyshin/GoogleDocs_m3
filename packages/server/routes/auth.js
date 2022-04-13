@@ -33,7 +33,12 @@ const createTransporter = async () => {
 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 25,
+    secureConnection: false, // TLS requires secureConnection to be false
+    port: 587, // port for secure SMTP
+    tls: {
+      ciphers: "SSLv3",
+    },
+    requireTLS: true, //this parameter solved problem for me
     auth: {
       type: "OAuth2",
       user: process.env.EMAIL,
@@ -42,9 +47,9 @@ const createTransporter = async () => {
       clientSecret: process.env.CLIENT_SECRET,
       refreshToken: process.env.REFRESH_TOKEN,
     },
-    tls: {
-      rejectUnauthorized: false,
-    },
+    // tls: {
+    //   rejectUnauthorized: false,
+    // },
   });
 
   return transporter;
