@@ -32,7 +32,8 @@ const createTransporter = async () => {
   });
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 25,
     auth: {
       type: "OAuth2",
       user: process.env.EMAIL,
@@ -41,6 +42,9 @@ const createTransporter = async () => {
       clientSecret: process.env.CLIENT_SECRET,
       refreshToken: process.env.REFRESH_TOKEN,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 
   return transporter;
@@ -48,6 +52,13 @@ const createTransporter = async () => {
 
 const sendEmail = async (emailOptions) => {
   let emailTransporter = await createTransporter();
+  emailTransporter.verify(function (error, success) {
+    if (error) {
+      logging.error(error);
+    } else {
+      logging.info("mail server is ready to take our messages");
+    }
+  });
   await emailTransporter.sendMail(emailOptions);
 };
 
@@ -141,6 +152,7 @@ router.post("/signup", async (req, res) => {
         text: `${key}`,
         html: `<b>http://${DOMAIN_NAME}/users/verify?_id=${userId}&email=${email}&key=${key}</b>`,
       };
+
       await sendEmail(info);
       logging.info("Message sent: %s", info.messageId);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
