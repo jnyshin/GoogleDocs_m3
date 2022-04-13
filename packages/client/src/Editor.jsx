@@ -5,6 +5,7 @@ import API from "./api";
 import DOMAIN_NAME from "./store";
 import { useParams } from "react-router-dom";
 import QuillCursors from "quill-cursors";
+
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -37,7 +38,9 @@ const Editor = (props) => {
   const [docId, setDocId] = useState();
   const [listening, setListening] = useState(false);
   const [cursor, setCursor] = useState();
-  const [username, setUsername] = useState();
+  const [currRange, setCurrRange] = useState();
+  const [docsData, setDocsData] = useState();
+  const currUsername = localStorage.getItem('email')
 
   Quill.register("modules/cursors", QuillCursors);
 
@@ -62,6 +65,14 @@ const Editor = (props) => {
         const dataFromServer = JSON.parse(event.data);
         console.log("message from server event push (event.data): ");
         console.log(dataFromServer);
+        console.log("cursors: ", dataFromServer.cursors)
+        if (dataFromServer.cursors){
+          Object.entries(dataFromServer.cursors).forEach(([key, value]) => {
+            //value == range object
+            cursor.createCursor(key, key, "green")
+            cursor.moveCursor(key, value);
+          })
+        };
         if (dataFromServer.content) {
           quill.setContents(dataFromServer.content);
           version = dataFromServer.version;
@@ -88,6 +99,7 @@ const Editor = (props) => {
           version: version,
           op: [delta],
         };
+        setDocsData(data);
         const response = await API.post(`/doc/op/${docId}/${id}`, data);
         if (response.data.status === "retry") {
           //do something
@@ -102,7 +114,6 @@ const Editor = (props) => {
   useEffect(() => {
     if (!quill) return;
     if (cursor) {
-      cursor.createCursor("cursor", "user1", "blue");
       function debounce(func, wait) {
         let timeout;
         return function (...args) {
@@ -118,6 +129,7 @@ const Editor = (props) => {
       function selectionChangeHandler(cursors) {
         const debouncedUpdate = debounce(updateCursor, 500);
         return function (range, oldRange, source) {
+          setCurrRange(range);
           if (source === "user") {
             updateCursor(range);
           } else {
@@ -125,12 +137,27 @@ const Editor = (props) => {
           }
         };
         function updateCursor(range) {
-          setTimeout(() => cursors.moveCursor("cursor", range), 10);
+          setTimeout(() => cursors.moveCursor(currUsername, range), 10);
         }
       }
       quill.on("selection-change", selectionChangeHandler(cursor));
     }
   }, [quill]);
+
+  useEffect(()=> {
+    if (currRange){
+      const sendCursor = async() => {
+        const data = {
+          username: currUsername,
+          range: currRange,
+          docId: docId,
+          id: id
+        }
+      const response = await API.post("/doc/sendcursors", data).then()
+    }
+    sendCursor();
+    }
+  }, [currRange])
 
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;
@@ -151,6 +178,7 @@ const Editor = (props) => {
       theme: "snow",
     });
     setCursor(q.getModule("cursors"));
+    q.getModule("cursors").createCursor(currUsername, currUsername, "red");
     q.disable();
     q.setText("loading..");
     setQuill(q);
