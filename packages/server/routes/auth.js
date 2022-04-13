@@ -32,16 +32,13 @@ const createTransporter = async () => {
   });
 
   const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
     service: "gmail",
     port: 587,
     secure: false,
     auth: {
-      type: "OAuth2",
       user: process.env.EMAIL,
-      accessToken,
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      refreshToken: process.env.REFRESH_TOKEN,
+      pass: process.env.PASS,
     },
   });
 
