@@ -1,6 +1,7 @@
 import express from "express";
 import User from "../schema/user";
 import nodemailer from "nodemailer";
+import smtpTransport from "nodemailer-smtp-transport";
 import logging from "../logging";
 import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
@@ -31,26 +32,28 @@ const createTransporter = async () => {
     });
   });
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    secureConnection: false, // TLS requires secureConnection to be false
-    port: 25, // port for secure SMTP
-    tls: {
-      ciphers: "SSLv3",
-    },
-    requireTLS: true, //this parameter solved problem for me
-    auth: {
-      type: "OAuth2",
-      user: process.env.EMAIL,
-      accessToken,
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      refreshToken: process.env.REFRESH_TOKEN,
-    },
-    // tls: {
-    //   rejectUnauthorized: false,
-    // },
-  });
+  const transporter = nodemailer.createTransport(
+    smtpTransport({
+      host: "smtp.gmail.com",
+      secure: false, // TLS requires secureConnection to be false
+      port: 25, // port for secure SMTP
+      // tls: {
+      //   ciphers: "SSLv3",
+      // },
+      // requireTLS: true, //this parameter solved problem for me
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL,
+        accessToken,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    })
+  );
 
   return transporter;
 };
@@ -59,9 +62,9 @@ const sendEmail = async (emailOptions) => {
   let emailTransporter = await createTransporter();
   emailTransporter.verify(function (error, success) {
     if (error) {
-      logging.error(error);
+      console.log(error);
     } else {
-      logging.info("mail server is ready to take our messages");
+      console.log("mail server is ready to take our messages");
     }
   });
   await emailTransporter.sendMail(emailOptions, (err, info) => {
