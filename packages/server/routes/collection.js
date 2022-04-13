@@ -80,3 +80,16 @@ router.get("/list", async (req, res) => {
   }
 });
 export default router;
+
+export async function getTen() {
+  const docs = await Docs.find().sort({ updatedAt: -1 }).limit(10);
+  const ret = [];
+  for (const doc of docs) {
+    const ele = {
+      id: doc.id,
+      name: doc.name,
+    };
+    ret.push(ele);
+  }
+  return ret;
+}

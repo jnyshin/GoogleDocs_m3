@@ -47,6 +47,12 @@ app.use("/users", authRouter);
 //   res.sendFile(newPath);
 // });
 app.use("/home", homeRouter);
+app.get("/makeList.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "routes", "makeList.js"));
+});
+app.get("/collection.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "routes", "collection.js"));
+});
 
 mongoose
   .connect("mongodb://localhost/docs_clone", {
