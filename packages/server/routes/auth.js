@@ -33,7 +33,6 @@ const createTransporter = async () => {
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
-    port: 587,
     auth: {
       type: "OAuth2",
       user: process.env.EMAIL,
