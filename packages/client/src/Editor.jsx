@@ -67,7 +67,6 @@ const Editor = (props) => {
         const dataFromServer = JSON.parse(event.data);
         console.log("message from server event push (event.data): ");
         console.log(dataFromServer);
-
         if (dataFromServer.content) {
           quill.setContents(dataFromServer.content);
           version = dataFromServer.version;
@@ -151,6 +150,21 @@ const Editor = (props) => {
     };
     quill.on("selection-change", selectionChangeHandler);
   }, [quill]);
+
+  // useEffect(() => {
+  //   if (currRange) {
+  //     const sendCursor = async () => {
+  //       const data = {
+  //         username: currUsername,
+  //         range: currRange,
+  //         docId: docId,
+  //         id: id,
+  //       };
+  //       const response = await API.post("/doc/sendcursors", data).then();
+  //     };
+  //     sendCursor();
+  //   }
+  // }, [currRange]);
 
   const quillRef = useCallback((wrapper) => {
     if (!wrapper) return;
