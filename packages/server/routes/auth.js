@@ -33,6 +33,7 @@ const createTransporter = async () => {
 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
+    name: "smtp.gmail.com",
     service: "gmail",
     port: 587,
     secure: false,
