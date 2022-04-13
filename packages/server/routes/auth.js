@@ -151,7 +151,7 @@ router.post("/signup", async (req, res) => {
         from: process.env.EMAIL,
         to: email,
         subject: "Verification Code",
-        html: `http://${DOMAIN_NAME}/users/verify?_id=${userId}&email=${email}&key=${key}`,
+        html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?_id=${userId}&email=${email}&key=${key}`,
       };
 
       await sendEmail(info);
