@@ -1,7 +1,6 @@
 import express from "express";
 import User from "../schema/user";
 import nodemailer from "nodemailer";
-import smtpTransport from "nodemailer-smtp-transport";
 import logging from "../logging";
 import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
@@ -32,31 +31,9 @@ const createTransporter = async () => {
     });
   });
 
-  // const transporter = nodemailer.createTransport(
-  //   smtpTransport({
-  //     host: "smtp.gmail.com",
-  //     secure: false, // TLS requires secureConnection to be false
-  //     port: 25, // port for secure SMTP
-  //     // tls: {
-  //     //   ciphers: "SSLv3",
-  //     // },
-  //     //requireTLS: true, //this parameter solved problem for me
-  //     auth: {
-  //       type: "OAuth2",
-  //       user: process.env.EMAIL,
-  //       accessToken,
-  //       clientId: process.env.CLIENT_ID,
-  //       clientSecret: process.env.CLIENT_SECRET,
-  //       refreshToken: process.env.REFRESH_TOKEN,
-  //     },
-  //     tls: {
-  //       rejectUnauthorized: false,
-  //     },
-  //   })
-  // );
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 25,
+    service: "gmail",
+    port: 587,
     auth: {
       type: "OAuth2",
       user: process.env.EMAIL,
@@ -64,9 +41,6 @@ const createTransporter = async () => {
       clientId: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
       refreshToken: process.env.REFRESH_TOKEN,
-    },
-    tls: {
-      rejectUnauthorized: false,
     },
   });
 
@@ -178,8 +152,7 @@ router.post("/signup", async (req, res) => {
         from: process.env.EMAIL,
         to: email,
         subject: "Verification Code",
-        text: `${key}`,
-        html: `<b>http://${DOMAIN_NAME}/users/verify?_id=${userId}&email=${email}&key=${key}</b>`,
+        html: `http://${DOMAIN_NAME}/users/verify?_id=${userId}&email=${email}&key=${key}`,
       };
 
       await sendEmail(info);
