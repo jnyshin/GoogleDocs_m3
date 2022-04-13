@@ -3,10 +3,21 @@ import Docs from "../schema/docs";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { ERROR_MESSAGE } from "../store";
 import logging from "../logging";
-import { clients } from "../store";
+import { clients, cursors } from "../store";
 import Delta from "quill-delta";
 
 const router = express.Router();
+
+router.post("/sendcursors", async (req, res) => {
+  const { username, range, docId, id } = req.body;
+  cursors[username] = range;
+  clients.forEach((client) => {
+    if (client.id !== id && client.docId === docId) {
+      client.res.write(`data: ${JSON.stringify(cursors)}\n\n`);
+    }
+  });
+  res.send({cursors: cursors})
+});
 
 router.get("/get/:DOCID/:UID", async (req, res) => {
   logging.info("[/doc/get/:DOCID/:UID] Route");
@@ -41,7 +52,7 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
       "X-CSE356": "61f9f57373ba724f297db6ba",
     });
     //{ content, version }, { presence }, { ack },
-    const payload = { content: document.data.ops, version: document.version };
+    const payload = { content: document.data.ops, version: document.version, cursors: cursors };
     res.write(`data: ${JSON.stringify(payload)}\n\n`);
     logging.info(`Event Stream connection open for UID = ${id}`);
     logging.info(`[Pushed data]`);
@@ -72,6 +83,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
   const docId = req.params.DOCID;
   const version = req.body.version;
   const op = req.body.op;
+  console.log(op);
   let oldVersion;
   logging.info(`Incoming Version = ${version}`);
   logging.info(op);
@@ -89,6 +101,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       version: version + 1,
     });
     const ack = { ack: op[op.length - 1] };
+    // if (version !== oldVersion) {
+    //   res.send({ status: "retry" });
+    // }
     if (version !== oldVersion) {
       res.send({ status: "retry" });
     }
@@ -96,6 +111,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       if (client.id !== id && client.docId === docId) {
         client.res.write(`data: ${JSON.stringify(op)}\n\n`);
         client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
+        client.res.write(`data: ${JSON.stringify(cursors)}\n\n`);
 
         logging.info(`sent message to UID = ${client.id}`);
         logging.info(`sent: ${JSON.stringify(op)}`);
@@ -104,6 +120,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
 
     res.send({ status: "OK" });
   } catch (err) {
+    // conso
     logging.error("failed to update OP");
     res.send(ERROR_MESSAGE("failed to update OP"));
     console.error(err);
