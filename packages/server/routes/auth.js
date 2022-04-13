@@ -34,7 +34,7 @@ const createTransporter = async () => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     secureConnection: false, // TLS requires secureConnection to be false
-    port: 587, // port for secure SMTP
+    port: 25, // port for secure SMTP
     tls: {
       ciphers: "SSLv3",
     },
@@ -64,7 +64,13 @@ const sendEmail = async (emailOptions) => {
       logging.info("mail server is ready to take our messages");
     }
   });
-  await emailTransporter.sendMail(emailOptions);
+  await emailTransporter.sendMail(emailOptions, (err, info) => {
+    if (err) {
+      logging.error(err);
+    } else {
+      logging.info(info);
+    }
+  });
 };
 
 const router = express.Router();
