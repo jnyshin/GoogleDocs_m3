@@ -20,25 +20,38 @@ router.post("/sendcursors", async (req, res) => {
 });
 
 router.get("/get/:DOCID/:UID", async (req, res) => {
-  logging.info("[/doc/get/:DOCID/:UID] Route");
-  const docId = req.params.DOCID;
-  // Not sure what uid is for
-  const uid = req.params.UID;
-  try {
-    const doc = await Docs.findById(docId);
-    const ops = doc.data.ops;
-    const converter = new QuillDeltaToHtmlConverter(ops, {});
-    const html = converter.convert();
+  if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(html);
-  } catch (err) {
-    logging.error("fail to convert to HTML Format");
+    res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
+  if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("fail to convert to HTML Format"));
-  }
+    res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
+    logging.info("[/doc/get/:DOCID/:UID] Route");
+    const docId = req.params.DOCID;
+    // Not sure what uid is for
+    const uid = req.params.UID;
+    try {
+      const doc = await Docs.findById(docId);
+      const ops = doc.data.ops;
+      const converter = new QuillDeltaToHtmlConverter(ops, {});
+      const html = converter.convert();
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(html);
+    } catch (err) {
+      logging.error("fail to convert to HTML Format");
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE("fail to convert to HTML Format"));
+    }
+  }}
 });
 
 router.get("/connect/:DOCID/:UID", async (req, res) => {
+  if (!req.session.user) {
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
   logging.info("[/doc/connect/:DOCID/:UID] Route");
   const docId = req.params.DOCID;
   const id = req.params.UID;
@@ -75,9 +88,13 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
     logging.error("fail to create event stream connection");
     logging.error(err);
     res.send(ERROR_MESSAGE(err));
-  }
+  }}
 });
 router.post("/op/:DOCID/:UID", async (req, res) => {
+  if (!req.session.user) {
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
   logging.info("[/doc/op/:DOCID/:UID] Route");
   const id = req.params.UID;
   const docId = req.params.DOCID;
@@ -113,17 +130,28 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
         client.res.write(`data: ${JSON.stringify(cursors)}\n\n`);
 
-        logging.info(`sent message to UID = ${client.id}`);
-        logging.info(`sent: ${JSON.stringify(op)}`);
+      await Docs.findByIdAndUpdate(docId, {
+        version: version + 1,
+      });
+      const ack = { ack: op[op.length - 1] };
+      if (version !== oldVersion) {
+        res.send({ status: "retry" });
       }
-    });
+      clients.forEach((client) => {
+        if (client.id !== id && client.docId === docId) {
+          client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+          client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
 
+          logging.info(`sent message to UID = ${client.id}`);
+          logging.info(`sent: ${JSON.stringify(op)}`);
+        }
+      });
     res.send({ status: "OK" });
   } catch (err) {
     // conso
     logging.error("failed to update OP");
     res.send(ERROR_MESSAGE("failed to update OP"));
     console.error(err);
-  }
+  }}
 });
 export default router;
