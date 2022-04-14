@@ -9,6 +9,7 @@ import path from "path";
 const router = express.Router();
 router.get("/edit/:DOCID", (req, res) => {
   if (!req.session.user) {
+    logging.error(`Did not logged in`);
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));
   } else {
