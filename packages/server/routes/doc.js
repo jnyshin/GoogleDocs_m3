@@ -147,7 +147,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    let oldVersion;
     logging.info(`Incoming Version = ${version}`);
     logging.info(op);
     try {
@@ -155,23 +154,21 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       logging.info("Incomming Delta: ");
       logging.info(incomming);
       const document = await Docs.findById(docId);
-      oldVersion = document.version;
-      const old = new Delta(document.data);
-      const newDelta = old.compose(incomming);
-      logging.info("newDelta Delta: ");
-      logging.info(newDelta);
-      await Docs.findByIdAndUpdate(docId, { data: newDelta });
-
-      await Docs.findByIdAndUpdate(docId, {
-        version: version + 1,
-      });
-      const ack = { ack: op };
-      if (version !== oldVersion) {
+      if (version !== document.version) {
         logging.info("Version is not matched");
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }");
         res.send({ status: "retry" });
       } else {
+        const old = new Delta(document.data);
+        const newDelta = old.compose(incomming);
+        logging.info("newDelta Delta: ");
+        logging.info(newDelta);
+        await Docs.findByIdAndUpdate(docId, { data: newDelta });
+        await Docs.findByIdAndUpdate(docId, {
+          version: version + 1,
+        });
+        const ack = { ack: op };
         clients.forEach((client) => {
           if (client.id !== id && client.docId === docId) {
             client.res.write(`data: ${JSON.stringify(op)}\n\n`);
