@@ -144,14 +144,14 @@ router.post("/signup", async (req, res) => {
         email: email,
         password: password,
         enable: false,
-        key: key,
+        key: userId,
       });
 
       const info = {
         from: "icloud@icloud.cse356.compas.cs.stonybrook.edu",
         to: email,
         subject: "Verification Code",
-        html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?email=${email}&key=${key}`,
+        html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?key=${userId}`,
       };
 
       const mailOption = {
@@ -177,12 +177,12 @@ router.post("/signup", async (req, res) => {
 
 router.get("/verify", async (req, res) => {
   logging.info("[/user/verify] Route");
-  const { email, key } = req.query;
-  logging.info(`Requested querystring is email=${email} key=${key}`);
+  const { key } = req.query;
+  logging.info(`Requested querystring is key=${key}`);
   logging.info(req.query);
 
   try {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOnebyId(key);
     logging.info(user);
     console.log("-----------------------");
     console.log(user.key);
