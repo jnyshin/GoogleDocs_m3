@@ -152,9 +152,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     logging.info(`Incoming Version = ${version}`);
     logging.info(`Incoming op =`);
     logging.info(op);
-    const document = await Docs.findById(docId);
-    if (version !== document.version) {
-    }
     try {
       const incoming = new Delta(op);
       logging.info("Incoming Delta: ");
@@ -164,7 +161,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info("Version is not matched");
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }");
-        res.json({ status: "retry" });
+        return res.send({ status: "retry" });
       } else {
         const old = new Delta(document.data);
         const newDelta = old.compose(incoming);
@@ -178,7 +175,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const ack = { ack: op };
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: ok }");
-        res.json({ status: "ok" });
+
         clients.forEach((client) => {
           if (client.id !== id && client.docId === docId) {
             client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
@@ -189,11 +186,12 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
             logging.info(`sent op: ${JSON.stringify(op)}`);
           }
         });
+        return res.send({ status: "ok" });
       }
     } catch (err) {
       logging.error("failed to update OP");
       logging.error(err);
-      res.json(ERROR_MESSAGE("failed to update OP"));
+      return res.send(ERROR_MESSAGE("failed to update OP"));
     }
   }
 });
