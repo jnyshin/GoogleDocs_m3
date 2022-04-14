@@ -26,7 +26,7 @@ const DocsList = () => {
     if (newDoc.data.error) {
       console.log(newDoc.data.message);
     } else {
-      setDocs([{ id: newDoc.data, name: data.name }, ...docs]);
+      setDocs([{ id: newDoc.data.docid, name: data.name }, ...docs]);
     }
   };
 
