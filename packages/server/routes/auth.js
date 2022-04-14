@@ -11,58 +11,58 @@ import { __dirname } from "../store";
 const client_path = path.join(__dirname, "../client/dist");
 const OAuth2 = google.auth.OAuth2;
 
-const createTransporter = async () => {
-  const oauth2Client = new OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    "https://developers.google.com/oauthplayground"
-  );
+// const createTransporter = async () => {
+//   const oauth2Client = new OAuth2(
+//     process.env.CLIENT_ID,
+//     process.env.CLIENT_SECRET,
+//     "https://developers.google.com/oauthplayground"
+//   );
 
-  oauth2Client.setCredentials({
-    refresh_token: process.env.REFRESH_TOKEN,
-  });
+//   oauth2Client.setCredentials({
+//     refresh_token: process.env.REFRESH_TOKEN,
+//   });
 
-  const accessToken = await new Promise((resolve, reject) => {
-    oauth2Client.getAccessToken((err, token) => {
-      if (err) {
-        reject("Failed to create access token :(");
-      }
-      resolve(token);
-    });
-  });
+//   const accessToken = await new Promise((resolve, reject) => {
+//     oauth2Client.getAccessToken((err, token) => {
+//       if (err) {
+//         reject("Failed to create access token :(");
+//       }
+//       resolve(token);
+//     });
+//   });
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    name: "smtp.gmail.com",
-    service: "gmail",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASS,
-    },
-  });
+//   const transporter = nodemailer.createTransport({
+//     host: "smtp.gmail.com",
+//     name: "smtp.gmail.com",
+//     service: "gmail",
+//     port: 587,
+//     secure: false,
+//     auth: {
+//       user: process.env.EMAIL,
+//       pass: process.env.PASS,
+//     },
+//   });
 
-  return transporter;
-};
+//   return transporter;
+// };
 
-const sendEmail = async (emailOptions) => {
-  let emailTransporter = await createTransporter();
-  emailTransporter.verify(function (error, success) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("mail server is ready to take our messages");
-    }
-  });
-  await emailTransporter.sendMail(emailOptions, (err, info) => {
-    if (err) {
-      logging.error(err);
-    } else {
-      logging.info(info);
-    }
-  });
-};
+// const sendEmail = async (emailOptions) => {
+//   let emailTransporter = await createTransporter();
+//   emailTransporter.verify(function (error, success) {
+//     if (error) {
+//       console.log(error);
+//     } else {
+//       console.log("mail server is ready to take our messages");
+//     }
+//   });
+//   await emailTransporter.sendMail(emailOptions, (err, info) => {
+//     if (err) {
+//       logging.error(err);
+//     } else {
+//       logging.info(info);
+//     }
+//   });
+// };
 
 const router = express.Router();
 router.get("/login", async (req, res) => {
@@ -148,13 +148,22 @@ router.post("/signup", async (req, res) => {
       });
 
       const info = {
-        from: process.env.EMAIL,
+        from: "icloud@icloud.cse356.compas.cs.stonybrook.edu",
         to: email,
         subject: "Verification Code",
         html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?_id=${userId}&email=${email}&key=${key}`,
       };
 
-      await sendEmail(info);
+      const mailOption = {
+        host: "localhost",
+        port: 25,
+        secure: false,
+        tls: {
+          rejectUnauthorized: false,
+        },
+      };
+      const transporter = nodemailer.createTransport(mailOption);
+      transporter.sendMail(info);
       logging.info("Message sent: %s", info.messageId);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send({ status: "OK" });
