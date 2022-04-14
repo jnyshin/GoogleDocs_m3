@@ -9,8 +9,9 @@ router.get("/", async (req, res) => {
   if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    res.sendFile(path.join(client_path, "index.html"));
   }
-  res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-  res.sendFile(path.join(client_path, "index.html"));
 });
 export default router;
