@@ -184,13 +184,18 @@ router.get("/verify", async (req, res) => {
   if (!user) {
     user = await User.findOne({ email: email });
   }
-  if (key === user.key) {
-    await User.findByIdAndUpdate(_id, { enable: true });
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send({ status: "OK" });
-  } else {
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE(`email verification failed`));
+  try {
+    if (key === user.key) {
+      await User.findByIdAndUpdate(_id, { enable: true });
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send({ status: "OK" });
+    } else {
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE(`email verification failed`));
+    }
+  } catch (err) {
+    logging.error(err);
+    res.send(ERROR_MESSAGE("Error while verify"));
   }
 });
 
