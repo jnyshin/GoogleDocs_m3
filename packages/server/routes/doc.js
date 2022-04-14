@@ -187,7 +187,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     } catch (err) {
       logging.error("failed to update OP");
       logging.error(err);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send(ERROR_MESSAGE("failed to update OP"));
     }
   }
