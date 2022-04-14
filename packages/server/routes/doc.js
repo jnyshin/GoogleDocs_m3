@@ -153,10 +153,14 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     try {
       for (const delta of op) {
         const incomming = new Delta(delta);
+        logging.info("Incomming Delta: ");
+        logging.info(incomming);
         const document = await Docs.findById(docId);
         oldVersion = document.version;
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
+        logging.info("newDelta Delta: ");
+        logging.info(newDelta);
         await Docs.findByIdAndUpdate(docId, { data: newDelta });
       }
 
