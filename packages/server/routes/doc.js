@@ -165,7 +165,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       await Docs.findByIdAndUpdate(docId, {
         version: version + 1,
       });
-      const ack = { ack: op[op.length - 1] };
+      const ack = { ack: op };
       if (version !== oldVersion) {
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "retry" });
@@ -181,7 +181,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           }
         });
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        res.send({ status: "OK" });
+        res.send({ status: "ok" });
       }
     } catch (err) {
       logging.error("failed to update OP");
