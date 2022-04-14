@@ -38,7 +38,7 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       });
       logging.info(`Created image with _id = ${mediaId}`);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(mediaId);
+      res.send({ mediaid: mediaId });
     } catch (err) {
       logging.error(err);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
