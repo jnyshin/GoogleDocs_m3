@@ -168,6 +168,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         await Docs.findByIdAndUpdate(docId, {
           version: version + 1,
         });
+        const _op = { op: op };
         const ack = { ack: op };
         clients.forEach((client) => {
           if (client.id !== id && client.docId === docId) {
