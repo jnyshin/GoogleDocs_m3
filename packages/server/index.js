@@ -9,19 +9,18 @@ import mediaRouter from "./routes/media";
 import session from "express-session";
 import homeRouter from "./routes/home";
 import { client_path } from "./store";
-import * as connectMongo from "connect-mongo";
+import connectMongo from "connect-mongo";
 
-const MongoStore = connectMongo(session);
-const sessionStore = new MongoStore({
-  mongoUrl: "mongodb://localhost/docs_clone",
-  collectionName: "sessions",
-});
+import MongoStore from "connect-mongo";
+
 dotenv.config();
 
 const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
 
 const app = express();
-
+const options = {
+  mongoUrl: "mongodb://localhost/docs_clone",
+};
 // 👇️ "/home/john/Desktop/javascript"
 
 app.use(express.static(client_path));
@@ -38,7 +37,7 @@ app.use(
     },
     saveUninitialized: true,
     resave: true,
-    store: sessionStore,
+    store: MongoStore.create(options),
   })
 );
 
