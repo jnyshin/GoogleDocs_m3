@@ -179,7 +179,7 @@ router.get("/verify", async (req, res) => {
   logging.info("[/user/verify] Route");
   const { _id, email, key } = req.query;
   logging.info(`Requested querystring is id=${_id} email=${email} key=${key}`);
-
+  logging.info(req.query);
   let user = await User.findById(_id);
   if (!user) {
     user = await User.findOne({ email: email });
