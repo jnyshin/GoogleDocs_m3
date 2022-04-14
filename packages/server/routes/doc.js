@@ -165,6 +165,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       await Docs.findByIdAndUpdate(docId, {
         version: version + 1,
       });
+      const _op = { op: op };
       const ack = { ack: op };
       if (version !== oldVersion) {
         logging.info("Version is not matched");
@@ -174,7 +175,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       } else {
         clients.forEach((client) => {
           if (client.id !== id && client.docId === docId) {
-            client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+            client.res.write(`data: ${JSON.stringify(_op)}\n\n`);
             client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
 
             logging.info(`sent message to UID = ${client.id}`);
