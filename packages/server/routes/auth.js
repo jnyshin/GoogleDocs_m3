@@ -183,6 +183,9 @@ router.get("/verify", async (req, res) => {
 
   try {
     const user = await User.findOne({ email: email });
+    logging.info(user);
+    console.log("-----------------------");
+    console.log(user.key);
     if (key === user.key) {
       await User.findByIdAndUpdate(user._id, { enable: true });
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
