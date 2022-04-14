@@ -152,17 +152,18 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     logging.info(op);
     const document = await Docs.findById(docId);
     if (version !== document.version) {
-      logging.info("Version is not matched");
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      logging.info("sending { status: retry }");
-      res.send({ status: "retry" });
-    } else {
-      try {
-        const incoming = new Delta(op);
-        logging.info("Incoming Delta: ");
-        logging.info(incoming);
-        const document = await Docs.findById(docId);
-
+    }
+    try {
+      const incoming = new Delta(op);
+      logging.info("Incoming Delta: ");
+      logging.info(incoming);
+      const document = await Docs.findById(docId);
+      if (version !== document.version) {
+        logging.info("Version is not matched");
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        logging.info("sending { status: retry }");
+        res.json({ status: "retry" });
+      } else {
         const old = new Delta(document.data);
         const newDelta = old.compose(incoming);
         logging.info("newDelta Delta: ");
@@ -185,13 +186,12 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         });
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: ok }");
-        res.send({ status: "ok" });
-      } catch (err) {
-        logging.error("failed to update OP");
-        logging.error(err);
-        res.send(ERROR_MESSAGE("failed to update OP"));
+        res.json({ status: "ok" });
       }
-      res.send({ status: "ok" });
+    } catch (err) {
+      logging.error("failed to update OP");
+      logging.error(err);
+      res.send(ERROR_MESSAGE("failed to update OP"));
     }
   }
 });
