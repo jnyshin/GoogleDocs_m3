@@ -18,6 +18,7 @@ dotenv.config();
 const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
 
 const app = express();
+const sessionStore = new session.MemoryStore();
 const options = {
   mongoUrl: "mongodb://localhost/docs_clone",
 };
@@ -37,7 +38,7 @@ app.use(
     },
     saveUninitialized: true,
     resave: true,
-    store: MongoStore.create(options),
+    store: sessionStore,
   })
 );
 
