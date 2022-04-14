@@ -171,19 +171,20 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       if (version !== oldVersion) {
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "retry" });
-      }
-      clients.forEach((client) => {
-        if (client.id !== id && client.docId === docId) {
-          client.res.write(`data: ${JSON.stringify(op)}\n\n`);
-          client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
+      } else {
+        clients.forEach((client) => {
+          if (client.id !== id && client.docId === docId) {
+            client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+            client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
 
-          logging.info(`sent message to UID = ${client.id}`);
-          logging.info(`sent op: ${JSON.stringify(op)}`);
-          logging.info(`sent ack: ${JSON.stringify(ack)}`);
-        }
-      });
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send({ status: "OK" });
+            logging.info(`sent message to UID = ${client.id}`);
+            logging.info(`sent op: ${JSON.stringify(op)}`);
+            logging.info(`sent ack: ${JSON.stringify(ack)}`);
+          }
+        });
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send({ status: "OK" });
+      }
     } catch (err) {
       logging.error("failed to update OP");
       logging.error(err);
