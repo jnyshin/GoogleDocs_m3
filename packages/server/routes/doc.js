@@ -16,7 +16,9 @@ router.get("/edit/:DOCID", (req, res) => {
     logging.info("[/doc/edit/:DOCID] Route");
     logging.info(`Requested from ${docId}`);
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.sendFile(path.join(client_path, "index.html"));
+    const filePath = path.join(client_path, "index.html");
+    logging.info(`Filepath: ${filePath}`);
+    res.sendFile(filePath);
   }
 });
 
