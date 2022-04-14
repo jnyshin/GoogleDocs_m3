@@ -153,9 +153,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     logging.info(`Incoming op =`);
     logging.info(op);
     try {
-      const incoming = new Delta(op);
-      logging.info("Incoming Delta: ");
-      logging.info(incoming);
+      const incomming = new Delta(op);
+      logging.info("Incomming Delta from : ", id);
+      logging.info(incomming);
       const document = await Docs.findById(docId);
       if (version !== document.version) {
         logging.info("Version is not matched");
@@ -164,7 +164,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         return res.send({ status: "retry" });
       } else {
         const old = new Delta(document.data);
-        const newDelta = old.compose(incoming);
+        const newDelta = old.compose(incomming);
         logging.info("newDelta Delta: ");
         logging.info(newDelta);
         await Docs.findByIdAndUpdate(docId, { data: newDelta });
