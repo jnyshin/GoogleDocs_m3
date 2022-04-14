@@ -8,11 +8,11 @@ import Delta from "quill-delta";
 import path from "path";
 const router = express.Router();
 router.get("/edit/:DOCID", (req, res) => {
-  logging.info("[/doc/edit/:DOCID] Route");
   if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));
   } else {
+    logging.info("[/doc/edit/:DOCID] Route");
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.sendFile(path.join(client_path, "index.html"));
   }
