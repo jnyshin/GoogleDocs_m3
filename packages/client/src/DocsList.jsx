@@ -22,7 +22,7 @@ const DocsList = () => {
       name: name,
     };
     const newDoc = await API.post("/collection/create", data);
-
+    console.log(newDoc);
     if (newDoc.data.error) {
       console.log(newDoc.data.message);
     } else {
