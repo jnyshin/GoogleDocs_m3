@@ -2,70 +2,13 @@ import express from "express";
 import User from "../schema/user";
 import nodemailer from "nodemailer";
 import logging from "../logging";
-import { DOMAIN_NAME, ERROR_MESSAGE } from "../store";
+import { client_path, ERROR_MESSAGE } from "../store";
 import { v4 as uuid } from "uuid";
-import { google } from "googleapis";
 import path from "path";
-import { __dirname } from "../store";
-
-const client_path = path.join(__dirname, "../client/dist");
-const OAuth2 = google.auth.OAuth2;
-
-// const createTransporter = async () => {
-//   const oauth2Client = new OAuth2(
-//     process.env.CLIENT_ID,
-//     process.env.CLIENT_SECRET,
-//     "https://developers.google.com/oauthplayground"
-//   );
-
-//   oauth2Client.setCredentials({
-//     refresh_token: process.env.REFRESH_TOKEN,
-//   });
-
-//   const accessToken = await new Promise((resolve, reject) => {
-//     oauth2Client.getAccessToken((err, token) => {
-//       if (err) {
-//         reject("Failed to create access token :(");
-//       }
-//       resolve(token);
-//     });
-//   });
-
-//   const transporter = nodemailer.createTransport({
-//     host: "smtp.gmail.com",
-//     name: "smtp.gmail.com",
-//     service: "gmail",
-//     port: 587,
-//     secure: false,
-//     auth: {
-//       user: process.env.EMAIL,
-//       pass: process.env.PASS,
-//     },
-//   });
-
-//   return transporter;
-// };
-
-// const sendEmail = async (emailOptions) => {
-//   let emailTransporter = await createTransporter();
-//   emailTransporter.verify(function (error, success) {
-//     if (error) {
-//       console.log(error);
-//     } else {
-//       console.log("mail server is ready to take our messages");
-//     }
-//   });
-//   await emailTransporter.sendMail(emailOptions, (err, info) => {
-//     if (err) {
-//       logging.error(err);
-//     } else {
-//       logging.info(info);
-//     }
-//   });
-// };
 
 const router = express.Router();
 router.get("/login", async (req, res) => {
+  res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
   res.sendFile(path.join(client_path, "index.html"));
 });
 
@@ -103,10 +46,13 @@ router.post("/login", async (req, res) => {
       }
     } else {
       logging.error(`User with email = ${email} does not exist`);
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send(ERROR_MESSAGE("user does not exist"));
     }
   } catch (err) {
+    logging.error("Error in logging in");
     logging.error(err);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Error in logged in"));
   }
 });
@@ -132,6 +78,7 @@ router.post("/signup", async (req, res) => {
   );
   const user = await User.findOne({ email: email });
   if (user) {
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("already registered with same email"));
   } else {
     try {
@@ -183,10 +130,8 @@ router.get("/verify", async (req, res) => {
 
   try {
     const user = await User.findById(key);
-    logging.info(user);
-    console.log("-----------------------");
-    console.log(user.key);
-    if (key === user.key) {
+
+    if (user && key === user.key) {
       await User.findByIdAndUpdate(user._id, { enable: true });
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send({ status: "OK" });
@@ -196,6 +141,7 @@ router.get("/verify", async (req, res) => {
     }
   } catch (err) {
     logging.error(err);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Error while verify"));
   }
 });

@@ -1,9 +1,7 @@
 import express from "express";
 import path from "path";
 import logging from "../logging";
-import { ERROR_MESSAGE, __dirname } from "../store";
-
-const client_path = path.join(__dirname, "../client/dist");
+import { client_path, ERROR_MESSAGE } from "../store";
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -12,6 +10,7 @@ router.get("/", async (req, res) => {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));
   }
+  res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
   res.sendFile(path.join(client_path, "index.html"));
 });
 export default router;

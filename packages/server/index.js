@@ -6,10 +6,9 @@ import docRouter from "./routes/doc";
 import authRouter from "./routes/auth";
 import collectionRouter from "./routes/collection";
 import mediaRouter from "./routes/media";
-import path from "path";
 import session from "express-session";
 import homeRouter from "./routes/home";
-import { __dirname } from "./store";
+import { client_path } from "./store";
 dotenv.config();
 
 const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
@@ -17,8 +16,6 @@ const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
 const app = express();
 
 // 👇️ "/home/john/Desktop/javascript"
-
-const client_path = path.join(__dirname, "../client/dist");
 
 app.use(express.static(client_path));
 app.use(cors());
