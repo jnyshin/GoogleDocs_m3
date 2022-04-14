@@ -184,13 +184,13 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: ok }");
         res.send({ status: "ok" });
-        logging.info("After status");
       }
     } catch (err) {
       logging.error("failed to update OP");
       logging.error(err);
       res.send(ERROR_MESSAGE("failed to update OP"));
     }
+    res.send({ status: "ok" });
   }
 });
 export default router;
