@@ -88,13 +88,13 @@ router.post("/login", async (req, res) => {
         if (req.session.authenticated) {
           logging.info("User already logged in");
           res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-          res.send({ status: "OK" });
+          res.send({ name: user.name });
         } else if (user.password === password) {
           logging.info("User first time logging in");
           req.session.authenticated = true;
           req.session.user = { id: user._id, email: email };
           res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-          res.send({ status: "OK" });
+          res.send({ name: user.name });
         } else {
           logging.info(`${email} failed to logged in (mismatch password)`);
           res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
@@ -117,7 +117,7 @@ router.post("/logout", (req, res) => {
     req.session.destroy();
     logging.info("logged out");
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.json({ status: "OK" });
+    res.send();
   } else {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE(`failed to logout`));
