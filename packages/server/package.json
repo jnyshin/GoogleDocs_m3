@@ -9,6 +9,7 @@
     "production": "NODE_ENV=production nodemon --experimental-specifier-resolution=node index"
   },
   "dependencies": {
+    "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "event-stream": "^4.0.1",

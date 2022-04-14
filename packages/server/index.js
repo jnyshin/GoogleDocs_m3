@@ -9,6 +9,13 @@ import mediaRouter from "./routes/media";
 import session from "express-session";
 import homeRouter from "./routes/home";
 import { client_path } from "./store";
+import * as connectMongo from "connect-mongo";
+
+const MongoStore = connectMongo(session);
+const sessionStore = new MongoStore({
+  mongoUrl: "mongodb://localhost/docs_clone",
+  collectionName: "sessions",
+});
 dotenv.config();
 
 const PORT = process.env.NODE_ENV === "production" ? 80 : 8000;
@@ -26,15 +33,15 @@ app.use(
   session({
     secret: "docs-session",
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      // secure: true,
-      sameSite: "none",
     },
-    resave: false,
     saveUninitialized: true,
+    resave: true,
+    store: sessionStore,
   })
 );
+
 app.use("/users", authRouter);
 app.use("/doc", docRouter);
 app.use("/media", mediaRouter);
