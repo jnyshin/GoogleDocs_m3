@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "concurrently \"yarn workspace server start\" \"yarn workspace client dev\"",
-    "production": "concurrently \"yarn workspace server production\" \"yarn workspace client start\""
+    "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" "
   },
   "workspaces": [
     "packages/*"
