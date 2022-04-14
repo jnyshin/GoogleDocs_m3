@@ -176,16 +176,30 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: ok }");
 
+        // clients.forEach((client) => {
+        //   if (client.id !== id && client.docId === docId) {
+        //     client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
+        //     client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+
+        //     logging.info(`sent message to UID = ${client.id}`);
+        //     logging.info(`sent ack: ${JSON.stringify(ack)}`);
+        //     logging.info(`sent op: ${JSON.stringify(op)}`);
+        //   }
+        // });
         clients.forEach((client) => {
-          if (client.id !== id && client.docId === docId) {
+          if (client.docId === docId) {
             client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
-            client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+            if (client.id !== id) {
+              client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+            }
 
             logging.info(`sent message to UID = ${client.id}`);
             logging.info(`sent ack: ${JSON.stringify(ack)}`);
             logging.info(`sent op: ${JSON.stringify(op)}`);
           }
         });
+        // res.write(`data: ${JSON.stringify(ack)}\n\n`);
+        // logging.info(`sent ack to incomming user, ${id}`);
         return res.send({ status: "ok" });
       }
     } catch (err) {
