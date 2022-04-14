@@ -152,7 +152,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     logging.info(op);
     try {
       const incomming = new Delta(op);
-      logging.info("Incomming Delta: ");
+      logging.info("Incomming Delta from : ", id);
       logging.info(incomming);
       const document = await Docs.findById(docId);
       oldVersion = document.version;
