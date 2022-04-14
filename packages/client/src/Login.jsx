@@ -15,6 +15,7 @@ const Login = () => {
     };
 
     const user = await API.post("/users/login", body);
+    console.log(user);
     if (user.data.error) {
       console.log(user.data.message);
     }
@@ -27,7 +28,7 @@ const Login = () => {
   return (
     <div className="wrapper">
       <div className="container">
-        <form method="post" action="/users/login" onSubmit={handleSubmit}>
+        <form method="post" onSubmit={handleSubmit}>
           <label htmlFor="email">email:</label>
           <input
             type="text"
