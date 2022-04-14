@@ -140,13 +140,15 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
 router.post("/op/:DOCID/:UID", async (req, res) => {
   if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Not logged in"));
+    res.json(ERROR_MESSAGE("Not logged in"));
   } else {
     logging.info("[/doc/op/:DOCID/:UID] Route");
     const id = req.params.UID;
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
+    logging.info(`Incoming UID = ${id}`);
+    logging.info(`Incoming docId = ${docId}`);
     logging.info(`Incoming Version = ${version}`);
     logging.info(`Incoming op =`);
     logging.info(op);
@@ -174,6 +176,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         });
 
         const ack = { ack: op };
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        logging.info("sending { status: ok }");
+        res.json({ status: "ok" });
         clients.forEach((client) => {
           if (client.id !== id && client.docId === docId) {
             client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
@@ -184,14 +189,11 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
             logging.info(`sent op: ${JSON.stringify(op)}`);
           }
         });
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("sending { status: ok }");
-        res.json({ status: "ok" });
       }
     } catch (err) {
       logging.error("failed to update OP");
       logging.error(err);
-      res.send(ERROR_MESSAGE("failed to update OP"));
+      res.json(ERROR_MESSAGE("failed to update OP"));
     }
   }
 });
