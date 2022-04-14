@@ -136,7 +136,7 @@ router.post("/signup", async (req, res) => {
   } else {
     try {
       logging.info(`received new user with this email: ${email}`);
-      const key = Math.floor(Math.random() * 9999).toString();
+      const key = uuid();
       const userId = uuid();
       await User.create({
         _id: userId,
@@ -151,7 +151,7 @@ router.post("/signup", async (req, res) => {
         from: "icloud@icloud.cse356.compas.cs.stonybrook.edu",
         to: email,
         subject: "Verification Code",
-        html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?_id=${userId}&email=${email}&key=${key}`,
+        html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?email=${email}&key=${key}`,
       };
 
       const mailOption = {
@@ -177,16 +177,14 @@ router.post("/signup", async (req, res) => {
 
 router.get("/verify", async (req, res) => {
   logging.info("[/user/verify] Route");
-  const { _id, email, key } = req.query;
-  logging.info(`Requested querystring is id=${_id} email=${email} key=${key}`);
+  const { email, key } = req.query;
+  logging.info(`Requested querystring is email=${email} key=${key}`);
   logging.info(req.query);
-  let user = await User.findById(_id);
-  if (!user) {
-    user = await User.findOne({ email: email });
-  }
+
   try {
+    const user = await User.findOne({ email: email });
     if (key === user.key) {
-      await User.findByIdAndUpdate(_id, { enable: true });
+      await User.findByIdAndUpdate(user._id, { enable: true });
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send({ status: "OK" });
     } else {
