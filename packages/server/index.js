@@ -22,17 +22,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-session({
-  secret: "docs-session",
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  },
-  resave: true,
-  saveUninitialized: true,
-});
+app.use(
+  session({
+    secret: "docs-session",
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      // secure: true,
+      sameSite: "none",
+    },
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 app.use("/users", authRouter);
 app.use("/doc", docRouter);
 app.use("/media", mediaRouter);
