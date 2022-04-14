@@ -182,7 +182,7 @@ router.get("/verify", async (req, res) => {
   logging.info(req.query);
 
   try {
-    const user = await User.findOnebyId(key);
+    const user = await User.findById(key);
     logging.info(user);
     console.log("-----------------------");
     console.log(user.key);
