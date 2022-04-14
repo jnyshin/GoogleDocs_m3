@@ -24,7 +24,7 @@ router.post("/create", async (req, res) => {
         version: 0,
       });
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(id);
+      res.send({ docid: id });
     } catch (err) {
       logging.error(`failed to created doc with id = ${id}`);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
