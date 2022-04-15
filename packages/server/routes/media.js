@@ -29,20 +29,29 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send(ERROR_MESSAGE("Please upload a file"));
     }
-    try {
-      const mediaId = uuidv4();
-      await Images.create({
-        _id: mediaId,
-        file: file.path,
-        mime: file.mimetype,
-      });
-      logging.info(`Created image with _id = ${mediaId}`);
+    if (file.mimetype !== "image/png" || file.mimetype !== "image/jpeg") {
+      logging.error("File is not PNG or JPEG");
+      logging.error(
+        `Server got fileName = ${file.originalname} mimeType = ${file.mimetype}`
+      );
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send({ mediaid: mediaId });
-    } catch (err) {
-      logging.error(err);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE("Error while creating Image Object"));
+      res.send(ERROR_MESSAGE("File is not PNG or JPEG"));
+    } else {
+      try {
+        const mediaId = uuidv4();
+        await Images.create({
+          _id: mediaId,
+          file: file.path,
+          mime: file.mimetype,
+        });
+        logging.info(`Created image with _id = ${mediaId}`);
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send({ mediaid: mediaId });
+      } catch (err) {
+        logging.error(err);
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send(ERROR_MESSAGE("Error while creating Image Object"));
+      }
     }
   }
 });
