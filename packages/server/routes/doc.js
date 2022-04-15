@@ -100,6 +100,7 @@ router.get("/get/:DOCID/:UID", async (req, res) => {
 
 router.get("/connect/:DOCID/:UID", async (req, res) => {
   if (!req.session.user) {
+    logging.info("/doc/connect reached, bit SESSION EXPIRED");
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));
   } else {
