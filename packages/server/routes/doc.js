@@ -25,7 +25,7 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     console.log("req.cookies: ", req.cookies);
     //console.log("req.session.cookie: ", req.session.cookie);
-    const cookieName = Object.keys(req.cookies)[0];
+    const cookieName = "connect.sid";
     const cookieValue = req.cookies.cookieName;
     console.log("cookie name: ", cookieName);
     console.log("cookie value: ", cookieValue);
