@@ -161,6 +161,13 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     logging.info(op, id);
     try {
       const document = await Docs.findById(docId);
+      const incomming = new Delta(op);
+      logging.info("Incomming Delta from : ", id);
+      logging.info(incomming, id);
+      const old = new Delta(document.data);
+      const newDelta = old.compose(incomming);
+      logging.info("newDelta Delta: ", id);
+      logging.info(newDelta, id);
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}`,
@@ -170,13 +177,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info("sending { status: retry }", id);
         res.send({ status: "retry" });
       } else {
-        const incomming = new Delta(op);
-        logging.info("Incomming Delta from : ", id);
-        logging.info(incomming, id);
-        const old = new Delta(document.data);
-        const newDelta = old.compose(incomming);
-        logging.info("newDelta Delta: ", id);
-        logging.info(newDelta, id);
         const newDocument = await Docs.findByIdAndUpdate(docId, {
           $set: { data: newDelta },
           $inc: { version: 1 },
