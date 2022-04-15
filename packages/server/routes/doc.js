@@ -162,6 +162,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       logging.info("Incomming Delta from : ", id);
       logging.info(incomming, id);
       const document = await Docs.findById(docId);
+      console.log(document.version);
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}`,
@@ -175,7 +176,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const newDelta = old.compose(incomming);
         logging.info("newDelta Delta: ", id);
         logging.info(newDelta, id);
-        await Docs.findByIdAndUpdate(
+        const newDocument = await Docs.findByIdAndUpdate(
           docId,
           { data: newDelta },
           {
@@ -183,8 +184,8 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           }
         );
 
-        logging.info(`Old version - ${version}`, id);
-        logging.info(`New version - ${version + 1}`, id);
+        // logging.info(`Old version - ${newDocument.version - 1}`, id);
+        logging.info(`New version - ${newDocument}`, id);
         const ack = { ack: op };
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: ok }", id);
