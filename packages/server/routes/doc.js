@@ -2,7 +2,7 @@ import express from "express";
 import Docs from "../schema/docs";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import logging from "../logging";
-import { clients, client_path, ERROR_MESSAGE } from "../store";
+import { currEditDoc, clients, client_path, ERROR_MESSAGE } from "../store";
 import User from "../schema/user";
 import Delta from "quill-delta";
 import path from "path";
@@ -162,15 +162,16 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     try {
       const document = await Docs.findById(docId);
       logging.info(`Document Version = ${document.version}`, id);
-      if (version !== document.version) {
+      if (version !== document.version || currEditDoc[0] === docId) {
         logging.info(
-          `Version is not matched. client = ${version}, server=${document.version}`,
+          `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
           id
         );
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }", id);
         res.send({ status: "retry" });
       } else {
+        currEditDoc.push(docId);
         const incomming = new Delta(op);
         logging.info("Incomming Delta from : ", id);
         logging.info(incomming, id);
@@ -204,6 +205,11 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           }
         });
         logging.info("sending { status: ok }", id);
+        currEditDoc.pop();
+        logging.info(
+          `currEditDoc is reset with length ${currEditDoc.length}`,
+          id
+        );
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send({ status: "ok" });
       }
