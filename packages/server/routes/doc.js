@@ -186,7 +186,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info("Sending ACK");
         clients.forEach((client) => {
           if (client.id === id) {
-            logging.info(`sent message to UID = ${client.id}`);
+            logging.info(`Sending ACK to UID = ${client.id}`);
             logging.info(`sent ack: ${JSON.stringify(ack)}`);
             client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
           }
@@ -195,7 +195,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info("Sending DOC");
         clients.forEach((client) => {
           if (client.docId === docId && client.id !== id) {
-            logging.info(`sent message to UID = ${client.id}`);
+            logging.info(`Sending OP to UID = ${client.id}`);
             logging.info(`sent op: ${JSON.stringify(op)}`);
             client.res.write(`data: ${JSON.stringify(op)}\n\n`);
           }
