@@ -28,7 +28,7 @@ router.get("/edit/:DOCID", async (req, res, next) => {
       content: document.data.ops,
       version: document.version,
     };
-    console.log(document.data.op);
+    console.log(document.data.ops);
     console.log(payload);
     clients.forEach((client) => {
       client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
