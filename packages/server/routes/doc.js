@@ -152,15 +152,15 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    logging.info(`Incoming UID = ${id}`);
+    logging.info(`Incoming UID = ${id}`, id);
     // logging.info(`Incoming docId = ${docId}`);
-    logging.info(`Incoming Version = ${version}`);
-    logging.info(`Incoming op =`);
-    logging.info(op);
+    logging.info(`Incoming Version = ${version}`, id);
+    logging.info(`Incoming op =`, id);
+    logging.info(op, id);
     try {
       const incomming = new Delta(op);
       logging.info("Incomming Delta from : ", id);
-      logging.info(incomming);
+      logging.info(incomming, id);
       const document = await Docs.findById(docId);
       if (version !== document.version) {
         logging.info(
@@ -175,11 +175,14 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const newDelta = old.compose(incomming);
         logging.info("newDelta Delta: ", id);
         logging.info(newDelta, id);
-        await Docs.findByIdAndUpdate(docId, { data: newDelta });
+        await Docs.findByIdAndUpdate(
+          docId,
+          { data: newDelta },
+          {
+            version: version + 1,
+          }
+        );
 
-        await Docs.findByIdAndUpdate(docId, {
-          version: version + 1,
-        });
         logging.info(`Old version - ${version}`, id);
         logging.info(`New version - ${version + 1}`, id);
         const ack = { ack: op };
@@ -194,7 +197,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           }
         });
 
-        logging.info("Sending DOC");
+        logging.info("Sending OP", id);
         clients.forEach((client) => {
           if (client.docId === docId && client.id !== id) {
             logging.info(`Sending OP to UID = ${client.id}`, id);
