@@ -29,14 +29,8 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send(ERROR_MESSAGE("Please upload a file"));
     }
-    if (file.mimetype !== "image/png" || file.mimetype !== "image/jpeg") {
-      logging.error("File is not PNG or JPEG");
-      logging.error(
-        `Server got fileName = ${file.originalname} mimeType = ${file.mimetype}`
-      );
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE("File is not PNG or JPEG"));
-    } else {
+
+    if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
       try {
         const mediaId = uuidv4();
         await Images.create({
@@ -52,6 +46,13 @@ router.post("/upload", upload.single("file"), async (req, res) => {
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         res.send(ERROR_MESSAGE("Error while creating Image Object"));
       }
+    } else {
+      logging.error("File is not PNG or JPEG");
+      logging.error(
+        `Server got fileName = ${file.originalname} mimeType = ${file.mimetype}`
+      );
+      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.send(ERROR_MESSAGE("File is not PNG or JPEG"));
     }
   }
 });
