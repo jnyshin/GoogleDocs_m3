@@ -6,6 +6,7 @@ import { currEditDoc, clients, client_path, ERROR_MESSAGE } from "../store";
 import User from "../schema/user";
 import Delta from "quill-delta";
 import path from "path";
+import { v4 as uuid } from "uuid";
 
 const router = express.Router();
 router.get("/edit/:DOCID", async (req, res, next) => {
@@ -20,7 +21,8 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     logging.info(`Requested from ${docId}`);
     const filePath = path.join(client_path, "index.html");
     logging.info(`Filepath: ${filePath}`);
-    return res.sendFile(filePath);
+    res.redirect(`/doc/connect/${docId}/${uuid()}`);
+    res.sendFile(filePath);
   }
 });
 
