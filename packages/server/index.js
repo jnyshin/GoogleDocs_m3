@@ -9,6 +9,7 @@ import mediaRouter from "./routes/media";
 import session from "express-session";
 import homeRouter from "./routes/home";
 import { client_path } from "./store";
+import cookieParser from "cookie-parser";
 import connectMongo from "connect-mongo";
 
 import MongoStore from "connect-mongo";
@@ -28,6 +29,7 @@ app.use(express.static(client_path));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use(
   session({

@@ -6,6 +6,7 @@ import { currEditDoc, clients, client_path, ERROR_MESSAGE } from "../store";
 import User from "../schema/user";
 import Delta from "quill-delta";
 import path from "path";
+import cookieParser from "cookie-parser";
 import { v4 as uuid } from "uuid";
 
 const router = express.Router();
@@ -24,7 +25,7 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     console.log("req.cookies: ", req.cookies);
     console.log("req.session.cookie: ", req.session.cookie);
-    res.cookie(req.session.cookie);
+    res.cookie(req.cookies);
     res.sendFile(filePath);
   }
 });
