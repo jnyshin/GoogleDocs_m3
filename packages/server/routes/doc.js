@@ -24,6 +24,7 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     console.log("req.cookies: ", req.cookies);
     console.log("req.session.cookie: ", req.session.cookie);
+    res.cookie(req.session.cookie);
     res.sendFile(filePath);
   }
 });
