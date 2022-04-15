@@ -13,14 +13,15 @@ router.get("/edit/:DOCID", (req, res) => {
   if (!req.session.user) {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.send(ERROR_MESSAGE("Not logged in"));
+  } else {
+    const docId = req.params.DOCID;
+    logging.info("[/doc/edit/:DOCID] Route");
+    logging.info(`Requested from ${docId}`);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    const filePath = path.join(client_path, "index.html");
+    logging.info(`Filepath: ${filePath}`);
+    res.sendFile(filePath);
   }
-  const docId = req.params.DOCID;
-  logging.info("[/doc/edit/:DOCID] Route");
-  logging.info(`Requested from ${docId}`);
-  res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-  const filePath = path.join(client_path, "index.html");
-  logging.info(`Filepath: ${filePath}`);
-  res.sendFile(filePath);
 });
 
 router.post("/presence/:DOCID/:UID", async (req, res) => {
