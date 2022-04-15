@@ -184,13 +184,14 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           if (client.docId === docId) {
             // client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
             if (client.id !== id) {
+              logging.info(`sent message to UID = ${client.id}`);
+              logging.info(`sent op: ${JSON.stringify(op)}`);
               client.res.write(`data: ${JSON.stringify(op)}\n\n`);
             } else {
+              logging.info(`sent message to UID = ${client.id}`);
+              logging.info(`sent ack: ${JSON.stringify(ack)}`);
               client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
             }
-            logging.info(`sent message to UID = ${client.id}`);
-            logging.info(`sent ack: ${JSON.stringify(ack)}`);
-            logging.info(`sent op: ${JSON.stringify(op)}`);
           }
         });
         return res.send({ status: "ok" });
