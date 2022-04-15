@@ -25,7 +25,7 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     const document = await Docs.findById(docId);
     console.log(document);
     const payload = {
-      content: document.data.op,
+      content: document.data.ops,
       version: document.version,
     };
     console.log(document.data.op);
