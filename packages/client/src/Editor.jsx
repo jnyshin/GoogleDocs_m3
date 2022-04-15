@@ -71,7 +71,6 @@ const Editor = (props) => {
           console.log(index, length, name);
         } else {
           quill.updateContents(dataFromServer[0]);
-          version += 1;
         }
       };
       evtSource.onerror = function (event) {

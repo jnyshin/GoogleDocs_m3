@@ -153,7 +153,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     const version = req.body.version;
     const op = req.body.op;
     logging.info(`Incoming UID = ${id}`);
-    logging.info(`Incoming docId = ${docId}`);
+    // logging.info(`Incoming docId = ${docId}`);
     logging.info(`Incoming Version = ${version}`);
     logging.info(`Incoming op =`);
     logging.info(op);
@@ -168,12 +168,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         );
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }");
-        if (version > document.version) {
-          await Docs.findByIdAndUpdate(docId, {
-            version: version + 1,
-          });
-        }
-        return res.send({ status: "retry" });
+        res.send({ status: "retry" });
       } else {
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
@@ -187,26 +182,30 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const ack = { ack: op };
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: ok }");
+
+        logging.info("Sending ACK");
         clients.forEach((client) => {
-          if (client.docId === docId) {
-            // client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
-            if (client.id !== id) {
-              logging.info(`sent message to UID = ${client.id}`);
-              logging.info(`sent op: ${JSON.stringify(op)}`);
-              client.res.write(`data: ${JSON.stringify(op)}\n\n`);
-            } else {
-              logging.info(`sent message to UID = ${client.id}`);
-              logging.info(`sent ack: ${JSON.stringify(ack)}`);
-              client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
-            }
+          if (client.id === id) {
+            logging.info(`sent message to UID = ${client.id}`);
+            logging.info(`sent ack: ${JSON.stringify(ack)}`);
+            client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
           }
         });
-        return res.send({ status: "ok" });
+
+        logging.info("Sending DOC");
+        clients.forEach((client) => {
+          if (client.docId === docId && client.id !== id) {
+            logging.info(`sent message to UID = ${client.id}`);
+            logging.info(`sent op: ${JSON.stringify(op)}`);
+            client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+          }
+        });
+        res.send({ status: "ok" });
       }
     } catch (err) {
       logging.error("failed to update OP");
       logging.error(err);
-      return res.send(ERROR_MESSAGE("failed to update OP"));
+      res.send(ERROR_MESSAGE("failed to update OP"));
     }
   }
 });
