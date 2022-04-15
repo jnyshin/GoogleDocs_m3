@@ -180,9 +180,10 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const newDelta = old.compose(incomming);
         // logging.info("newDelta Delta: ", id);
         // logging.info(newDelta, id);
-        if (version !== document.version) {
+        const document2 = await Docs.findById(docId);
+        if (version !== document2.version) {
           logging.info(
-            `Version is not matched. client = ${version}, server=${document.version}`,
+            `Version is not matched. client = ${version}, server=${document2.version}`,
             id
           );
           res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
