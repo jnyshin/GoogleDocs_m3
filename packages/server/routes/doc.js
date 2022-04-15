@@ -180,10 +180,11 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const newDelta = old.compose(incomming);
         // logging.info("newDelta Delta: ", id);
         // logging.info(newDelta, id);
-        const newDocument = await Docs.findByIdAndUpdate(docId, {
+        await Docs.findByIdAndUpdate(docId, {
           $set: { data: newDelta },
           $inc: { version: 1 },
         });
+        const newDocument = await Docs.findById(docId);
         logging.info("NEW DOCUMENT:", id);
         logging.info(newDocument, id);
         logging.info(`Old version - ${newDocument.version - 1}`, id);
