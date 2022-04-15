@@ -6,7 +6,7 @@ import { currEditDoc, clients, client_path, ERROR_MESSAGE } from "../store";
 import User from "../schema/user";
 import Delta from "quill-delta";
 import path from "path";
-import { v4 as uuidv4 } from "uuid";
+
 const router = express.Router();
 router.get("/edit/:DOCID", async (req, res, next) => {
   logging.info(`Section Cookie:`);
@@ -22,18 +22,6 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     const filePath = path.join(client_path, "index.html");
     logging.info(`Filepath: ${filePath}`);
     res.sendFile(filePath);
-    const document = await Docs.findById(docId);
-    const payload = {
-      content: document.data.ops,
-      version: document.version,
-    };
-    console.log(document.data.op);
-    console.log(payload);
-    clients.forEach((client) => {
-      client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
-      logging.info(`sent message to UID = ${client.id}`, client.id);
-      logging.info(`sent: ${JSON.stringify(payload)}`, client.id);
-    });
   }
 });
 
