@@ -21,6 +21,9 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     logging.info(`Requested from ${docId}`);
     const filePath = path.join(client_path, "index.html");
     logging.info(`Filepath: ${filePath}`);
+    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+    console.log("req.cookies: ", req.cookies);
+    console.log("req.session.cookie: ", req.session.cookie);
     res.sendFile(filePath);
   }
 });
