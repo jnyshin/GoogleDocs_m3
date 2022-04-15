@@ -20,9 +20,10 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     logging.info("[/doc/edit/:DOCID] Route");
     logging.info(`Requested from ${docId}`);
     const filePath = path.join(client_path, "index.html");
-    logging.info(`Filepath: ${filePath}`);
+
     res.redirect(`/doc/connect/${docId}/${uuid()}`);
     res.sendFile(filePath);
+    logging.info(`Filepath: ${filePath}`);
   }
 });
 
