@@ -46,7 +46,7 @@ router.post("/presence/:DOCID/:UID", async (req, res) => {
       logging.info("presence: ", id);
       logging.info(presence, id);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send();
+      res.send({});
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
           client.res.write(`data: ${JSON.stringify(presence)}\n\n`);
