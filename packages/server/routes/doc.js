@@ -168,6 +168,11 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         );
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }");
+        if (version > document.version) {
+          await Docs.findByIdAndUpdate(docId, {
+            version: version + 1,
+          });
+        }
         return res.send({ status: "retry" });
       } else {
         const old = new Delta(document.data);
