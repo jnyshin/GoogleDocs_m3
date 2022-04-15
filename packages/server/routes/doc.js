@@ -24,8 +24,12 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     logging.info(`Filepath: ${filePath}`);
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     console.log("req.cookies: ", req.cookies);
-    console.log("req.session.cookie: ", req.session.cookie);
-    res.cookie(req.cookies);
+    //console.log("req.session.cookie: ", req.session.cookie);
+    const cookieName = Object.keys(req.cookies)[0];
+    const cookieValue = req.cookies.cookieName;
+    console.log("cookie name: ", cookieName);
+    console.log("cookie value: ", cookieValue);
+    res.cookie(cookieName, cookieValue);
     res.sendFile(filePath);
   }
 });
