@@ -8,19 +8,13 @@ import Delta from "quill-delta";
 import path from "path";
 const router = express.Router();
 router.get("/edit/:DOCID", (req, res) => {
-  if (!req.session.user) {
-    logging.error(`Did not logged in`);
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Not logged in"));
-  } else {
-    const docId = req.params.DOCID;
-    logging.info("[/doc/edit/:DOCID] Route");
-    logging.info(`Requested from ${docId}`);
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    const filePath = path.join(client_path, "index.html");
-    logging.info(`Filepath: ${filePath}`);
-    res.sendFile(filePath);
-  }
+  const docId = req.params.DOCID;
+  logging.info("[/doc/edit/:DOCID] Route");
+  logging.info(`Requested from ${docId}`);
+  res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+  const filePath = path.join(client_path, "index.html");
+  logging.info(`Filepath: ${filePath}`);
+  res.sendFile(filePath);
 });
 
 router.post("/presence/:DOCID/:UID", async (req, res) => {
@@ -147,22 +141,16 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
     res.json(ERROR_MESSAGE("Not logged in"));
   } else {
-    logging.info("[/doc/op/:DOCID/:UID] Route");
     const id = req.params.UID;
+    logging.info("[/doc/op/:DOCID/:UID] Route", id);
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    logging.info(`Incoming UID = ${id}`, id);
-    // logging.info(`Incoming docId = ${docId}`);
     logging.info(`Incoming Version = ${version}`, id);
     logging.info(`Incoming op =`, id);
     logging.info(op, id);
     try {
-      const incomming = new Delta(op);
-      logging.info("Incomming Delta from : ", id);
-      logging.info(incomming, id);
       const document = await Docs.findById(docId);
-      console.log(document.version);
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}`,
@@ -172,6 +160,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info("sending { status: retry }", id);
         res.send({ status: "retry" });
       } else {
+        const incomming = new Delta(op);
+        logging.info("Incomming Delta from : ", id);
+        logging.info(incomming, id);
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
         logging.info("newDelta Delta: ", id);
@@ -180,11 +171,11 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           $set: { data: newDelta },
           $inc: { version: 1 },
         });
-
-        // logging.info(`Old version - ${newDocument.version - 1}`, id);
-        logging.info(`New version - ${newDocument}`, id);
+        logging.info(`Old version - ${newDocument.version - 1}`, id);
+        logging.info(`New version - ${newDocument.version}`, id);
         const ack = { ack: op };
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send({ status: "ok" });
         logging.info("sending { status: ok }", id);
         logging.info("Sending ACK", id);
         clients.forEach((client) => {
@@ -203,7 +194,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
             client.res.write(`data: ${JSON.stringify(op)}\n\n`);
           }
         });
-        res.send({ status: "ok" });
       }
     } catch (err) {
       logging.error("failed to update OP", id);
