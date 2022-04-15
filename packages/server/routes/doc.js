@@ -163,7 +163,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       logging.info(incomming);
       const document = await Docs.findById(docId);
       if (version !== document.version) {
-        logging.info("Version is not matched");
+        logging.info(
+          `Version is not matched. client = ${version}, server=${document.version}`
+        );
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }");
         return res.send({ status: "retry" });
