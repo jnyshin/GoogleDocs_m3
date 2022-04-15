@@ -66,6 +66,7 @@ const Editor = (props) => {
           quill.enable();
         } else if (dataFromServer.ack) {
           setAck(dataFromServer.ack);
+          version += 1;
         } else if (dataFromServer.presence) {
           const { index, length, name } = dataFromServer.presence.cursor;
           console.log(index, length, name);
@@ -94,7 +95,6 @@ const Editor = (props) => {
           //do something
           console.log("RETRY!!!!!!!!!");
         }
-        version += 1;
       }
     };
     quill.on("text-change", update);
