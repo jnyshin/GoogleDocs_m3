@@ -52,8 +52,8 @@ router.get("/edit/:DOCID", async (req, res, next) => {
         );
         logging.info(`remaining clients = ${clients.length}`);
       });
+      res.sendFile(filePath);
     }
-    res.sendFile(filePath);
   }
 });
 
