@@ -71,8 +71,8 @@ const Editor = (props) => {
           const { index, length, name } = dataFromServer.presence.cursor;
           console.log(index, length, name);
         } else {
-          console.log("OP");
-          quill.updateContents(dataFromServer[0]);
+          console.log(dataFromServer);
+          quill.updateContents(dataFromServer);
           version += 1;
         }
       };
@@ -86,10 +86,11 @@ const Editor = (props) => {
   useEffect(() => {
     if (!quill) return;
     const update = async (delta, oldDelta, source) => {
+      console.log(delta.ops);
       if (source === "user") {
         const data = {
           version: version,
-          op: [delta],
+          op: delta.ops,
         };
         const response = await API.post(`/doc/op/${docId}/${id}`, data);
         if (response.data.status === "retry") {
