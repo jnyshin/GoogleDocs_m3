@@ -23,10 +23,13 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     logging.info(`Filepath: ${filePath}`);
     res.sendFile(filePath);
     const document = await Docs.findById(docId);
+    console.log(document);
     const payload = {
       content: document.data.op,
       version: document.version,
     };
+    console.log(document.data.op);
+    console.log(payload);
     clients.forEach((client) => {
       client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
       logging.info(`sent message to UID = ${client.id}`, client.id);
