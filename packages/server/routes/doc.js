@@ -183,9 +183,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info(`Old version - ${newDocument.version - 1}`, id);
         logging.info(`New version - ${newDocument.version}`, id);
         const ack = { ack: op };
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        res.send({ status: "ok" });
-        logging.info("sending { status: ok }", id);
+
         logging.info("Sending ACK", id);
         clients.forEach((client) => {
           if (client.id === id) {
@@ -203,6 +201,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
             client.res.write(`data: ${JSON.stringify(op)}\n\n`);
           }
         });
+        logging.info("sending { status: ok }", id);
+        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send({ status: "ok" });
       }
     } catch (err) {
       logging.error("failed to update OP", id);
