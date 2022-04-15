@@ -26,9 +26,13 @@ router.post("/presence/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const id = req.params.UID;
     const { index, length } = req.body;
+    logging.info(`Request with index=${index}, length=${length}`, id);
     try {
       const _id = req.session.user.id;
+      logging.info(`session user id = ${_id}`, id);
       const user = await User.findById(_id);
+      logging.info(`found user`, id);
+      logging.info(user, id);
       const presence = {
         presence: {
           id: id,
@@ -39,13 +43,15 @@ router.post("/presence/:DOCID/:UID", async (req, res) => {
           },
         },
       };
+      logging.info("presence: ", id);
+      logging.info(presence, id);
       res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
       res.send();
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
           client.res.write(`data: ${JSON.stringify(presence)}\n\n`);
-          logging.info(`sent message to UID = ${client.id}`);
-          logging.info(`sent: ${JSON.stringify(presence)}`);
+          logging.info(`sent message to UID = ${client.id}`, id);
+          logging.info(`sent: ${JSON.stringify(presence)}`, id);
         }
       });
     } catch (err) {
