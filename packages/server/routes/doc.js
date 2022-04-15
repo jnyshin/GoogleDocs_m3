@@ -153,7 +153,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    const ack = { ack: op };
     logging.info(
       `--------------Remaining connected clients : ${clients.length}`
     );
@@ -169,13 +168,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         );
         res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }", id);
-        clients.forEach((client) => {
-          if (client.id === id) {
-            logging.info(`Sending ACK to UID = ${client.id}`, id);
-            logging.info(`sent ack: ${JSON.stringify(ack)}`, id);
-            client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
-          }
-        });
         res.send({ status: "retry" });
       } else {
         const incomming = new Delta(op);
@@ -191,6 +183,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         });
         logging.info(`Old version - ${newDocument.version - 1}`, id);
         logging.info(`New version - ${newDocument.version}`, id);
+        const ack = { ack: op };
 
         logging.info("Sending ACK", id);
         clients.forEach((client) => {
