@@ -8,7 +8,7 @@ import Delta from "quill-delta";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 const router = express.Router();
-router.get("/edit/:DOCID", async (req, res) => {
+router.get("/edit/:DOCID", async (req, res, next) => {
   logging.info(`Section Cookie:`);
   logging.info(req.session);
   if (!req.session.user) {
@@ -22,7 +22,7 @@ router.get("/edit/:DOCID", async (req, res) => {
     const filePath = path.join(client_path, "index.html");
     logging.info(`Filepath: ${filePath}`);
     res.sendFile(filePath);
-    res.redirect(`/doc/edit/${docId}/${uuidv4()}`);
+    next();
   }
 });
 
