@@ -22,7 +22,7 @@ router.get("/edit/:DOCID", async (req, res) => {
     const filePath = path.join(client_path, "index.html");
     logging.info(`Filepath: ${filePath}`);
     res.sendFile(filePath);
-    res.redirect(`/doc/edit/${docId}/${uuidv4()}`);
+    res.redirect(`/doc/connect/${docId}/${uuidv4()}`);
   }
 });
 
