@@ -17,13 +17,43 @@ router.get("/edit/:DOCID", async (req, res, next) => {
     res.send(ERROR_MESSAGE("Not logged in"));
   } else {
     const docId = req.params.DOCID;
+    const id = uuid();
     logging.info("[/doc/edit/:DOCID] Route");
     logging.info(`Requested from ${docId}`);
     const filePath = path.join(client_path, "index.html");
-
-    res.redirect(`/doc/connect/${docId}/${uuid()}`);
+    const document = await Docs.findById(docId);
+    if (document) {
+      logging.info(`Found doc id = ${docId}`);
+      res.status(200).set({
+        "Content-Type": "text/event-stream",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "X-CSE356": "61f9f57373ba724f297db6ba",
+      });
+      const payload = {
+        content: document.data.ops,
+        version: document.version,
+      };
+      res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      logging.info(`Event Stream connection open for UID = ${id}`);
+      logging.info(`[Pushed data]`);
+      logging.info(payload);
+      const newClient = {
+        id: id,
+        docId: docId,
+        res,
+      };
+      clients.push(newClient);
+      logging.info(`Current connected clients = ${clients.length}`);
+      req.on("close", () => {
+        logging.info(`UID = ${id} connection closed`);
+        clients.map((c, index) =>
+          c.id === id ? clients.splice(index, 1) : clients
+        );
+        logging.info(`remaining clients = ${clients.length}`);
+      });
+    }
     res.sendFile(filePath);
-    logging.info(`Filepath: ${filePath}`);
   }
 });
 
