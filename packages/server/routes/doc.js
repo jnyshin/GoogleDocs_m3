@@ -6,6 +6,7 @@ import { clients, client_path, ERROR_MESSAGE } from "../store";
 import User from "../schema/user";
 import Delta from "quill-delta";
 import path from "path";
+import e from "express";
 const router = express.Router();
 router.get("/edit/:DOCID", (req, res) => {
   const docId = req.params.DOCID;
@@ -178,25 +179,26 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info(incomming, id);
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
-        // logging.info("newDelta Delta: ", id);
-        // logging.info(newDelta, id);
-        const document2 = await Docs.findById(docId);
-        if (version !== document2.version) {
+        logging.info("newDelta Delta: ", id);
+        logging.info(newDelta, id);
+        await Docs.findByIdAndUpdate(docId, {
+          $set: { data: newDelta },
+          $inc: { version: 1 },
+        });
+        const newDocument = await Docs.findById(docId);
+        if (newDocument.version - 1 !== version) {
+          await Docs.findByIdAndUpdate(docId, {
+            $set: { data: old },
+            $inc: { version: -1 },
+          });
           logging.info(
-            `Version is not matched. client = ${version}, server=${document2.version}`,
+            `Version is not matched. client = ${version}, server=${document.version}`,
             id
           );
           res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
           logging.info("sending { status: retry }", id);
           res.send({ status: "retry" });
         } else {
-          await Docs.findByIdAndUpdate(docId, {
-            $set: { data: newDelta },
-            $inc: { version: 1 },
-          });
-          const newDocument = await Docs.findById(docId);
-          logging.info("NEW DOCUMENT:", id);
-          logging.info(newDocument, id);
           logging.info(`Old version - ${newDocument.version - 1}`, id);
           logging.info(`New version - ${newDocument.version}`, id);
           const ack = { ack: op };
