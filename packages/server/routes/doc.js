@@ -7,7 +7,7 @@ import User from "../schema/user";
 import Delta from "quill-delta";
 import path from "path";
 const router = express.Router();
-router.get("/edit/:DOCID", (req, res) => {
+router.get("/edit/:DOCID", async (req, res) => {
   logging.info(`Section Cookie:`);
   logging.info(req.session);
   if (!req.session.user) {
@@ -21,6 +21,14 @@ router.get("/edit/:DOCID", (req, res) => {
     const filePath = path.join(client_path, "index.html");
     logging.info(`Filepath: ${filePath}`);
     res.sendFile(filePath);
+    const document = await Docs.findById(docId);
+    const payload = {
+      content: document.data.ops,
+      version: document.version,
+    };
+    clients.forEach((client) => {
+      client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
+    });
   }
 });
 

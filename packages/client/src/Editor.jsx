@@ -71,6 +71,7 @@ const Editor = (props) => {
           const { index, length, name } = dataFromServer.presence.cursor;
           console.log(index, length, name);
         } else {
+          console.log("OP");
           quill.updateContents(dataFromServer[0]);
           version += 1;
         }
@@ -108,6 +109,7 @@ const Editor = (props) => {
           index: range.index,
           length: range.length,
         };
+        console.log(id);
         const response = await API.post(
           `/doc/presence/${docId}/${id}`,
           presence
@@ -141,8 +143,7 @@ const Editor = (props) => {
 
   return (
     <div className="App">
-      <button onClick={handleTest}>Test</button>
-      <div ref={quillRef} style={{ height: "1000px" }}></div>
+      <div ref={quillRef} style={{ height: "100%" }}></div>
     </div>
   );
 };
