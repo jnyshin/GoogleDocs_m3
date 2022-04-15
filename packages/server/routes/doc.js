@@ -152,6 +152,9 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
+    logging.info(
+      `--------------Remaining connected clients : ${clients.length}`
+    );
     logging.info(`Incoming Version = ${version}`, id);
     logging.info(`Incoming op =`, id);
     logging.info(op, id);
