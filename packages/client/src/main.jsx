@@ -7,6 +7,7 @@ import Login from "./Login";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import Home from "./Home";
+import Test from "./Test";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -23,6 +24,9 @@ ReactDOM.render(
         </Route>
         <Route path="/home" exact>
           <Home />
+        </Route>
+        <Route path="/test" exact>
+          <Test />
         </Route>
       </Switch>
     </Router>
