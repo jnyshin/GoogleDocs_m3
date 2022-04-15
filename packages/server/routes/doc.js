@@ -28,6 +28,8 @@ router.get("/edit/:DOCID", async (req, res) => {
     };
     clients.forEach((client) => {
       client.res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      logging.info(`sent message to UID = ${client.id}`, client.id);
+      logging.info(`sent: ${JSON.stringify(payload)}`, client.id);
     });
   }
 });
