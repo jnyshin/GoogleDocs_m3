@@ -178,10 +178,8 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info(newDelta, id);
         const newDocument = await Docs.findByIdAndUpdate(
           docId,
-          { data: newDelta },
-          {
-            version: version + 1,
-          }
+          { $set: { data: newDelta } },
+          { $inc: { version: 1 } }
         );
 
         // logging.info(`Old version - ${newDocument.version - 1}`, id);
