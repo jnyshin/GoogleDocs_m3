@@ -10,3 +10,4 @@ const __filename = fileURLToPath(import.meta.url);
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
 export const client_path = path.join(__dirname, "../client/dist");
+export const currEditDoc = [];
