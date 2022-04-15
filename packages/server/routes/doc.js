@@ -180,6 +180,15 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         const newDelta = old.compose(incomming);
         // logging.info("newDelta Delta: ", id);
         // logging.info(newDelta, id);
+        if (version !== document.version) {
+          logging.info(
+            `Version is not matched. client = ${version}, server=${document.version}`,
+            id
+          );
+          res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+          logging.info("sending { status: retry }", id);
+          res.send({ status: "retry" });
+        }
         await Docs.findByIdAndUpdate(docId, {
           $set: { data: newDelta },
           $inc: { version: 1 },
