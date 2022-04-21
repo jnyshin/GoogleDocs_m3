@@ -37,7 +37,7 @@ export default async (fastify, opts) => {
     dir: join(__dirname, "routes"),
     options: Object.assign({}, opts),
   });
-  fastify.addHook("preHandler", async (req, res, next) => {
+  fastify.addHook("preHandler", (req, res, next) => {
     req.log.info(`incoming request from ${req.ip}`);
     if (!req.url.startsWith("/user")) {
       if (!req.session.user) {
