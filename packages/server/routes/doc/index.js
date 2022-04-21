@@ -43,7 +43,7 @@ export default async (fastify, opts) => {
         title: "presence",
         type: "object",
         properties: {
-          presence: {
+          presense: {
             type: "object",
             properties: {
               id: { type: "string" },
