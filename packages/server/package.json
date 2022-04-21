@@ -23,7 +23,7 @@
   },
   "scripts": {
     "test": "tap \"test/**/*.test.js\"",
-    "production": "NODE_ENV=PRODUCTION fastify start -l info -p 80 -a icloud.cse356.compas.cs.stonybrook.edu app.js",
+    "production": "NODE_ENV=PRODUCTION fastify start -l info -P -p 80 -a icloud.cse356.compas.cs.stonybrook.edu app.js",
     "dev": "NODE_ENV=DEVELOPEMENT fastify start -w -l info -P -p 8000 app.js"
   }
 }
