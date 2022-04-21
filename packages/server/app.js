@@ -37,7 +37,7 @@ export default async (fastify, opts) => {
     dir: join(__dirname, "routes"),
     options: Object.assign({}, opts),
   });
-  fastify.addHook("onRequest", async (req, res) => {
+  fastify.addHook("preHandler", async (req, res, next) => {
     req.log.info(`incoming request from ${req.ip}`);
     if (!req.url.startsWith("/user")) {
       if (!req.session.user) {
@@ -45,6 +45,7 @@ export default async (fastify, opts) => {
         return ERROR_MESSAGE("Not logged in");
       }
     }
+    next();
   });
   fastify.register((fastifyInstance, options, done) => {
     mongoose
