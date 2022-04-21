@@ -29,7 +29,6 @@ export default async (fastify, opts) => {
 
   fastify.register(fastifyStatic, {
     root: join(__dirname, "dist"),
-    prefix: "/dist/",
   });
 
   fastify.register(fastifyMultipart);
