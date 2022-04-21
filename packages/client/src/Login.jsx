@@ -15,11 +15,10 @@ const Login = () => {
     };
 
     const user = await API.post("/users/login", body);
+    console.log(user);
     if (user.data.error) {
       console.log(user.data.error);
-    }
-    if (user.data.name) {
-      console.log("pushed?");
+    } else {
       history.push("/home");
     }
   };

@@ -7,7 +7,7 @@
     "yarn": ">=1.21.0 <2.0.0"
   },
   "scripts": {
-    "start": "concurrently \"yarn workspace server start\" \"yarn workspace client dev\"",
+    "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
     "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" "
   },
   "workspaces": [

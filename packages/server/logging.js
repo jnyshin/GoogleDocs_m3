@@ -1,5 +1,3 @@
-import fs from "fs";
-
 const DEFAULT_NAMESPACE = "Client";
 
 const info = (message, namespace) => {

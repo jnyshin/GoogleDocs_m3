@@ -1,44 +1,22 @@
-import express from "express";
-import Docs from "../schema/docs";
+import Docs from "../../schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import logging from "../logging";
-import { currEditDoc, clients, client_path, ERROR_MESSAGE } from "../store";
-import User from "../schema/user";
+import logging from "../../logging.js";
+import { currEditDoc, clients, ERROR_MESSAGE } from "../../store.js";
+import User from "../../schema/user.js";
 import Delta from "quill-delta";
 import path from "path";
-import cookieParser from "cookie-parser";
 import { v4 as uuid } from "uuid";
 
-const router = express.Router();
-router.get("/edit/:DOCID", async (req, res, next) => {
-  logging.info(`Section Cookie:`);
-  logging.info(req.session);
-  if (!req.session.user) {
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Not logged in"));
-  } else {
+export default async (fastify, opts) => {
+  fastify.get("/edit/:DOCID", async (req, res, next) => {
     const docId = req.params.DOCID;
     logging.info("[/doc/edit/:DOCID] Route");
     logging.info(`Requested from ${docId}`);
-    const filePath = path.join(client_path, "index.html");
-    logging.info(`Filepath: ${filePath}`);
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    // console.log("req.cookies: ", req.cookies);
-    // //console.log("req.session.cookie: ", req.session.cookie);
-    // const cookieName = "connect.sid";
-    // const cookieValue = req.cookies.cookieName;
-    // console.log("cookie name: ", cookieName);
-    // console.log("cookie value: ", cookieValue);
-    // res.cookie(cookieName, cookieValue);
-    res.sendFile(filePath);
-  }
-});
+    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    return res.sendFile("index.html");
+  });
 
-router.post("/presence/:DOCID/:UID", async (req, res) => {
-  if (!req.session.user) {
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Not logged in"));
-  } else {
+  fastify.post("/presence/:DOCID/:UID", async (req, res) => {
     logging.info("[/doc/presence/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     const id = req.params.UID;
@@ -62,29 +40,25 @@ router.post("/presence/:DOCID/:UID", async (req, res) => {
       };
       logging.info("presence: ", id);
       logging.info(presence, id);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send({});
+
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
-          client.res.write(`data: ${JSON.stringify(presence)}\n\n`);
+          client.res.raw.write(`data: ${JSON.stringify(presence)}\n\n`);
           logging.info(`sent message to UID = ${client.id}`, id);
           logging.info(`sent: ${JSON.stringify(presence)}`, id);
         }
       });
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return {};
     } catch (err) {
       logging.error("Failed to send presence");
       logging.error(err);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE("Failed to send presence"));
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return ERROR_MESSAGE("Failed to send presence");
     }
-  }
-});
+  });
 
-router.get("/get/:DOCID/:UID", async (req, res) => {
-  if (!req.session.user) {
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Not logged in"));
-  } else {
+  fastify.get("/get/:DOCID/:UID", async (req, res) => {
     logging.info("[/doc/get/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     // Not sure what uid is for
@@ -96,23 +70,17 @@ router.get("/get/:DOCID/:UID", async (req, res) => {
       const html = converter.convert();
       logging.info("Sent HTML: ");
       logging.info(html);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(html);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return html;
     } catch (err) {
       logging.error("fail to convert to HTML Format");
       logging.error(err);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE("fail to convert to HTML Format"));
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return ERROR_MESSAGE("fail to convert to HTML Format");
     }
-  }
-});
+  });
 
-router.get("/connect/:DOCID/:UID", async (req, res) => {
-  if (!req.session.user) {
-    logging.info("/doc/connect reached, bit SESSION EXPIRED");
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.send(ERROR_MESSAGE("Not logged in"));
-  } else {
+  fastify.get("/connect/:DOCID/:UID", async (req, res) => {
     logging.info("[/doc/connect/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     const id = req.params.UID;
@@ -120,17 +88,18 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
       const document = await Docs.findById(docId);
       if (document) {
         logging.info(`Found doc id = ${docId}`);
-        res.status(200).set({
+        const headers = {
           "Content-Type": "text/event-stream",
           Connection: "keep-alive",
           "Access-Control-Allow-Origin": "*",
           "X-CSE356": "61f9f57373ba724f297db6ba",
-        });
+        };
+        res.raw.writeHead(200, headers);
         const payload = {
           content: document.data.ops,
           version: document.version,
         };
-        res.write(`data: ${JSON.stringify(payload)}\n\n`);
+        res.raw.write(`data: ${JSON.stringify(payload)}\n\n`);
         logging.info(`Event Stream connection open for UID = ${id}`);
         logging.info(`[Pushed data]`);
         logging.info(payload);
@@ -141,39 +110,33 @@ router.get("/connect/:DOCID/:UID", async (req, res) => {
         };
         clients.push(newClient);
         logging.info(`Current connected clients = ${clients.length}`);
-        req.on("close", () => {
+        req.raw.on("close", () => {
           logging.info(`UID = ${id} connection closed`);
           clients.map((c, index) =>
             c.id === id ? clients.splice(index, 1) : clients
           );
           logging.info(`remaining clients = ${clients.length}`);
         });
+        res.sent = true;
       } else {
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        res.send(ERROR_MESSAGE(`Did not find matching doc for id =${docId}`));
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        return ERROR_MESSAGE(`Did not find matching doc for id =${docId}`);
       }
     } catch (err) {
       logging.error("fail to create event stream connection");
       logging.error(err);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE(err));
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return ERROR_MESSAGE(err);
     }
-  }
-});
+  });
 
-router.post("/op/:DOCID/:UID", async (req, res) => {
-  if (!req.session.user) {
-    res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-    res.json(ERROR_MESSAGE("Not logged in"));
-  } else {
+  fastify.post("/op/:DOCID/:UID", async (req, res) => {
     const id = req.params.UID;
     logging.info("[/doc/op/:DOCID/:UID] Route", id);
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    logging.info(
-      `--------------Remaining connected clients : ${clients.length}`
-    );
+
     logging.info(`Incoming Version = ${version}`, id);
     logging.info(`Incoming op =`, id);
     logging.info(op, id);
@@ -181,18 +144,13 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
       const document = await Docs.findById(docId);
       logging.info(`Document Version = ${document.version}`, id);
       if (version !== document.version || currEditDoc[0] === docId) {
-        // logging.info(`Document Version = ${document.version}`, id);
-        //       logging.info(`Document = `, id);
-        //       logging.info(document, id);
-        //       if (version !== document.version) {
-
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
           id
         );
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("sending { status: retry }", id);
-        res.send({ status: "retry" });
+        return { status: "retry" };
       } else {
         currEditDoc.push(docId);
         const incomming = new Delta(op);
@@ -200,18 +158,6 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
         logging.info(incomming, id);
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
-        // logging.info("newDelta Delta: ", id);
-        // logging.info(newDelta, id);
-        const document2 = await Docs.findById(docId);
-        // if (version !== document2.version) {
-        //   logging.info(
-        //     `Version is not matched. client = ${version}, server=${document2.version}`,
-        //     id
-        //   );
-        //   res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        //   logging.info("sending { status: retry }", id);
-        //   res.send({ status: "retry" });
-        // } else {
         await Docs.findByIdAndUpdate(docId, {
           $set: { data: newDelta },
           $inc: { version: 1 },
@@ -228,7 +174,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           if (client.id === id) {
             logging.info(`Sending ACK to UID = ${client.id}`, id);
             logging.info(`sent ack: ${JSON.stringify(ack)}`, id);
-            client.res.write(`data: ${JSON.stringify(ack)}\n\n`);
+            client.res.raw.write(`data: ${JSON.stringify(ack)}\n\n`);
           }
         });
 
@@ -237,7 +183,7 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           if (client.docId === docId && client.id !== id) {
             logging.info(`Sending OP to UID = ${client.id}`, id);
             logging.info(`sent op: ${JSON.stringify(op)}`, id);
-            client.res.write(`data: ${JSON.stringify(op)}\n\n`);
+            client.res.raw.write(`data: ${JSON.stringify(op)}\n\n`);
           }
         });
         logging.info("sending { status: ok }", id);
@@ -246,26 +192,13 @@ router.post("/op/:DOCID/:UID", async (req, res) => {
           `currEditDoc is reset with length ${currEditDoc.length}`,
           id
         );
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        res.send({ status: "ok" });
-
-        // logging.info("Sending OP", id);
-        // clients.forEach((client) => {
-        //   if (client.docId === docId && client.id !== id) {
-        //     logging.info(`Sending OP to UID = ${client.id}`, id);
-        //     logging.info(`sent op: ${JSON.stringify(op)}`, id);
-        //     client.res.write(`data: ${JSON.stringify(op)}\n\n`);
-        //   }
-        // });
-        // logging.info("sending { status: ok }", id);
-        // res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
-        // res.send({ status: "ok" });
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        return { status: "ok" };
       }
     } catch (err) {
       logging.error("failed to update OP", id);
       logging.error(err, id);
-      res.send(ERROR_MESSAGE("failed to update OP"));
+      return ERROR_MESSAGE("failed to update OP");
     }
-  }
-});
-export default router;
+  });
+};
