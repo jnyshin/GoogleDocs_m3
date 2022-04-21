@@ -71,7 +71,7 @@ export default async (fastify, opts) => {
     );
     const user = await User.findOne({ email: email });
     if (user) {
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("already registered with same email");
     } else {
       try {
@@ -105,11 +105,11 @@ export default async (fastify, opts) => {
         const transporter = nodemailer.createTransport(mailOption);
         transporter.sendMail(info);
         logging.info("Message sent: %s", info.messageId);
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       } catch (err) {
         console.log(err);
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE("failed to send email");
       }
     }
@@ -124,15 +124,15 @@ export default async (fastify, opts) => {
       const user = await User.findById(key);
       if (user && key === user.key) {
         await User.findByIdAndUpdate(user._id, { enable: true });
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       } else {
-        res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE(`email verification failed`);
       }
     } catch (err) {
       logging.error(err);
-      res.setHeader("X-CSE356", "61f9f57373ba724f297db6ba");
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Error while verify");
     }
   });
