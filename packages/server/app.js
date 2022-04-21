@@ -42,7 +42,7 @@ export default async (fastify, opts) => {
     if (!req.url.startsWith("/user")) {
       if (!req.session.user) {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        return ERROR_MESSAGE("Not logged in");
+        res.send(ERROR_MESSAGE("Not logged in"));
       }
     }
     next();
