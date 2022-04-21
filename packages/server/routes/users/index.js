@@ -2,7 +2,7 @@ import { ERROR_MESSAGE } from "../../store.js";
 import User from "../../schema/user.js";
 import logging from "../../logging.js";
 import { v4 as uuid } from "uuid";
-import path from "path";
+import nodemailer from "nodemailer";
 export default async (fastify, opts) => {
   fastify.get("/login", (req, res) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
