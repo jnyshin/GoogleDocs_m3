@@ -7,6 +7,10 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
+import os from "os";
+import cluster from "cluster";
+
+const numCore = os.cpus.length; //finds the number of cores in the machine
 
 const { NODE_ENV, SECRET } = process.env;
 export default async (fastify, opts) => {
@@ -63,3 +67,14 @@ export default async (fastify, opts) => {
       .finally(() => done());
   });
 };
+
+if (numCore > 1) {
+  if (cluster.isPrimary) {
+    for (let i = 0; i < numCore; i++) {
+      cluster.fork();
+    }
+    cluster.on("exit", (worker) => {
+      console.log("Worker", worker.id, " has exited");
+    });
+  }
+}
