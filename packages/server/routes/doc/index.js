@@ -4,8 +4,7 @@ import logging from "../../logging.js";
 import { currEditDoc, clients, ERROR_MESSAGE } from "../../store.js";
 import User from "../../schema/user.js";
 import Delta from "quill-delta";
-import path from "path";
-import { v4 as uuid } from "uuid";
+import fastJson from "fast-json-stringify";
 
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
@@ -40,12 +39,31 @@ export default async (fastify, opts) => {
       };
       logging.info("presence: ", id);
       logging.info(presence, id);
-
+      const stringify = fastJson({
+        title: "presence",
+        type: "object",
+        properties: {
+          presense: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              cursor: {
+                type: "object",
+                properties: {
+                  index: { type: "number" },
+                  length: { type: "number" },
+                  name: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      });
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
-          client.res.raw.write(`data: ${JSON.stringify(presence)}\n\n`);
+          client.res.raw.write(`data: ${stringify(presence)}\n\n`);
           logging.info(`sent message to UID = ${client.id}`, id);
-          logging.info(`sent: ${JSON.stringify(presence)}`, id);
+          logging.info(`sent: ${stringify(presence)}`, id);
         }
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
@@ -99,7 +117,15 @@ export default async (fastify, opts) => {
           content: document.data.ops,
           version: document.version,
         };
-        res.raw.write(`data: ${JSON.stringify(payload)}\n\n`);
+        const stringify = fastJson({
+          title: "initial content w/ version",
+          type: "object",
+          properties: {
+            content: { type: "array" },
+            version: { type: "number" },
+          },
+        });
+        res.raw.write(`data: ${stringify(payload)}\n\n`);
         logging.info(`Event Stream connection open for UID = ${id}`);
         logging.info(`[Pushed data]`);
         logging.info(payload);
@@ -168,22 +194,29 @@ export default async (fastify, opts) => {
         logging.info(`Old version - ${newDocument.version - 1}`, id);
         logging.info(`New version - ${newDocument.version}`, id);
         const ack = { ack: op };
-
+        const stringify = fastJson({
+          title: "ack",
+          type: "object",
+          properties: {
+            ack: { type: "array" },
+          },
+        });
+        const stringify2 = fastJson({
+          title: "op",
+          type: "array",
+        });
         logging.info("Sending ACK", id);
+        logging.info("Sending OP", id);
         clients.forEach((client) => {
           if (client.id === id) {
             logging.info(`Sending ACK to UID = ${client.id}`, id);
-            logging.info(`sent ack: ${JSON.stringify(ack)}`, id);
-            client.res.raw.write(`data: ${JSON.stringify(ack)}\n\n`);
+            logging.info(`sent ack: ${stringify(ack)}`, id);
+            client.res.raw.write(`data: ${stringify(ack)}\n\n`);
           }
-        });
-
-        logging.info("Sending OP", id);
-        clients.forEach((client) => {
           if (client.docId === docId && client.id !== id) {
             logging.info(`Sending OP to UID = ${client.id}`, id);
-            logging.info(`sent op: ${JSON.stringify(op)}`, id);
-            client.res.raw.write(`data: ${JSON.stringify(op)}\n\n`);
+            logging.info(`sent op: ${stringify2(op)}`, id);
+            client.res.raw.write(`data: ${stringify2(op)}\n\n`);
           }
         });
         logging.info("sending { status: ok }", id);
