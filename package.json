@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
     "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" ",
-    "pm": "concurrently \"yarn workspace server pm-pro\""
+    "pm": "concurrently \"yarn workspace server pm-pro\"",
+    "pm-dev": "concurrently \"yarn workspace server pm-dev\""
   },
   "workspaces": [
     "packages/*"

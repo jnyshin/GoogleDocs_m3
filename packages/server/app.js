@@ -6,13 +6,12 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import fastifyRedis from "fastify-redis";
 import { RedisStore } from "fastify-redis-session";
 import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
-const redisClient = redis.createClient({ host: "127.0.0.1", port: 6379 });
-redisClient.connect().then(console.log("redis connected"));
+
+//const redisClient = redis.createClient({ host: "127.0.0.1", port: 6379 });
 
 const { NODE_ENV } = process.env;
 // const fastify = Fastify({
@@ -26,6 +25,8 @@ const fastify = Fastify({
 });
 const PORT = NODE_ENV === "production" ? 80 : 8000;
 const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
+const redisClient = redis.createClient({ host: IP, port: 6379 });
+redisClient.connect().then(console.log("redis connected"));
 
 fastify.register(fastifyCors, {});
 
