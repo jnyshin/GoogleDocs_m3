@@ -6,21 +6,17 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import fastifyRedis from "fastify-redis";
 import { RedisStore } from "fastify-redis-session";
 import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
-const redisClient = redis.createClient({ host: "localhost", port: 6379 });
 const { NODE_ENV } = process.env;
 const fastify = Fastify({
-  logger: {
-    level: "info",
-    file: join(__dirname, "log", "info.txt"),
-  },
+  logger: true,
 });
 const PORT = NODE_ENV === "production" ? 80 : 8000;
 const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
+const redisClient = redis.createClient({ host: IP, port: 6379 });
 
 fastify.register(fastifyCors, {});
 
@@ -47,9 +43,6 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyMultipart);
-// fastify.register(fastifyRedis, {
-//   client: redisClient,
-// });
 
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
