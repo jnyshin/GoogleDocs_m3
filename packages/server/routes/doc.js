@@ -1,7 +1,7 @@
 import Docs from "../schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import logging from "../logging.js";
-import { currEditDoc, clients, ERROR_MESSAGE } from "../store.js";
+import { ERROR_MESSAGE } from "../store.js";
 import User from "../schema/user.js";
 import Delta from "quill-delta";
 import fastJson from "fast-json-stringify";
@@ -21,6 +21,9 @@ export default async (fastify, opts) => {
     const id = req.params.UID;
     const { index, length } = req.body;
     logging.info(`Request with index=${index}, length=${length}`, id);
+    const { redis } = fastify;
+    const clients = await redis.lrange("clients", 0, -1);
+    console.log("from /presence, ", clients);
     try {
       const _id = req.session.user.id;
       logging.info(`session user id = ${_id}`, id);
@@ -102,6 +105,7 @@ export default async (fastify, opts) => {
     logging.info("[/doc/connect/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     const id = req.params.UID;
+    const { redis } = fastify;
     try {
       const document = await Docs.findById(docId);
       if (document) {
@@ -134,7 +138,10 @@ export default async (fastify, opts) => {
           docId: docId,
           res,
         };
-        clients.push(newClient);
+        //clients.push(newClient);
+        redis.lpush("clients", newClient.id);
+        const clients = await redis.lrange("clients", 0, -1);
+        console.log("from /connect, ", clients);
         logging.info(`Current connected clients = ${clients.length}`);
         req.raw.on("close", () => {
           logging.info(`UID = ${id} connection closed`);
@@ -162,14 +169,16 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-
+    const { redis } = fastify;
     logging.info(`Incoming Version = ${version}`, id);
     logging.info(`Incoming op =`, id);
     logging.info(op, id);
     try {
       const document = await Docs.findById(docId);
+      let checkCurrDoc = await redis.sismember("currDoc", docId);
+      console.log("Is this doc being edited? 0 means it is free", checkCurrDoc);
       logging.info(`Document Version = ${document.version}`, id);
-      if (version !== document.version || currEditDoc[0] === docId) {
+      if (version !== document.version || checkCurrDoc == "1") {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
           id
@@ -178,7 +187,8 @@ export default async (fastify, opts) => {
         logging.info("sending { status: retry }", id);
         return { status: "retry" };
       } else {
-        currEditDoc.push(docId);
+        await redis.sadd("currDoc", docId);
+        console.log(await redis.smembers("currDoc"));
         const incomming = new Delta(op);
         logging.info("Incomming Delta from : ", id);
         logging.info(incomming, id);
@@ -207,6 +217,8 @@ export default async (fastify, opts) => {
         });
         logging.info("Sending ACK", id);
         logging.info("Sending OP", id);
+        const clients = await redis.lrange("clients", 0, -1);
+        console.log("from /op, ", clients);
         clients.forEach((client) => {
           if (client.id === id) {
             logging.info(`Sending ACK to UID = ${client.id}`, id);
@@ -220,11 +232,11 @@ export default async (fastify, opts) => {
           }
         });
         logging.info("sending { status: ok }", id);
-        currEditDoc.pop();
-        logging.info(
-          `currEditDoc is reset with length ${currEditDoc.length}`,
-          id
-        );
+
+        await redis.srem("currDoc", docId);
+        let currDocLen = await redis.scard("currDoc");
+        console.log(await redis.smembers("currDoc"));
+        logging.info(`currEditDoc is reset with length ${currDocLen}`, id);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       }
