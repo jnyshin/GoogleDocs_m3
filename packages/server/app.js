@@ -1,16 +1,17 @@
 import mongoose from "mongoose";
 import AutoLoad from "fastify-autoload";
 import { join } from "path";
-import { ERROR_MESSAGE, __dirname } from "./store.js";
+import { ERROR_MESSAGE, __dirname, currEditDoc } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import os from "os";
-import cluster from "cluster";
+import fastify from "fastify";
+import fastifyRedis from "fastify-redis";
+//import redis from "redis";
 
-const numCore = os.cpus.length; //finds the number of cores in the machine
+//const redisClient = redis.createClient();
 
 const { NODE_ENV, SECRET } = process.env;
 export default async (fastify, opts) => {
@@ -34,13 +35,15 @@ export default async (fastify, opts) => {
   fastify.register(fastifyStatic, {
     root: join(__dirname, "dist"),
   });
-
   fastify.register(fastifyMultipart);
-
   fastify.register(AutoLoad, {
     dir: join(__dirname, "routes"),
-    options: Object.assign({}, opts),
   });
+
+  fastify.register(fastifyRedis, {
+    host: "127.0.0.1",
+  });
+
   fastify.addHook("preHandler", (req, res, next) => {
     req.log.info(`incoming request from ${req.ip}`);
     if (!req.url.startsWith("/user")) {
@@ -50,6 +53,18 @@ export default async (fastify, opts) => {
       }
     }
     next();
+  });
+  fastify.get(`/`, async (req, res) => {
+    console.log(`from ${process.pid}`);
+    //return { hello: "world" };
+    //currEditDoc.push("a");
+    //redisClient.get("counter");
+    const { redis } = app;
+    await redis.get(`counter`, (err, val) => {
+      console.log(val);
+      res.send(`from ${process.pid}, ${val}`);
+    });
+    redis.incr(`counter`);
   });
   fastify.register((fastifyInstance, options, done) => {
     mongoose
@@ -66,6 +81,18 @@ export default async (fastify, opts) => {
       })
       .finally(() => done());
   });
+};
+
+const start = async () => {
+  try {
+    await app.listen(NODE_ENV === "production" ? 80 : 8000);
+    console.log(NODE_ENV);
+    const address = app.server.address();
+    console.log(address);
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
 };
 
 if (numCore > 1) {
