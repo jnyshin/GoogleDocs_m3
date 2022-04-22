@@ -74,4 +74,4 @@ app.register((fastifyInstance, options, done) => {
     })
     .finally(() => done());
 });
-app.listen(NODE_PORT);
+app.listen(PORT, IP);
