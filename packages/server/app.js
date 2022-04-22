@@ -11,10 +11,7 @@ import fastify from "fastify";
 
 const { NODE_ENV, SECRET } = process.env;
 const PORT = NODE_ENV === "production" ? 80 : 8000;
-const IP =
-  NODE_ENV === "production"
-    ? "127.0.0.1"
-    : "http://icloud.cse356.compas.cs.stonybrook.edu/";
+const IP = NODE_ENV === "production" ? "127.0.0.1" : "209.94.56.137";
 const app = fastify({ logger: true });
 
 app.register(fastifyCors, {});
