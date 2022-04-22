@@ -47,9 +47,9 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyMultipart);
-fastify.register(fastifyRedis, {
-  client: redisClient,
-});
+// fastify.register(fastifyRedis, {
+//   client: redisClient,
+// });
 
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
