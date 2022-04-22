@@ -138,7 +138,6 @@ export default async (fastify, opts) => {
           docId: docId,
           res,
         };
-        //clients.push(newClient);
         redis.lpush("clients", newClient.id);
         const clients = await redis.lrange("clients", 0, -1);
         console.log("from /connect, ", clients);
