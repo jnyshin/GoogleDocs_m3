@@ -1,11 +1,21 @@
 import fastify from "fastify";
-
-fastify({
+const server = fastify({
   logger: true,
 });
-fastify.get("/", async (request, reply) => {
-  console.log(`from :${process.pid}`);
-  return { hello: "world" };
+server.get("/", async (request, reply) => {
+  console.log(`from ${process.pid}`);
+  return { pong: "it worked!" };
 });
 
-fastify.listen(3000);
+const start = async () => {
+  try {
+    await server.listen(3000);
+
+    const address = server.server.address();
+    const port = typeof address === "string" ? address : address?.port;
+  } catch (err) {
+    server.log.error(err);
+    process.exit(1);
+  }
+};
+start();
