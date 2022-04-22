@@ -6,6 +6,7 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
+import fastifyRedis from "fastify-redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
 
@@ -41,6 +42,9 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyMultipart);
+fastify.register(fastifyRedis, {
+  host: "127.0.0.1",
+});
 
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
