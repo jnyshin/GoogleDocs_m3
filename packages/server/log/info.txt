@@ -1,0 +1,187 @@
+{"level":40,"time":1650604232908,"pid":96797,"hostname":"HasungucBookAir","msg":"\"root\" path \"/Users/hasungjun/Documents/GitHub/GoogleDocs_m3/packages/server/dist\" must exist"}
+{"level":30,"time":1650604232931,"pid":96797,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650604238175,"pid":96797,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":61524},"msg":"incoming request"}
+{"level":30,"time":1650604238180,"pid":96797,"hostname":"HasungucBookAir","reqId":"req-1","msg":"incoming request from /users/login"}
+{"level":30,"time":1650604238184,"pid":96797,"hostname":"HasungucBookAir","reqId":"req-1","msg":"incoming request from /users/login"}
+{"level":30,"time":1650604238184,"pid":96797,"hostname":"HasungucBookAir","reqId":"req-1","msg":"Route GET:/users/login not found"}
+{"level":30,"time":1650604238194,"pid":96797,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":404},"responseTime":18.20674991607666,"msg":"request completed"}
+{"level":40,"time":1650604292763,"pid":96884,"hostname":"HasungucBookAir","msg":"\"root\" path \"/Users/hasungjun/Documents/GitHub/GoogleDocs_m3/packages/server/dist\" must exist"}
+{"level":30,"time":1650604292790,"pid":96884,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":40,"time":1650604322049,"pid":96920,"hostname":"HasungucBookAir","msg":"\"root\" path \"/Users/hasungjun/Documents/GitHub/GoogleDocs_m3/packages/server/dist\" must exist"}
+{"level":30,"time":1650604322070,"pid":96920,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":40,"time":1650604322602,"pid":96926,"hostname":"HasungucBookAir","msg":"\"root\" path \"/Users/hasungjun/Documents/GitHub/GoogleDocs_m3/packages/server/dist\" must exist"}
+{"level":30,"time":1650604322625,"pid":96926,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650604328669,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":61913},"msg":"incoming request"}
+{"level":30,"time":1650604328674,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-1","msg":"incoming request from /login"}
+{"level":30,"time":1650604328680,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":200},"responseTime":9.693292140960693,"msg":"request completed"}
+{"level":30,"time":1650604331889,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":61913},"msg":"incoming request"}
+{"level":30,"time":1650604331890,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-2","msg":"incoming request from /users/login"}
+{"level":30,"time":1650604331892,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-2","msg":"incoming request from /users/login"}
+{"level":30,"time":1650604331893,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-2","msg":"Route GET:/users/login not found"}
+{"level":30,"time":1650604331893,"pid":96926,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":404},"responseTime":3.9892916679382324,"msg":"request completed"}
+{"level":30,"time":1650605086868,"pid":97974,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605094952,"pid":97993,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605096558,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605096559,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-1","msg":"incoming request from /users/login"}
+{"level":30,"time":1650605096566,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":304},"responseTime":7.1240410804748535,"msg":"request completed"}
+{"level":30,"time":1650605096585,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605096586,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-2","msg":"incoming request from /assets/index.bb9d5c52.js"}
+{"level":30,"time":1650605096587,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":200},"responseTime":1.3523750305175781,"msg":"request completed"}
+{"level":30,"time":1650605096587,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-3","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605096588,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-3","msg":"incoming request from /assets/index.e259b5ee.css"}
+{"level":30,"time":1650605096589,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-3","res":{"statusCode":200},"responseTime":1.3350000381469727,"msg":"request completed"}
+{"level":30,"time":1650605096592,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-4","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605096592,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-4","msg":"incoming request from /assets/favicon.17e50649.svg"}
+{"level":30,"time":1650605096592,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-4","res":{"statusCode":200},"responseTime":0.3561248779296875,"msg":"request completed"}
+{"level":30,"time":1650605097309,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-5","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605097310,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-5","msg":"incoming request from /users/login"}
+{"level":30,"time":1650605097311,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-5","res":{"statusCode":304},"responseTime":1.7002921104431152,"msg":"request completed"}
+{"level":30,"time":1650605097327,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-6","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605097327,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-6","msg":"incoming request from /assets/index.bb9d5c52.js"}
+{"level":30,"time":1650605097328,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-6","res":{"statusCode":200},"responseTime":0.8110837936401367,"msg":"request completed"}
+{"level":30,"time":1650605097333,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-7","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605097333,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-7","msg":"incoming request from /assets/index.e259b5ee.css"}
+{"level":30,"time":1650605097334,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-7","res":{"statusCode":200},"responseTime":0.6876668930053711,"msg":"request completed"}
+{"level":30,"time":1650605097337,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-8","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605097338,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-8","msg":"incoming request from /assets/favicon.17e50649.svg"}
+{"level":30,"time":1650605097338,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-8","res":{"statusCode":200},"responseTime":0.6251668930053711,"msg":"request completed"}
+{"level":30,"time":1650605098706,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-9","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605098707,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-9","msg":"incoming request from /users/login"}
+{"level":30,"time":1650605098709,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-9","res":{"statusCode":304},"responseTime":2.0963330268859863,"msg":"request completed"}
+{"level":30,"time":1650605098722,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-a","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605098723,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-a","msg":"incoming request from /assets/index.bb9d5c52.js"}
+{"level":30,"time":1650605098724,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-a","res":{"statusCode":200},"responseTime":1.512834072113037,"msg":"request completed"}
+{"level":30,"time":1650605098725,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-b","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605098725,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-b","msg":"incoming request from /assets/index.e259b5ee.css"}
+{"level":30,"time":1650605098726,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-b","res":{"statusCode":200},"responseTime":0.9242920875549316,"msg":"request completed"}
+{"level":30,"time":1650605098728,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-c","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605098728,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-c","msg":"incoming request from /assets/favicon.17e50649.svg"}
+{"level":30,"time":1650605098729,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-c","res":{"statusCode":200},"responseTime":0.7510418891906738,"msg":"request completed"}
+{"level":30,"time":1650605101783,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-d","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605101800,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-d","msg":"incoming request from /users/login"}
+{"level":30,"time":1650605101804,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-d","res":{"statusCode":304},"responseTime":4.421541690826416,"msg":"request completed"}
+{"level":30,"time":1650605101820,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-e","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65341},"msg":"incoming request"}
+{"level":30,"time":1650605101821,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-e","msg":"incoming request from /assets/index.bb9d5c52.js"}
+{"level":30,"time":1650605101822,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-e","res":{"statusCode":200},"responseTime":1.174583911895752,"msg":"request completed"}
+{"level":30,"time":1650605101823,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-f","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605101823,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-f","msg":"incoming request from /assets/index.e259b5ee.css"}
+{"level":30,"time":1650605101841,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-f","res":{"statusCode":200},"responseTime":18.25624990463257,"msg":"request completed"}
+{"level":30,"time":1650605101844,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-g","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65340},"msg":"incoming request"}
+{"level":30,"time":1650605101860,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-g","msg":"incoming request from /assets/favicon.17e50649.svg"}
+{"level":30,"time":1650605101861,"pid":97993,"hostname":"HasungucBookAir","reqId":"req-g","res":{"statusCode":200},"responseTime":1.4273338317871094,"msg":"request completed"}
+{"level":30,"time":1650605110011,"pid":98011,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605111009,"pid":98019,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605112073,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65414},"msg":"incoming request"}
+{"level":30,"time":1650605112089,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":304},"responseTime":15.28000020980835,"msg":"request completed"}
+{"level":30,"time":1650605112119,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65414},"msg":"incoming request"}
+{"level":30,"time":1650605112121,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":200},"responseTime":1.990832805633545,"msg":"request completed"}
+{"level":30,"time":1650605112122,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-3","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65415},"msg":"incoming request"}
+{"level":30,"time":1650605112123,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-3","res":{"statusCode":200},"responseTime":1.0809578895568848,"msg":"request completed"}
+{"level":30,"time":1650605112127,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-4","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65415},"msg":"incoming request"}
+{"level":30,"time":1650605112130,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-4","res":{"statusCode":200},"responseTime":1.9330830574035645,"msg":"request completed"}
+{"level":30,"time":1650605118918,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-5","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65441},"msg":"incoming request"}
+{"level":30,"time":1650605118923,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-5","res":{"statusCode":304},"responseTime":4.350375175476074,"msg":"request completed"}
+{"level":30,"time":1650605118934,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-6","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65441},"msg":"incoming request"}
+{"level":30,"time":1650605118936,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-6","res":{"statusCode":200},"responseTime":1.3784589767456055,"msg":"request completed"}
+{"level":30,"time":1650605118937,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-7","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65442},"msg":"incoming request"}
+{"level":30,"time":1650605118938,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-7","res":{"statusCode":200},"responseTime":0.6468753814697266,"msg":"request completed"}
+{"level":30,"time":1650605118940,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-8","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":65442},"msg":"incoming request"}
+{"level":30,"time":1650605118941,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-8","res":{"statusCode":200},"responseTime":0.7685418128967285,"msg":"request completed"}
+{"level":30,"time":1650605158122,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-9","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49237},"msg":"incoming request"}
+{"level":30,"time":1650605158128,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-9","res":{"statusCode":304},"responseTime":4.548209190368652,"msg":"request completed"}
+{"level":30,"time":1650605158149,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-a","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49237},"msg":"incoming request"}
+{"level":30,"time":1650605158151,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-a","res":{"statusCode":200},"responseTime":1.834625244140625,"msg":"request completed"}
+{"level":30,"time":1650605158151,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-b","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49238},"msg":"incoming request"}
+{"level":30,"time":1650605158153,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-b","res":{"statusCode":200},"responseTime":1.0425000190734863,"msg":"request completed"}
+{"level":30,"time":1650605158159,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-c","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49238},"msg":"incoming request"}
+{"level":30,"time":1650605158160,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-c","res":{"statusCode":200},"responseTime":1.0414581298828125,"msg":"request completed"}
+{"level":30,"time":1650605161528,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-d","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49238},"msg":"incoming request"}
+{"level":30,"time":1650605161530,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-d","res":{"statusCode":200},"responseTime":1.2660417556762695,"msg":"request completed"}
+{"level":30,"time":1650605164016,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-e","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49238},"msg":"incoming request"}
+{"level":30,"time":1650605164018,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-e","res":{"statusCode":304},"responseTime":2.0789589881896973,"msg":"request completed"}
+{"level":30,"time":1650605164033,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-f","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49238},"msg":"incoming request"}
+{"level":30,"time":1650605164035,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-f","res":{"statusCode":200},"responseTime":1.6456670761108398,"msg":"request completed"}
+{"level":30,"time":1650605164036,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-g","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49259},"msg":"incoming request"}
+{"level":30,"time":1650605164037,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-g","res":{"statusCode":200},"responseTime":0.8619170188903809,"msg":"request completed"}
+{"level":30,"time":1650605164040,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-h","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49259},"msg":"incoming request"}
+{"level":30,"time":1650605164042,"pid":98019,"hostname":"HasungucBookAir","reqId":"req-h","res":{"statusCode":200},"responseTime":1.607874870300293,"msg":"request completed"}
+{"level":30,"time":1650605171026,"pid":98065,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605171401,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49296},"msg":"incoming request"}
+{"level":30,"time":1650605171406,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":304},"responseTime":4.789834022521973,"msg":"request completed"}
+{"level":30,"time":1650605171423,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49296},"msg":"incoming request"}
+{"level":30,"time":1650605171424,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-3","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49297},"msg":"incoming request"}
+{"level":30,"time":1650605171432,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-3","res":{"statusCode":200},"responseTime":7.346040725708008,"msg":"request completed"}
+{"level":30,"time":1650605171436,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":200},"responseTime":12.672874927520752,"msg":"request completed"}
+{"level":30,"time":1650605171468,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-4","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"127.0.0.1:8000","remoteAddress":"127.0.0.1","remotePort":49296},"msg":"incoming request"}
+{"level":30,"time":1650605171470,"pid":98065,"hostname":"HasungucBookAir","reqId":"req-4","res":{"statusCode":200},"responseTime":2.0436253547668457,"msg":"request completed"}
+{"level":30,"time":1650605216560,"pid":98090,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605223980,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49520},"msg":"incoming request"}
+{"level":30,"time":1650605224010,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":200},"responseTime":26.521999835968018,"msg":"request completed"}
+{"level":30,"time":1650605224055,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49520},"msg":"incoming request"}
+{"level":30,"time":1650605224056,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":200},"responseTime":1.454124927520752,"msg":"request completed"}
+{"level":30,"time":1650605224057,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-3","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49521},"msg":"incoming request"}
+{"level":30,"time":1650605224058,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-3","res":{"statusCode":200},"responseTime":1.1811251640319824,"msg":"request completed"}
+{"level":30,"time":1650605224062,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-4","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49521},"msg":"incoming request"}
+{"level":30,"time":1650605224063,"pid":98090,"hostname":"HasungucBookAir","reqId":"req-4","res":{"statusCode":200},"responseTime":0.8192501068115234,"msg":"request completed"}
+{"level":30,"time":1650605244696,"pid":98120,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605245434,"pid":98120,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49617},"msg":"incoming request"}
+{"level":30,"time":1650605245466,"pid":98120,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":200},"responseTime":13.152291774749756,"msg":"request completed"}
+{"level":30,"time":1650605246514,"pid":98120,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49617},"msg":"incoming request"}
+{"level":30,"time":1650605246516,"pid":98120,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":200},"responseTime":1.4252080917358398,"msg":"request completed"}
+{"level":30,"time":1650605267836,"pid":98147,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605289067,"pid":98167,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605290714,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605290743,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":200},"responseTime":25.720791339874268,"msg":"request completed"}
+{"level":30,"time":1650605290767,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605290768,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-3","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49818},"msg":"incoming request"}
+{"level":30,"time":1650605290773,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-3","res":{"statusCode":200},"responseTime":4.936916828155518,"msg":"request completed"}
+{"level":30,"time":1650605290780,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":200},"responseTime":11.84816598892212,"msg":"request completed"}
+{"level":30,"time":1650605290816,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-4","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605290817,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-4","res":{"statusCode":200},"responseTime":1.7563753128051758,"msg":"request completed"}
+{"level":30,"time":1650605292532,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-5","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605292534,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-5","res":{"statusCode":304},"responseTime":1.9998340606689453,"msg":"request completed"}
+{"level":30,"time":1650605292548,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-6","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605292549,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-7","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49818},"msg":"incoming request"}
+{"level":30,"time":1650605292551,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-6","res":{"statusCode":304},"responseTime":3.217916965484619,"msg":"request completed"}
+{"level":30,"time":1650605292552,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-7","res":{"statusCode":304},"responseTime":1.9208331108093262,"msg":"request completed"}
+{"level":30,"time":1650605292591,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-8","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49818},"msg":"incoming request"}
+{"level":30,"time":1650605292592,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-8","res":{"statusCode":304},"responseTime":1.228416919708252,"msg":"request completed"}
+{"level":30,"time":1650605293323,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-9","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49818},"msg":"incoming request"}
+{"level":30,"time":1650605293326,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-9","res":{"statusCode":304},"responseTime":3.112499713897705,"msg":"request completed"}
+{"level":30,"time":1650605293340,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-a","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49818},"msg":"incoming request"}
+{"level":30,"time":1650605293342,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-b","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605293345,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-a","res":{"statusCode":304},"responseTime":4.0893330574035645,"msg":"request completed"}
+{"level":30,"time":1650605293346,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-b","res":{"statusCode":304},"responseTime":3.219250202178955,"msg":"request completed"}
+{"level":30,"time":1650605293365,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-c","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49816},"msg":"incoming request"}
+{"level":30,"time":1650605293367,"pid":98167,"hostname":"HasungucBookAir","reqId":"req-c","res":{"statusCode":304},"responseTime":1.7409582138061523,"msg":"request completed"}
+{"level":30,"time":1650605299227,"pid":98188,"hostname":"HasungucBookAir","msg":"Server listening at http://127.0.0.1:8000"}
+{"level":30,"time":1650605300490,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-1","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49862},"msg":"incoming request"}
+{"level":30,"time":1650605300505,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-1","res":{"statusCode":304},"responseTime":13.451791763305664,"msg":"request completed"}
+{"level":30,"time":1650605300527,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-2","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49862},"msg":"incoming request"}
+{"level":30,"time":1650605300529,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-3","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49863},"msg":"incoming request"}
+{"level":30,"time":1650605300531,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-2","res":{"statusCode":304},"responseTime":4.2291669845581055,"msg":"request completed"}
+{"level":30,"time":1650605300532,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-3","res":{"statusCode":304},"responseTime":3.0409998893737793,"msg":"request completed"}
+{"level":30,"time":1650605300557,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-4","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49863},"msg":"incoming request"}
+{"level":30,"time":1650605300558,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-4","res":{"statusCode":304},"responseTime":1.340792179107666,"msg":"request completed"}
+{"level":30,"time":1650605301263,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-5","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49863},"msg":"incoming request"}
+{"level":30,"time":1650605301265,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-5","res":{"statusCode":304},"responseTime":1.7624168395996094,"msg":"request completed"}
+{"level":30,"time":1650605301278,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-6","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49863},"msg":"incoming request"}
+{"level":30,"time":1650605301280,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-6","res":{"statusCode":304},"responseTime":1.1087079048156738,"msg":"request completed"}
+{"level":30,"time":1650605301280,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-7","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49862},"msg":"incoming request"}
+{"level":30,"time":1650605301282,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-7","res":{"statusCode":304},"responseTime":0.7825832366943359,"msg":"request completed"}
+{"level":30,"time":1650605301297,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-8","req":{"method":"GET","url":"/assets/favicon.17e50649.svg","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49862},"msg":"incoming request"}
+{"level":30,"time":1650605301299,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-8","res":{"statusCode":304},"responseTime":1.7851252555847168,"msg":"request completed"}
+{"level":30,"time":1650605307631,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-9","req":{"method":"GET","url":"/","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49899},"msg":"incoming request"}
+{"level":30,"time":1650605307644,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-9","res":{"statusCode":200},"responseTime":12.030457973480225,"msg":"request completed"}
+{"level":30,"time":1650605307663,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-a","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49899},"msg":"incoming request"}
+{"level":30,"time":1650605307665,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-b","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49900},"msg":"incoming request"}
+{"level":30,"time":1650605307667,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-a","res":{"statusCode":304},"responseTime":3.59641695022583,"msg":"request completed"}
+{"level":30,"time":1650605307668,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-b","res":{"statusCode":304},"responseTime":2.8470420837402344,"msg":"request completed"}
+{"level":30,"time":1650605313292,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-c","req":{"method":"GET","url":"/users/login","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49923},"msg":"incoming request"}
+{"level":30,"time":1650605313295,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-c","res":{"statusCode":304},"responseTime":2.722708225250244,"msg":"request completed"}
+{"level":30,"time":1650605313373,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-d","req":{"method":"GET","url":"/assets/index.bb9d5c52.js","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49923},"msg":"incoming request"}
+{"level":30,"time":1650605313375,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-d","res":{"statusCode":304},"responseTime":2.376832962036133,"msg":"request completed"}
+{"level":30,"time":1650605313376,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-e","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49925},"msg":"incoming request"}
+{"level":30,"time":1650605313377,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-e","res":{"statusCode":304},"responseTime":1.3431663513183594,"msg":"request completed"}
+{"level":30,"time":1650605313514,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-f","req":{"method":"GET","url":"/assets/index.e259b5ee.css","hostname":"localhost:8000","remoteAddress":"127.0.0.1","remotePort":49925},"msg":"incoming request"}
+{"level":30,"time":1650605313516,"pid":98188,"hostname":"HasungucBookAir","reqId":"req-f","res":{"statusCode":304},"responseTime":1.8384580612182617,"msg":"request completed"}

@@ -1,7 +1,7 @@
-import Docs from "../../schema/docs.js";
+import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
-import logging from "../../logging.js";
-import { ERROR_MESSAGE } from "../../store.js";
+import logging from "../logging.js";
+import { ERROR_MESSAGE } from "../store.js";
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
     logging.info("[/collection/create] Route");

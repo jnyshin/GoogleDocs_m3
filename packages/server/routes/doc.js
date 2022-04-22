@@ -1,8 +1,8 @@
-import Docs from "../../schema/docs.js";
+import Docs from "../schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import logging from "../../logging.js";
-import { currEditDoc, clients, ERROR_MESSAGE } from "../../store.js";
-import User from "../../schema/user.js";
+import logging from "../logging.js";
+import { currEditDoc, clients, ERROR_MESSAGE } from "../store.js";
+import User from "../schema/user.js";
 import Delta from "quill-delta";
 import fastJson from "fast-json-stringify";
 
