@@ -10,73 +10,62 @@ import fastifyMultipart from "fastify-multipart";
 import fastify from "fastify";
 
 const { NODE_ENV, SECRET } = process.env;
-const app = fastify({ logger: true });
-app.register(fastifyCors, {});
+export default async (app, opts) => {
+  app.register(fastifyCors, {});
 
-app.register(fastifyCookie, {
-  secret:
-    "hjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrk",
-  parseOptions: {},
-});
-app.register(fastifySession, {
-  secret:
-    "hjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrk",
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    httpOnly: true,
-    secure: false,
-  },
-  saveUninitialized: true,
-  resave: true,
-});
+  app.register(fastifyCookie, {
+    secret:
+      "hjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrk",
+    parseOptions: {},
+  });
+  app.register(fastifySession, {
+    secret:
+      "hjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrk",
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+      secure: false,
+    },
+    saveUninitialized: true,
+    resave: true,
+  });
 
-app.register(fastifyStatic, {
-  root: join(__dirname, "dist"),
-});
+  app.register(fastifyStatic, {
+    root: join(__dirname, "dist"),
+  });
 
-app.register(fastifyMultipart);
+  app.register(fastifyMultipart);
 
-app.register(AutoLoad, {
-  dir: join(__dirname, "routes"),
-});
-app.addHook("preHandler", (req, res, next) => {
-  req.log.info(`incoming request from ${req.ip}`);
-  if (!req.url.startsWith("/user")) {
-    if (!req.session.user) {
-      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE("Not logged in"));
+  app.register(AutoLoad, {
+    dir: join(__dirname, "routes"),
+  });
+  app.addHook("preHandler", (req, res, next) => {
+    req.log.info(`incoming request from ${req.ip}`);
+    if (!req.url.startsWith("/user")) {
+      if (!req.session.user) {
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        res.send(ERROR_MESSAGE("Not logged in"));
+      }
     }
-  }
-  next();
-});
-app.get("/", (req, res) => {
-  console.log(`from ${process.pid}`);
-  return { hello: "world" };
-});
-app.register((fastifyInstance, options, done) => {
-  mongoose
-    .connect("mongodb://localhost/docs_clone", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => {
-      console.log("mongoose connected");
-    })
-    .catch((err) => {
-      console.error("failed to connect with MongoDB", err);
-      fastifyInstance.close();
-    })
-    .finally(() => done());
-});
-const start = async () => {
-  try {
-    await app.listen(NODE_ENV === "production" ? 80 : 8000);
-    console.log(NODE_ENV);
-    const address = app.server.address();
-    console.log(address);
-  } catch (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
+    next();
+  });
+  app.get("/", (req, res) => {
+    console.log(`from ${process.pid}`);
+    return { hello: "world" };
+  });
+  app.register((fastifyInstance, options, done) => {
+    mongoose
+      .connect("mongodb://localhost/docs_clone", {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      })
+      .then(() => {
+        console.log("mongoose connected");
+      })
+      .catch((err) => {
+        console.error("failed to connect with MongoDB", err);
+        fastifyInstance.close();
+      })
+      .finally(() => done());
+  });
 };
-start();
