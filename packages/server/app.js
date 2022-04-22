@@ -42,9 +42,9 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyMultipart);
-fastify.register(fastifyRedis, {
-  host: "127.0.0.1",
-});
+// fastify.register(fastifyRedis, {
+//   host: "127.0.0.1",
+// });
 
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
