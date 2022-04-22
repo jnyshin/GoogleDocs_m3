@@ -50,15 +50,18 @@ const userRouter = async (fastify, opts) => {
       return ERROR_MESSAGE("Error in logged in");
     }
   });
-  fastify.post("/logout", (req, res) => {
+  fastify.post("/logout", async (req, res) => {
     logging.info("[/user/logout] Route");
     console.log(req.session.authenticated);
     if (req.session.authenticated) {
-      req.session.destroy(() => {
+      try {
+        await req.session.destroy();
         logging.info("logged out");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { message: "logged out" };
-      });
+      } catch (err) {
+        return err;
+      }
     } else {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(`failed to logout`);
