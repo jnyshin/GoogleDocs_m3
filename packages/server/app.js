@@ -55,7 +55,8 @@ fastify.register(fastifyStatic, {
 
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
-  client: redisClient,
+  //client: redisClient,
+  host: "127.0.0.1",
 });
 
 fastify.addHook("preHandler", (req, res, next) => {
@@ -94,16 +95,18 @@ fastify.get(`/`, (req, res) => {
   //return { hello: "world" };
   //currEditDoc.push("a");
   //redisClient.get("counter");
-  //const { redis } = fastify;
-  redisClient.get(`counter`, (err, val) => {
+  const { redis } = fastify;
+  redis.get(`counter`, (err, val) => {
     if (err) {
-      res.send(err);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return err;
     } else {
       console.log(val);
-      res.send(`from ${process.pid}, ${val}`);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return `from ${process.pid}, ${val}`;
     }
   });
-  redisClient.incr(`counter`);
+  redis.incr(`counter`);
 });
 
 fastify.register((fastifyInstance, options, done) => {
