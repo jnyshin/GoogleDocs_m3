@@ -7,9 +7,11 @@ import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
 import fastifyRedis from "fastify-redis";
+import { RedisStore } from "fastify-redis-session";
+import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
-
+const redisClient = redis.createClient({ host: "localhost", port: 6379 });
 const { NODE_ENV } = process.env;
 const fastify = Fastify({
   logger: {
@@ -27,6 +29,9 @@ fastify.register(fastifyCookie, {
   parseOptions: {},
 });
 fastify.register(fastifySession, {
+  store: new RedisStore({
+    client: redisClient,
+  }),
   secret: "2BCC52D156A297EB555F33A2A605E8FB",
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -42,9 +47,9 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyMultipart);
-// fastify.register(fastifyRedis, {
-//   host: "127.0.0.1",
-// });
+fastify.register(fastifyRedis, {
+  client: redisClient,
+});
 
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
