@@ -1,4 +1,4 @@
-const http = require("http");
+import http from "http";
 const options = ["yes", "no"];
 
 const server = http.createServer((req, res) => {
