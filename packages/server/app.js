@@ -7,21 +7,23 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import fastify from "fastify";
+import Fastify from "fastify";
+const fastify = Fastify({
+  logger: true,
+});
 
 const { NODE_ENV, SECRET } = process.env;
 const PORT = NODE_ENV === "production" ? 80 : 8000;
 const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
-const app = fastify({ logger: true });
 
-app.register(fastifyCors, {});
+fastify.register(fastifyCors, {});
 
-app.register(fastifyCookie, {
+fastify.register(fastifyCookie, {
   secret:
     "hjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrk",
   parseOptions: {},
 });
-app.register(fastifySession, {
+fastify.register(fastifySession, {
   secret:
     "hjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrkhjadksegdjrk",
   cookie: {
@@ -33,16 +35,16 @@ app.register(fastifySession, {
   resave: true,
 });
 
-app.register(fastifyStatic, {
+fastify.register(fastifyStatic, {
   root: join(__dirname, "dist"),
 });
 
-app.register(fastifyMultipart);
+fastify.register(fastifyMultipart);
 
-app.register(AutoLoad, {
+fastify.register(AutoLoad, {
   dir: join(__dirname, "routes"),
 });
-app.addHook("preHandler", (req, res, next) => {
+fastify.addHook("preHandler", (req, res, next) => {
   req.log.info(`incoming request from ${req.ip}`);
   if (!req.url.startsWith("/user")) {
     if (!req.session.user) {
@@ -52,11 +54,11 @@ app.addHook("preHandler", (req, res, next) => {
   }
   next();
 });
-app.get("/", (req, res) => {
+fastify.get("/", (req, res) => {
   console.log(`from ${process.pid}`);
   return { hello: "world" };
 });
-app.register((fastifyInstance, options, done) => {
+fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect("mongodb://localhost/docs_clone", {
       useNewUrlParser: true,
@@ -71,4 +73,12 @@ app.register((fastifyInstance, options, done) => {
     })
     .finally(() => done());
 });
-app.listen(PORT, IP);
+const start = async () => {
+  try {
+    await fastify.listen(PORT, IP);
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+start();
