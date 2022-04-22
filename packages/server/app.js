@@ -7,10 +7,7 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import os from "os";
-import cluster from "cluster";
 import fastify from "fastify";
-const numCore = os.cpus.length; //finds the number of cores in the machine
 
 const { NODE_ENV, SECRET } = process.env;
 const app = fastify({ logger: true });
@@ -52,6 +49,10 @@ app.addHook("preHandler", (req, res, next) => {
   }
   next();
 });
+app.get("/", (req, res) => {
+  console.log(`from ${process.pid}`);
+  return { hello: "world" };
+});
 app.register((fastifyInstance, options, done) => {
   mongoose
     .connect("mongodb://localhost/docs_clone", {
@@ -78,18 +79,4 @@ const start = async () => {
     process.exit(1);
   }
 };
-
-if (numCore > 1) {
-  if (cluster.isPrimary) {
-    for (let i = 0; i < numCore; i++) {
-      cluster.fork();
-    }
-    cluster.on("exit", (worker) => {
-      console.log("Worker", worker.id, " has exited");
-    });
-  } else {
-    start();
-  }
-} else {
-  start();
-}
+start();
