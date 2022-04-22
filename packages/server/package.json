@@ -12,7 +12,6 @@
     "fastify-cli": "^2.15.0",
     "fastify-cookie": "^5.6.1",
     "fastify-cors": "^6.0.3",
-    "fastify-env": "^2.1.1",
     "fastify-multer": "^2.0.2",
     "fastify-multipart": "^5.3.1",
     "fastify-plugin": "^3.0.1",
@@ -24,8 +23,12 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "test": "tap \"test/**/*.test.js\"",
-    "production": "NODE_ENV=PRODUCTION fastify start -l info -P -p 80 -a icloud.cse356.compas.cs.stonybrook.edu app.js",
-    "dev": "NODE_ENV=DEVELOPEMENT fastify start -w -l info -P -p 8000 app.js"
+    "dev": "NODE_ENV=development nodemon app.js",
+    "production": "NODE_ENV=production nodemon app.js",
+    "pm-dev": "NODE_ENV=development pm2 start app.js -i max --attach",
+    "pm-pro": "NODE_ENV=production NODE_PORT=80 pm2 start app.js -i max --attach"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }

@@ -1,5 +1,4 @@
-import path from "path";
-import logging from "../../logging.js";
+import logging from "../logging.js";
 
 export default async (fastify, opts) => {
   fastify.get("/", async (req, res) => {

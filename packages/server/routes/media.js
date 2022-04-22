@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 import multer from "fastify-multer";
-import Images from "../../schema/images.js";
-import logging from "../../logging.js";
-import { __dirname, ERROR_MESSAGE } from "../../store.js";
+import Images from "../schema/images.js";
+import logging from "../logging.js";
+import { __dirname, ERROR_MESSAGE } from "../store.js";
 import path from "path";
 
 const storage = multer.diskStorage({
