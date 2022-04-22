@@ -10,6 +10,11 @@ import fastifyMultipart from "fastify-multipart";
 import fastify from "fastify";
 
 const { NODE_ENV, SECRET } = process.env;
+const PORT = NODE_ENV === "production" ? 80 : 8000;
+const IP =
+  NODE_ENV === "production"
+    ? "127.0.0.1"
+    : "http://icloud.cse356.compas.cs.stonybrook.edu/";
 const app = fastify({ logger: true });
 
 app.register(fastifyCors, {});
