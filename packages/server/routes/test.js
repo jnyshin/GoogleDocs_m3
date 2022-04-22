@@ -3,6 +3,7 @@ export default async (fastify, opts) => {
     const { key } = req.params;
     console.log(key);
     console.log(`from ${process.pid}`);
+    console.log(req.session.authenticated);
     const { redis } = fastify;
     try {
       const value = await redis.get(key);
