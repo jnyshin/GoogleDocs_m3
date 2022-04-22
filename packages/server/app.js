@@ -10,6 +10,7 @@ import { RedisStore } from "fastify-redis-session";
 import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
+import fastifyRedis from "fastify-redis";
 
 //const redisClient = redis.createClient({ host: "127.0.0.1", port: 6379 });
 
