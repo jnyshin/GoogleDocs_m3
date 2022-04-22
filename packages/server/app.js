@@ -83,16 +83,23 @@ fastify.register(import("./routes/media.js"), {
   prefix: "/media",
 });
 
-fastify.get(`/`, async (req, res) => {
+fastify.get(`/`, (request, reply) => {
   console.log(`from ${process.pid}`);
-  //return { hello: "world" };
-  //currEditDoc.push("a");
-  //redisClient.get("counter");
-  await redisClient.get(`counter`, (err, val) => {
-    console.log(val);
-    res.send(`from ${process.pid}, ${val}`);
-  });
-  redisClient.incr(`counter`);
+  const { redis } = fastify;
+  // redis.get(`counter`, (err, val) => {
+  //   if (err) {
+  //     reply.code(200).header("X-CSE356", "61f9f57373ba724f297db6ba").send(err);
+  //   } else {
+  //     console.log(val);
+  //     reply
+  //       .code(200)
+  //       .header("X-CSE356", "61f9f57373ba724f297db6ba")
+  //       .send(`from ${process.pid}, ${val}`);
+  //   }
+  // });
+  // const val = redis.get("counter");
+  reply.send("check send");
+  //redis.incr(`counter`);
 });
 
 fastify.register((fastifyInstance, options, done) => {
