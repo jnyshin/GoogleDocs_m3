@@ -70,6 +70,7 @@ app.register((fastifyInstance, options, done) => {
 const start = async () => {
   try {
     await app.listen(NODE_ENV === "production" ? 80 : 8000);
+    console.log(NODE_ENV);
     const address = app.server.address();
     console.log(address);
   } catch (err) {
