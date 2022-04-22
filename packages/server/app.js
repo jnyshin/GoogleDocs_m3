@@ -6,22 +6,28 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import fastifyRedis from "fastify-redis";
 import { RedisStore } from "fastify-redis-session";
 import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
+import fastifyRedis from "fastify-redis";
 
-const redisClient = redis.createClient({ host: "localhost", port: 6379 });
+//const redisClient = redis.createClient({ host: "127.0.0.1", port: 6379 });
+
 const { NODE_ENV } = process.env;
+// const fastify = Fastify({
+//   logger: {
+//     level: "info",
+//     file: join(__dirname, "log", "info.txt"),
+//   },
+// });
 const fastify = Fastify({
-  logger: {
-    level: "info",
-    file: join(__dirname, "log", "info.txt"),
-  },
+  logger: true,
 });
 const PORT = NODE_ENV === "production" ? 80 : 8000;
 const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
+const redisClient = redis.createClient({ host: IP, port: 6379 });
+redisClient.connect().then(console.log("redis connected"));
 
 fastify.register(fastifyCors, {});
 
@@ -49,7 +55,8 @@ fastify.register(fastifyStatic, {
 
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
-  client: redisClient,
+  //client: redisClient,
+  host: "127.0.0.1",
 });
 
 fastify.addHook("preHandler", (req, res, next) => {
@@ -83,23 +90,23 @@ fastify.register(import("./routes/media.js"), {
   prefix: "/media",
 });
 
-fastify.get(`/`, (request, reply) => {
+fastify.get(`/`, (req, res) => {
   console.log(`from ${process.pid}`);
+  //return { hello: "world" };
+  //currEditDoc.push("a");
+  //redisClient.get("counter");
   const { redis } = fastify;
-  // redis.get(`counter`, (err, val) => {
-  //   if (err) {
-  //     reply.code(200).header("X-CSE356", "61f9f57373ba724f297db6ba").send(err);
-  //   } else {
-  //     console.log(val);
-  //     reply
-  //       .code(200)
-  //       .header("X-CSE356", "61f9f57373ba724f297db6ba")
-  //       .send(`from ${process.pid}, ${val}`);
-  //   }
-  // });
-  // const val = redis.get("counter");
-  reply.send("check send");
-  //redis.incr(`counter`);
+  redis.get(`counter`, (err, val) => {
+    if (err) {
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return err;
+    } else {
+      console.log(val);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return `from ${process.pid}, ${val}`;
+    }
+  });
+  redis.incr(`counter`);
 });
 
 fastify.register((fastifyInstance, options, done) => {

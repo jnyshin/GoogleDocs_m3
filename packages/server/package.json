@@ -15,6 +15,7 @@
     "fastify-multer": "^2.0.2",
     "fastify-multipart": "^5.3.1",
     "fastify-plugin": "^3.0.1",
+    "fastify-redis-session": "^2.0.0",
     "fastify-static": "^4.6.1",
     "mongoose": "^6.3.0",
     "nodemailer": "^6.7.3",
@@ -26,7 +27,7 @@
     "dev": "NODE_ENV=development nodemon app.js",
     "production": "NODE_ENV=production nodemon app.js",
     "pm-dev": "NODE_ENV=development pm2 start app.js -i max --attach",
-    "pm-pro": "NODE_ENV=production NODE_PORT=80 pm2 start app.js -i max --attach"
+    "pm-pro": "NODE_ENV=production pm2 start app.js -i max --attach"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
