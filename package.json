@@ -10,7 +10,8 @@
     "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
     "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" ",
     "pm": "concurrently \"yarn workspace server pm-pro\"",
-    "pm-dev": "concurrently \"yarn workspace server pm-dev\""
+    "pm-dev": "concurrently \"yarn workspace server pm-dev\"",
+    "del": "concurrently \"pm2 delete all\""
   },
   "workspaces": [
     "packages/*"
