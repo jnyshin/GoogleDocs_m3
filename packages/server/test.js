@@ -1,7 +1,7 @@
 import fastify from "fastify";
 const server = fastify({
   logger: true,
-  trustProxy: true,
+  trustProxy: "209.94.56.137",
 });
 server.get("/", async (request, reply) => {
   console.log(`from ${process.pid}`);
