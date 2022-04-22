@@ -7,9 +7,12 @@ import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
 import fastifyRedis from "fastify-redis";
+import { RedisStore } from "fastify-redis-session";
+import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
 
+const redisClient = redis.createClient();
 const { NODE_ENV } = process.env;
 const fastify = Fastify({
   logger: {
@@ -27,6 +30,9 @@ fastify.register(fastifyCookie, {
   parseOptions: {},
 });
 fastify.register(fastifySession, {
+  store: new RedisStore({
+    client: redisClient,
+  }),
   secret: "2BCC52D156A297EB555F33A2A605E8FB",
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -43,7 +49,7 @@ fastify.register(fastifyStatic, {
 
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
-  host: "127.0.0.1",
+  client: redisClient,
 });
 
 fastify.addHook("preHandler", (req, res, next) => {
@@ -75,6 +81,18 @@ fastify.register(import("./routes/home.js"), {
 });
 fastify.register(import("./routes/media.js"), {
   prefix: "/media",
+});
+
+fastify.get(`/`, async (req, res) => {
+  console.log(`from ${process.pid}`);
+  //return { hello: "world" };
+  //currEditDoc.push("a");
+  //redisClient.get("counter");
+  await redisClient.get(`counter`, (err, val) => {
+    console.log(val);
+    res.send(`from ${process.pid}, ${val}`);
+  });
+  redisClient.incr(`counter`);
 });
 
 fastify.register((fastifyInstance, options, done) => {
