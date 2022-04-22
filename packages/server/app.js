@@ -11,13 +11,18 @@ import { RedisStore } from "fastify-redis-session";
 import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
-const redisClient = redis.createClient({ host: "localhost", port: 6379 });
+const redisClient = redis.createClient({ host: "127.0.0.1", port: 6379 });
+redisClient.connect().then(console.log("redis connected"));
+
 const { NODE_ENV } = process.env;
+// const fastify = Fastify({
+//   logger: {
+//     level: "info",
+//     file: join(__dirname, "log", "info.txt"),
+//   },
+// });
 const fastify = Fastify({
-  logger: {
-    level: "info",
-    file: join(__dirname, "log", "info.txt"),
-  },
+  logger: true,
 });
 const PORT = NODE_ENV === "production" ? 80 : 8000;
 const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
@@ -47,9 +52,9 @@ fastify.register(fastifyStatic, {
 });
 
 fastify.register(fastifyMultipart);
-// fastify.register(fastifyRedis, {
-//   client: redisClient,
-// });
+fastify.register(fastifyRedis, {
+  client: redisClient,
+});
 
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
@@ -80,6 +85,23 @@ fastify.register(import("./routes/home.js"), {
 });
 fastify.register(import("./routes/media.js"), {
   prefix: "/media",
+});
+
+fastify.get(`/`, (req, res) => {
+  console.log(`from ${process.pid}`);
+  //return { hello: "world" };
+  //currEditDoc.push("a");
+  //redisClient.get("counter");
+  //const { redis } = fastify;
+  redisClient.get(`counter`, (err, val) => {
+    if (err) {
+      res.send(err);
+    } else {
+      console.log(val);
+      res.send(`from ${process.pid}, ${val}`);
+    }
+  });
+  redisClient.incr(`counter`);
 });
 
 fastify.register((fastifyInstance, options, done) => {
