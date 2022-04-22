@@ -12,7 +12,7 @@ import redis from "redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
 
-const redisClient = redis.createClient();
+const redisClient = redis.createClient({ host: "localhost", port: 6379 });
 const { NODE_ENV } = process.env;
 const fastify = Fastify({
   logger: {
