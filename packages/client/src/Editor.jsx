@@ -56,7 +56,8 @@ const Editor = (props) => {
       };
 
       evtSource.onmessage = function (event) {
-        console.log("message from server event push");
+        console.log(typeof event.data);
+
         const dataFromServer = JSON.parse(event.data);
         console.log("message from server event push (event.data): ");
         console.log(dataFromServer);
@@ -144,6 +145,16 @@ const Editor = (props) => {
 
   return (
     <div className="App">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          width: "100%",
+          fontSize: 20,
+        }}
+      >
+        {id}
+      </div>
       <div ref={quillRef} style={{ height: "100%" }}></div>
     </div>
   );

@@ -1,5 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import fastJson from "fast-json-stringify";
 export const clients = [];
 export const DOMAIN_NAME =
   process.env.NODE_ENV === "production"
@@ -12,3 +13,54 @@ const __filename = fileURLToPath(import.meta.url);
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
 export const currEditDoc = [];
+
+export const payloadStringify = fastJson({
+  title: "initial content w/ version",
+  type: "object",
+  properties: {
+    content: { type: "array" },
+    version: { type: "number" },
+  },
+});
+export const presenceStringify = fastJson({
+  title: "presence",
+  type: "object",
+  properties: {
+    presence: {
+      type: "object",
+      properties: {
+        id: { type: "string" },
+        cursor: {
+          type: "object",
+          properties: {
+            index: { type: "number" },
+            length: { type: "number" },
+            name: { type: "string" },
+          },
+        },
+      },
+    },
+  },
+});
+
+export const clientStringify = fastJson({
+  title: "new client",
+  type: "object",
+  properties: {
+    id: { type: "string" },
+    docId: { type: "string" },
+  },
+});
+
+export const ackStringify = fastJson({
+  title: "ack",
+  type: "object",
+  properties: {
+    ack: { type: "array" },
+  },
+});
+
+export const opStringify = fastJson({
+  title: "op",
+  type: "array",
+});

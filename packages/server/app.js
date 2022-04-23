@@ -6,26 +6,19 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
-import ioredis from "ioredis";
+import IORedis from "ioredis";
 import connectRedis from "connect-redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
-
 const { NODE_ENV } = process.env;
-const fastify = Fastify({
-  logger: true,
-});
+const fastify = Fastify();
 const PORT = NODE_ENV === "production" ? 80 : 8000;
 const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
 
-//this is for general use of Redis
-// const redisClient = redis.createClient({ host: IP, port: 6379 });
-// redisClient.connect().then(console.log("redis connected"));
-
-//this is for Redis session storing
 const RedisStore = connectRedis(fastifySession);
-const IORedis = new ioredis();
+const ioredis = new IORedis();
+
 fastify.register(fastifyCors, {});
 fastify.register(fastifyCookie, {
   secret: "2BCC52D156A297EB555F33A2A605E8FB",
@@ -33,7 +26,7 @@ fastify.register(fastifyCookie, {
 });
 fastify.register(fastifySession, {
   store: new RedisStore({
-    client: IORedis,
+    client: ioredis,
     ttl: 86400,
   }),
   secret: "2BCC52D156A297EB555F33A2A605E8FB",

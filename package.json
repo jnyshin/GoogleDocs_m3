@@ -11,7 +11,8 @@
     "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" ",
     "pm": "concurrently \"yarn workspace server pm-pro\"",
     "pm-dev": "concurrently \"yarn workspace server pm-dev\"",
-    "del": "concurrently \"pm2 delete all\""
+    "del": "concurrently \"pm2 delete all\"",
+    "client-build": "concurrently \"yarn workspace client build\""
   },
   "workspaces": [
     "packages/*"

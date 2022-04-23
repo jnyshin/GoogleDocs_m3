@@ -1,30 +1,23 @@
+import IORedis from "ioredis";
+import { v4 as uuid } from "uuid";
+const sub = new IORedis();
+const pub = new IORedis();
 export default async (fastify, opts) => {
-  fastify.get(`/:key`, async (req, res) => {
-    const { key } = req.params;
-    console.log(key);
-    console.log(`from ${process.pid}`);
-    console.log(req.session.authenticated);
+  fastify.get(`/sub`, async (req, res) => {
+    // There's also an event called 'messageBuffer', which is the same as 'message' except
+    // it returns buffers instead of strings.
+    // It's useful when the messages are binary data.
     const { redis } = fastify;
-    try {
-      //const value = await redis.get(key);
-      const clients = await redis.lrange("clients", 0, -1);
-      console.log(clients);
-      await redis.lpush("clients", "Mike");
-      //redis.incr(key);
-      return redis.lrange("clients", 0, -1);
-    } catch (err) {
-      return err;
-    }
+
+    const value = await redis.call("JSON.GET", "doc", "$..f1");
+    return {};
   });
-  fastify.post(`/`, async (req, res) => {
-    console.log(`from ${process.pid}`);
-    //const { key, value } = req.body;
+  fastify.get(`/pub`, async (req, res) => {
     const { redis } = fastify;
-    try {
-      await redis.lpop("clients");
-      return redis.lrange("clients", 0, -1);
-    } catch (err) {
-      return err;
-    }
+    await redis.call("JSON.SET", "doc", "$", '[{"f1": {"a":1}, "f2":{"a":2}}]');
+    // Message can be either a string or a buffer
+    // Message can be either a string or a buffer
+
+    return {};
   });
 };

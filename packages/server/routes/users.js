@@ -52,7 +52,6 @@ const userRouter = async (fastify, opts) => {
   });
   fastify.post("/logout", async (req, res) => {
     logging.info("[/user/logout] Route");
-    console.log(req.session.authenticated);
     if (req.session.authenticated) {
       try {
         await req.session.destroy();

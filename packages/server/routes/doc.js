@@ -1,16 +1,22 @@
 import Docs from "../schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import logging from "../logging.js";
-import { ERROR_MESSAGE } from "../store.js";
+import {
+  ackStringify,
+  clientStringify,
+  ERROR_MESSAGE,
+  opStringify,
+  payloadStringify,
+  presenceStringify,
+} from "../store.js";
 import User from "../schema/user.js";
 import Delta from "quill-delta";
-import fastJson from "fast-json-stringify";
-
+import IORedis from "ioredis";
+const pub = new IORedis();
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
     const docId = req.params.DOCID;
     logging.info("[/doc/edit/:DOCID] Route");
-    logging.info(`Requested from ${docId}`);
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return res.sendFile("index.html");
   });
@@ -22,14 +28,9 @@ export default async (fastify, opts) => {
     const { index, length } = req.body;
     logging.info(`Request with index=${index}, length=${length}`, id);
     const { redis } = fastify;
-    const clients = await redis.lrange("clients", 0, -1);
-    console.log("from /presence, ", clients);
     try {
       const _id = req.session.user.id;
-      logging.info(`session user id = ${_id}`, id);
       const user = await User.findById(_id);
-      logging.info(`found user`, id);
-      logging.info(user, id);
       const presence = {
         presence: {
           id: id,
@@ -40,34 +41,11 @@ export default async (fastify, opts) => {
           },
         },
       };
-      logging.info("presence: ", id);
-      logging.info(presence, id);
-      const stringify = fastJson({
-        title: "presence",
-        type: "object",
-        properties: {
-          presence: {
-            type: "object",
-            properties: {
-              id: { type: "string" },
-              cursor: {
-                type: "object",
-                properties: {
-                  index: { type: "number" },
-                  length: { type: "number" },
-                  name: { type: "string" },
-                },
-              },
-            },
-          },
-        },
-      });
-      clients.forEach((client) => {
-        if (client.id !== id && client.docId === docId) {
-          client.res.raw.write(`data: ${stringify(presence)}\n\n`);
-          logging.info(`sent message to UID = ${client.id}`, id);
-          logging.info(`sent: ${stringify(presence)}`, id);
-        }
+      const clients = await redis.lrange("clients", 0, -1);
+      clients.map((c) => {
+        const client = JSON.parse(c);
+        if (client.id !== id && client.docId === docId)
+          pub.publish(client.id, presenceStringify(presence));
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
@@ -121,32 +99,37 @@ export default async (fastify, opts) => {
           content: document.data.ops,
           version: document.version,
         };
-        const stringify = fastJson({
-          title: "initial content w/ version",
-          type: "object",
-          properties: {
-            content: { type: "array" },
-            version: { type: "number" },
-          },
-        });
-        res.raw.write(`data: ${stringify(payload)}\n\n`);
-        logging.info(`Event Stream connection open for UID = ${id}`);
-        logging.info(`[Pushed data]`);
-        logging.info(payload);
+        res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
         const newClient = {
           id: id,
           docId: docId,
-          res,
         };
-        redis.lpush("clients", newClient.id);
+        redis.lpush("clients", clientStringify(newClient));
+        const sub = new IORedis();
+        sub.subscribe(id, (err, count) => {
+          if (err) {
+            console.error("Failed to subscribe: %s", err.message);
+          } else {
+            console.log(
+              `Subscribed successfully! This client is currently subscribed ${id}`
+            );
+          }
+        });
+        sub.on("message", (channel, message) => {
+          logging.info("Subscriber got message", channel);
+          logging.info(message, channel);
+          res.raw.write(`data: ${message}\n\n`);
+        });
         const clients = await redis.lrange("clients", 0, -1);
-        console.log("from /connect, ", clients);
         logging.info(`Current connected clients = ${clients.length}`);
         req.raw.on("close", () => {
           logging.info(`UID = ${id} connection closed`);
-          clients.map((c, index) =>
-            c.id === id ? clients.splice(index, 1) : clients
-          );
+          clients.map(async (c, index) => {
+            const client = JSON.parse(c);
+            if (client.id === id) {
+              await redis.lrem("clients", 0, c);
+            }
+          });
           logging.info(`remaining clients = ${clients.length}`);
         });
         res.sent = true;
@@ -169,73 +152,42 @@ export default async (fastify, opts) => {
     const version = req.body.version;
     const op = req.body.op;
     const { redis } = fastify;
-    logging.info(`Incoming Version = ${version}`, id);
-    logging.info(`Incoming op =`, id);
-    logging.info(op, id);
     try {
       const document = await Docs.findById(docId);
       let checkCurrDoc = await redis.sismember("currDoc", docId);
-      console.log("Is this doc being edited? 0 means it is free", checkCurrDoc);
-      logging.info(`Document Version = ${document.version}`, id);
       if (version !== document.version || checkCurrDoc == "1") {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
           id
         );
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("sending { status: retry }", id);
+        logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
         await redis.sadd("currDoc", docId);
-        console.log(await redis.smembers("currDoc"));
         const incomming = new Delta(op);
-        logging.info("Incomming Delta from : ", id);
-        logging.info(incomming, id);
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
         await Docs.findByIdAndUpdate(docId, {
           $set: { data: newDelta },
           $inc: { version: 1 },
         });
-        const newDocument = await Docs.findById(docId);
-        logging.info("NEW DOCUMENT:", id);
-        logging.info(newDocument, id);
-        logging.info(`Old version - ${newDocument.version - 1}`, id);
-        logging.info(`New version - ${newDocument.version}`, id);
         const ack = { ack: op };
-        const stringify = fastJson({
-          title: "ack",
-          type: "object",
-          properties: {
-            ack: { type: "array" },
-          },
-        });
-        const stringify2 = fastJson({
-          title: "op",
-          type: "array",
-        });
-        logging.info("Sending ACK", id);
-        logging.info("Sending OP", id);
-        const clients = await redis.lrange("clients", 0, -1);
-        console.log("from /op, ", clients);
-        clients.forEach((client) => {
-          if (client.id === id) {
-            logging.info(`Sending ACK to UID = ${client.id}`, id);
-            logging.info(`sent ack: ${stringify(ack)}`, id);
-            client.res.raw.write(`data: ${stringify(ack)}\n\n`);
-          }
-          if (client.docId === docId && client.id !== id) {
-            logging.info(`Sending OP to UID = ${client.id}`, id);
-            logging.info(`sent op: ${stringify2(op)}`, id);
-            client.res.raw.write(`data: ${stringify2(op)}\n\n`);
-          }
-        });
-        logging.info("sending { status: ok }", id);
 
+        const clients = await redis.lrange("clients", 0, -1);
+        clients.map((c) => {
+          const client = JSON.parse(c);
+          if (client.id === id) {
+            logging.info("Sending ACK", id);
+            pub.publish(client.id, ackStringify(ack));
+          }
+          if (client.id !== id && client.docId === docId) {
+            logging.info("Sending OP", client.id);
+            pub.publish(client.id, opStringify(op));
+          }
+        });
+        logging.info("{ status: ok }", id);
         await redis.srem("currDoc", docId);
-        let currDocLen = await redis.scard("currDoc");
-        console.log(await redis.smembers("currDoc"));
-        logging.info(`currEditDoc is reset with length ${currDocLen}`, id);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       }
