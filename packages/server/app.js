@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { join } from "path";
-import { ERROR_MESSAGE, __dirname, currEditDoc } from "./store.js";
+import { ERROR_MESSAGE, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
