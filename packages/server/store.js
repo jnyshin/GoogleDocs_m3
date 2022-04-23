@@ -13,7 +13,6 @@ const __filename = fileURLToPath(import.meta.url);
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
 export const currEditDoc = [];
-
 export const payloadStringify = fastJson({
   title: "initial content w/ version",
   type: "object",
