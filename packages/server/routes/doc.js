@@ -171,8 +171,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        await redis.set(docId, "");
-        console.log("This is test", await redis.get(docId));
+        await redis.set(docId, "using");
         // await redis.sadd("currDoc", docId);
         const incomming = new Delta(op);
         const old = new Delta(document.data);
