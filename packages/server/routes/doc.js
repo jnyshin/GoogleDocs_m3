@@ -154,12 +154,15 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
     try {
       const document = await Docs.findById(docId);
-      const checkCurrDoc = await redis.sismember("currDoc", docId);
 
-      logging.info(
-        `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
-      );
-      if (version !== document.version || checkCurrDoc === 1) {
+      // const checkCurrDoc = await redis.sismember("currDoc", docId);
+      // console.log(redis.get(docId, ""));
+      const doc = await redis.get(docId);
+
+      // logging.info(
+      //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
+      // );
+      if (version !== document.version || doc !== null) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
           id
@@ -168,7 +171,8 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        await redis.sadd("currDoc", docId);
+        await redis.set(docId, "");
+        // await redis.sadd("currDoc", docId);
         const incomming = new Delta(op);
         const old = new Delta(document.data);
         const newDelta = old.compose(incomming);
@@ -191,9 +195,10 @@ export default async (fastify, opts) => {
           }
         });
         logging.info("{ status: ok }", id);
-        await redis.srem("currDoc", docId);
-        let checkRemove = await redis.smembers("currDoc");
-        logging.info(`currDoc is now has ${checkRemove}`, id);
+        await redis.del(docId);
+        // await redis.srem("currDoc", docId);
+        // let checkRemove = await redis.smembers("currDoc");
+        // logging.info(`currDoc is now has ${checkRemove}`, id);
 
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
