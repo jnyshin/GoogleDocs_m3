@@ -152,9 +152,10 @@ export default async (fastify, opts) => {
     const version = req.body.version;
     const op = req.body.op;
     const { redis } = fastify;
+    const checkCurrDoc = await redis.sismember("currDoc", docId);
+
     try {
       const document = await Docs.findById(docId);
-      let checkCurrDoc = await redis.sismember("currDoc", docId);
       logging.info(
         `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       );
