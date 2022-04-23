@@ -191,7 +191,8 @@ export default async (fastify, opts) => {
         });
         logging.info("{ status: ok }", id);
         await redis.srem("currDoc", docId);
-        logging.info(`currDoc is now has ${redis.smembers("currDoc")}`, id);
+        let checkRemove = await redis.smembers("currDoc");
+        logging.info(`currDoc is now has ${checkRemove}`, id);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       }
