@@ -158,7 +158,7 @@ export default async (fastify, opts) => {
       // const checkCurrDoc = await redis.sismember("currDoc", docId);
       // console.log(redis.get(docId, ""));
       const doc = await redis.get(docId);
-
+      console.log(doc);
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
