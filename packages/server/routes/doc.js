@@ -155,7 +155,7 @@ export default async (fastify, opts) => {
     try {
       const document = await Docs.findById(docId);
       let checkCurrDoc = await redis.sismember("currDoc", docId);
-      if (version !== document.version || checkCurrDoc === "1") {
+      if (version !== document.version || checkCurrDoc === 1) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
           id
