@@ -168,7 +168,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version < document.version || currEditDoc[0] === docId) {
+      if (version !== document.version || currEditDoc[0] === docId) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -191,17 +191,15 @@ export default async (fastify, opts) => {
 
         const clients = await redis.lrange("clients", 0, -1);
         clients.map((c) => {
-          document.whenNothingPending(() => {
-            const client = JSON.parse(c);
-            if (client.id === id) {
-              logging.info("Sending ACK", id);
-              pub.publish(client.id, ackStringify(ack));
-            }
-            if (client.id !== id && client.docId === docId) {
-              logging.info("Sending OP", client.id);
-              pub.publish(client.id, opStringify(op));
-            }
-          });
+          const client = JSON.parse(c);
+          if (client.id === id) {
+            logging.info("Sending ACK", id);
+            pub.publish(client.id, ackStringify(ack));
+          }
+          if (client.id !== id && client.docId === docId) {
+            logging.info("Sending OP", client.id);
+            pub.publish(client.id, opStringify(op));
+          }
         });
         logging.info("{ status: ok }", id);
         currEditDoc.pop();
