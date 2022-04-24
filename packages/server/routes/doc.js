@@ -188,15 +188,17 @@ export default async (fastify, opts) => {
 
         const clients = await redis.lrange("clients", 0, -1);
         clients.map((c) => {
-          const client = JSON.parse(c);
-          if (client.id === id) {
-            logging.info("Sending ACK", id);
-            pub.publish(client.id, ackStringify(ack));
-          }
-          if (client.id !== id && client.docId === docId) {
-            logging.info("Sending OP", client.id);
-            pub.publish(client.id, opStringify(op));
-          }
+          document.whenNothingPending(() => {
+            const client = JSON.parse(c);
+            if (client.id === id) {
+              logging.info("Sending ACK", id);
+              pub.publish(client.id, ackStringify(ack));
+            }
+            if (client.id !== id && client.docId === docId) {
+              logging.info("Sending OP", client.id);
+              pub.publish(client.id, opStringify(op));
+            }
+          });
         });
         logging.info("{ status: ok }", id);
         // await redis.srem("currDoc", docId);
