@@ -10,15 +10,26 @@ import { connection } from "../app.js";
 import { ERROR_MESSAGE } from "../store.js";
 import Docs from "../schema/docs.js";
 import logging from "../logging.js";
+import { resourceLimits } from "worker_threads";
 
-// const ESclient = new Client({
-//   node: "http://localhost:9200",
-// }); //More configuration will be added after ES Cloud set up
+const ESclient = new Client({
+  node: "http://localhost:9200",
+}); //More configuration will be added after ES Cloud set up
 
 export default async (fastify, opts) => {
   fastify.get(`/search`, async (req, res) => {
     const keyword = url.parse(req.url, true).query.q;
-    return keyword;
+    const result = await ESclient.search({
+      index: "m3",
+      query: {
+        match: {
+          title: keyword,
+          body: keyword,
+        },
+      },
+    });
+    console.log(result.hits.hits);
+    return result.hits.hits; //may need to arrange formats
     // const query = connection.createSubscribeQuery("share_docs", {
     //   $sort: { "_m.mtime": -1 },
     //   $limit: 10,
@@ -35,6 +46,16 @@ export default async (fastify, opts) => {
   });
   fastify.get(`/suggest`, async (req, res) => {
     const keyword = url.parse(req.url, true).query.q;
-    return keyword;
+    const result = await ESclient.search({
+      index: "m3",
+      suggest: {
+        gotsuggest: {
+          text: keyword,
+          term: { field: "body" },
+        },
+      },
+    });
+    console.log(result);
+    return result;
   });
 };
