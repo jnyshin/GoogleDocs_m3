@@ -51,12 +51,12 @@ export default async (fastify, opts) => {
         $sort: { "_m.mtime": -1 },
         $limit: 10,
       });
-      const ret = [];
-      query.on("ready", async () => {
-        query.results.map(async (doc) => {
+      query.on("ready", () => {
+        let ret = await Promise.all(
+          query.results.map(async (doc) => {
           const document = await Docs.findById(doc.id);
           ret.push({ id: document.id, name: document.name });
-        });
+        }));
         logging.info(`sent docs list`);
         logging.info(ret);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
