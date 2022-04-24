@@ -197,13 +197,14 @@ export default async (fastify, opts) => {
               pub.publish(client.id, opStringify(op));
             }
           });
+          currEditDoc.pop();
         });
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
         });
 
         logging.info("{ status: ok }", id);
-        currEditDoc.pop();
+
         // await redis.srem("currDoc", docId);
         // let checkRemove = await redis.smembers("currDoc");
         // logging.info(`currDoc is now has ${checkRemove}`, id);
