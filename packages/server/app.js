@@ -125,8 +125,12 @@ const start = async () => {
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
-    wss.close();
     process.exit(1);
   }
 };
 start();
+
+process.on("SIGINT", function () {
+  wss.close();
+  process.exit(0);
+});
