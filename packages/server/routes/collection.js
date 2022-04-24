@@ -54,7 +54,7 @@ export default async (fastify, opts) => {
       const ret = [];
       query.on("ready", () => {
         query.results.map(async (doc) => {
-          // console.log(doc.id);
+          console.log(doc.id);
           const document = await Docs.findById(doc.id);
           ret.push({ id: document.id, name: document.name });
         });
