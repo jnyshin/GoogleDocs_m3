@@ -47,24 +47,22 @@ export default async (fastify, opts) => {
   fastify.get("/list", async (req, res) => {
     logging.info("[/collection/list] Route");
     try {
-      let query = connect.createFetchQuery("documents", {
+      const query = connection.createSubscribeQuery("share_docs", {
         $sort: { "_m.mtime": -1 },
         $limit: 10,
       });
-      query.on("ready", async () => {
-        const documents = await Promise.all(
-          query.results.map(async (doc, index) => {
-            try {
-              const doc = await Docs.findOne({ id: doc.id });
-              return { id: doc.id, name: doc.name };
-            } catch (err) {
-              throw err;
-            }
-          })
-        );
-
-        return documents;
+      const ret = [];
+      query.on("ready", () => {
+        query.results.map(async (doc) => {
+          // console.log(doc.id);
+          const document = await Docs.findById(doc.id);
+          ret.push({ id: document.id, name: document.name });
+        });
       });
+      logging.info(`sent docs list`);
+      logging.info(ret);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return ret;
     } catch (err) {
       logging.error("failed find all docs");
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
