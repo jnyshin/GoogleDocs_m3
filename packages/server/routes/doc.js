@@ -183,24 +183,25 @@ export default async (fastify, opts) => {
         return { status: "retry" };
       } else {
         currEditDoc.push(docId);
-        document.submitOp(op, { source: id });
+        await document.submitOp(op, { source: id }, async () => {
+          const ack = { ack: op };
+          const clients = await redis.lrange("clients", 0, -1);
+          clients.map((c) => {
+            const client = JSON.parse(c);
+            if (client.id === id) {
+              logging.info("Sending ACK", id);
+              pub.publish(client.id, ackStringify(ack));
+            }
+            if (client.id !== id && client.docId === docId) {
+              logging.info("Sending OP", client.id);
+              pub.publish(client.id, opStringify(op));
+            }
+          });
+        });
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
         });
-        const ack = { ack: op };
 
-        const clients = await redis.lrange("clients", 0, -1);
-        clients.map((c) => {
-          const client = JSON.parse(c);
-          if (client.id === id) {
-            logging.info("Sending ACK", id);
-            pub.publish(client.id, ackStringify(ack));
-          }
-          if (client.id !== id && client.docId === docId) {
-            logging.info("Sending OP", client.id);
-            pub.publish(client.id, opStringify(op));
-          }
-        });
         logging.info("{ status: ok }", id);
         currEditDoc.pop();
         // await redis.srem("currDoc", docId);
