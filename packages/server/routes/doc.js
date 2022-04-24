@@ -168,7 +168,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version !== document.version || currEditDoc[0] === docId) {
+      if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -176,14 +176,14 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
+      } else if (currEditDoc[0] === docId) {
+        logging.info("currently editing");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        logging.info("{ status: retry }", id);
+        return { status: "retry" };
       } else {
         currEditDoc.push(docId);
-        // await redis.sadd("currDoc", docId);
         document.submitOp(op, { source: id });
-
-        // const incomming = new Delta(op);
-        // const old = new Delta(document.data);
-        // const newDelta = old.compose(incomming);
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
         });
