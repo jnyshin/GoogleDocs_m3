@@ -12,7 +12,6 @@ export default async (fastify, opts) => {
       logging.info(`created new doc id=${id} route`);
       const share_doc = connection.get("share_docs", id);
       share_doc.create([], "rich-text");
-      share_doc.preventCompose = true;
       await Docs.create({
         _id: id,
         id: id,
