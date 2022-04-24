@@ -6,7 +6,6 @@ import {
   clientStringify,
   ERROR_MESSAGE,
   opStringify,
-  currEditDoc,
   payloadStringify,
   presenceStringify,
 } from "../store.js";
@@ -176,13 +175,13 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
-      } else if (currEditDoc[0] === docId) {
+      } else if (document.preventCompose) {
         logging.info("currently editing");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        currEditDoc.push(docId);
+        document.preventCompose = true;
         await document.submitOp(op, { source: id }, async () => {
           const ack = { ack: op };
           const clients = await redis.lrange("clients", 0, -1);
@@ -197,7 +196,7 @@ export default async (fastify, opts) => {
               pub.publish(client.id, opStringify(op));
             }
           });
-          currEditDoc.pop();
+          document.preventCompose = false;
         });
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
