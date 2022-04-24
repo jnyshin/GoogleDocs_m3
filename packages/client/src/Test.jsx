@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
-import API from "./api";
-import DOMAIN_NAME from "./store";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 

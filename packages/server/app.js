@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import { WebSocketServer } from "ws";
+import WebSocketJSONStream from "@teamwork/websocket-json-stream";
+import ShareDB from "sharedb";
+import MongoShareDB from "sharedb-mongo";
 import { join } from "path";
 import { ERROR_MESSAGE, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
@@ -11,6 +15,7 @@ import connectRedis from "connect-redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
+import richText from "rich-text";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 const PORT = NODE_ENV === "production" ? 80 : 8000;
@@ -18,6 +23,19 @@ const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
 
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
+ShareDB.types.register(richText.type);
+const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
+
+const backend = new ShareDB({
+  db: docsDB,
+  presence: true,
+  doNotForwardSendPresenceErrorsToClient: true,
+});
+const wss = new WebSocketServer({ port: 9001 });
+wss.on("connection", (webSocket) => {
+  backend.listen(new WebSocketJSONStream(webSocket));
+});
+export const connection = backend.connect();
 
 fastify.register(fastifyCors, {});
 fastify.register(fastifyCookie, {

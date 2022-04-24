@@ -12,7 +12,7 @@ import {
 import User from "../schema/user.js";
 import Delta from "quill-delta";
 import IORedis from "ioredis";
-import NodeCache from "node-cache";
+import { connection } from "../app.js";
 
 const pub = new IORedis();
 export default async (fastify, opts) => {
@@ -40,6 +40,7 @@ export default async (fastify, opts) => {
             index: index,
             length: length,
             name: user.name,
+            // name: "hasung",
           },
         },
       };
@@ -87,58 +88,55 @@ export default async (fastify, opts) => {
     const id = req.params.UID;
     const { redis } = fastify;
     try {
-      const document = await Docs.findById(docId);
-      if (document) {
-        logging.info(`Found doc id = ${docId}`);
-        const headers = {
-          "Content-Type": "text/event-stream",
-          Connection: "keep-alive",
-          "Access-Control-Allow-Origin": "*",
-          "X-CSE356": "61f9f57373ba724f297db6ba",
-        };
-        res.raw.writeHead(200, headers);
-        const payload = {
-          content: document.data.ops,
-          version: document.version,
-        };
-        res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
-        const newClient = {
-          id: id,
-          docId: docId,
-        };
-        redis.lpush("clients", clientStringify(newClient));
-        const sub = new IORedis();
-        sub.subscribe(id, (err, count) => {
-          if (err) {
-            console.error("Failed to subscribe: %s", err.message);
-          } else {
-            console.log(
-              `Subscribed successfully! This client is currently subscribed ${id}`
-            );
+      const share_doc = connection.get("share_docs", docId);
+      // const document = await Docs.findById(docId);
+      console.log(share_doc);
+      logging.info(`Found doc id = ${docId}`);
+      const headers = {
+        "Content-Type": "text/event-stream",
+        Connection: "keep-alive",
+        "Access-Control-Allow-Origin": "*",
+        "X-CSE356": "61f9f57373ba724f297db6ba",
+      };
+      res.raw.writeHead(200, headers);
+      const payload = {
+        content: share_doc.data.ops,
+        version: share_doc.version,
+      };
+      res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
+      const newClient = {
+        id: id,
+        docId: docId,
+      };
+      redis.lpush("clients", clientStringify(newClient));
+      const sub = new IORedis();
+      sub.subscribe(id, (err, count) => {
+        if (err) {
+          console.error("Failed to subscribe: %s", err.message);
+        } else {
+          console.log(
+            `Subscribed successfully! This client is currently subscribed ${id}`
+          );
+        }
+      });
+      sub.on("message", (channel, message) => {
+        logging.info("Subscriber got message", channel);
+        logging.info(message, channel);
+        res.raw.write(`data: ${message}\n\n`);
+      });
+      const clients = await redis.lrange("clients", 0, -1);
+      logging.info(`Current connected clients = ${clients.length}`);
+      req.raw.on("close", () => {
+        logging.info(`UID = ${id} connection closed`);
+        clients.map(async (c, index) => {
+          const client = JSON.parse(c);
+          if (client.id === id) {
+            await redis.lrem("clients", 0, c);
           }
         });
-        sub.on("message", (channel, message) => {
-          logging.info("Subscriber got message", channel);
-          logging.info(message, channel);
-          res.raw.write(`data: ${message}\n\n`);
-        });
-        const clients = await redis.lrange("clients", 0, -1);
-        logging.info(`Current connected clients = ${clients.length}`);
-        req.raw.on("close", () => {
-          logging.info(`UID = ${id} connection closed`);
-          clients.map(async (c, index) => {
-            const client = JSON.parse(c);
-            if (client.id === id) {
-              await redis.lrem("clients", 0, c);
-            }
-          });
-          logging.info(`remaining clients = ${clients.length}`);
-        });
-        res.sent = true;
-      } else {
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        return ERROR_MESSAGE(`Did not find matching doc for id =${docId}`);
-      }
+        logging.info(`remaining clients = ${clients.length}`);
+      });
+      res.sent = true;
     } catch (err) {
       logging.error("fail to create event stream connection");
       logging.error(err);
@@ -155,54 +153,50 @@ export default async (fastify, opts) => {
     const op = req.body.op;
     const { redis } = fastify;
     try {
-      const document = await Docs.findById(docId);
-
+      const document = connection.get("share_docs", docId);
+      // const document = await Docs.findById(docId);
+      document.preventCompose = true;
       // const checkCurrDoc = await redis.sismember("currDoc", docId);
       // console.log(redis.get(docId, ""));
-      const doc = await redis.get(docId);
-      console.log(doc);
+      // const doc = await redis.get(docId);
+      // console.log(doc);
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version !== document.version || doc !== null) {
+      if (version !== document.version) {
         logging.info(
-          `Version is not matched. client = ${version}, server=${document.version}. OR This doc is being edited right now`,
+          `Version is not matched. client = ${version}, server=${document.version}.`,
           id
         );
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        await redis
-          .multi()
-          .set(docId, "using")
-          .exec(async (err, results) => {
-            const incomming = new Delta(op);
-            const old = new Delta(document.data);
-            const newDelta = old.compose(incomming);
-            await Docs.findByIdAndUpdate(docId, {
-              $set: { data: newDelta },
-              $inc: { version: 1 },
-            });
-            const ack = { ack: op };
-
-            const clients = await redis.lrange("clients", 0, -1);
-            clients.map((c) => {
-              const client = JSON.parse(c);
-              if (client.id === id) {
-                logging.info("Sending ACK", id);
-                pub.publish(client.id, ackStringify(ack));
-              }
-              if (client.id !== id && client.docId === docId) {
-                logging.info("Sending OP", client.id);
-                pub.publish(client.id, opStringify(op));
-              }
-            });
-            logging.info("{ status: ok }", id);
-          });
         // await redis.sadd("currDoc", docId);
+        document.submitOp(op, { source: id });
 
-        await redis.del(docId);
+        // const incomming = new Delta(op);
+        // const old = new Delta(document.data);
+        // const newDelta = old.compose(incomming);
+        // await Docs.findByIdAndUpdate(docId, {
+        //   $set: { data: newDelta },
+        //   $inc: { version: 1 },
+        // });
+        const ack = { ack: op };
+
+        const clients = await redis.lrange("clients", 0, -1);
+        clients.map((c) => {
+          const client = JSON.parse(c);
+          if (client.id === id) {
+            logging.info("Sending ACK", id);
+            pub.publish(client.id, ackStringify(ack));
+          }
+          if (client.id !== id && client.docId === docId) {
+            logging.info("Sending OP", client.id);
+            pub.publish(client.id, opStringify(op));
+          }
+        });
+        logging.info("{ status: ok }", id);
         // await redis.srem("currDoc", docId);
         // let checkRemove = await redis.smembers("currDoc");
         // logging.info(`currDoc is now has ${checkRemove}`, id);

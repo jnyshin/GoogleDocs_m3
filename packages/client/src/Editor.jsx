@@ -2,10 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import API from "./api";
-import DOMAIN_NAME from "./store";
+import { DOMAIN_NAME, HOST } from "./store";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import ReconnectingWebSocket from "reconnecting-websocket";
+import Sharedb from "sharedb/lib/client";
+import richText from "rich-text";
 
+Sharedb.types.register(richText.type);
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -32,14 +36,18 @@ const FORMAT = [
 ];
 let version = 0;
 const Editor = (props) => {
+  const websocketURL = `ws://${HOST}:9001`;
+  const connection = new Sharedb.Connection(
+    new ReconnectingWebSocket(websocketURL)
+  );
   const params = useParams();
   const [quill, setQuill] = useState();
   const [id, setId] = useState();
   const [docId, setDocId] = useState();
+  const [doc, setDoc] = useState();
   const [listening, setListening] = useState(false);
   // const currUsername = useStore();
 
-  const [ack, setAck] = useState();
   useEffect(() => {
     setId(uuidv4());
     setDocId(params.docId);
@@ -47,6 +55,9 @@ const Editor = (props) => {
 
   useEffect(() => {
     if (quill && !listening) {
+      const doc = connection.get("share_docs", docId);
+      doc.subscribe();
+
       const evtSource = new EventSource(
         `http://${DOMAIN_NAME}/doc/connect/${docId}/${id}`
       );
@@ -66,7 +77,6 @@ const Editor = (props) => {
           version = dataFromServer.version;
           quill.enable();
         } else if (dataFromServer.ack) {
-          setAck(dataFromServer.ack);
           version += 1;
         } else if (dataFromServer.presence) {
           const { index, length, name } = dataFromServer.presence.cursor;

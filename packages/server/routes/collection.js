@@ -2,6 +2,7 @@ import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
 import { ERROR_MESSAGE } from "../store.js";
+import { connection } from "../app.js";
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
     logging.info("[/collection/create] Route");
@@ -9,17 +10,19 @@ export default async (fastify, opts) => {
     const id = uuidv4();
     try {
       logging.info(`created new doc id=${id} route`);
+      const share_doc = connection.get("share_docs", id);
+      share_doc.create([], "rich-text");
+      share_doc.preventCompose = true;
       await Docs.create({
         _id: id,
         id: id,
         name: name,
-        data: { ops: [{ insert: "" }] },
-        version: 0,
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
     } catch (err) {
       logging.error(`failed to created doc with id = ${id}`);
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(`failed to created doc with id = ${id}`);
     }
@@ -31,6 +34,8 @@ export default async (fastify, opts) => {
     try {
       await Docs.findByIdAndDelete(docId);
       logging.info(`deleted doc id=${docId} route`);
+      const share_doc = connection.get("share_docs", docId);
+      share_doc.del();
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
