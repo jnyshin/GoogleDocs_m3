@@ -122,6 +122,7 @@ const start = async () => {
     await fastify.listen(PORT, IP);
     logging.info(`Server started ${IP}:${PORT}`);
   } catch (err) {
+    console.log(err);
     fastify.log.error(err);
     process.exit(1);
   }
