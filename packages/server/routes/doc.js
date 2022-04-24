@@ -5,6 +5,7 @@ import {
   ackStringify,
   clientStringify,
   ERROR_MESSAGE,
+  isEditig,
   opStringify,
   payloadStringify,
   presenceStringify,
@@ -156,7 +157,6 @@ export default async (fastify, opts) => {
     try {
       const document = connection.get("share_docs", docId);
       document.preventCompose = true;
-
       // const document = await Docs.findById(docId);
 
       // const checkCurrDoc = await redis.sismember("currDoc", docId);
@@ -166,7 +166,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version < document.version) {
+      if (version < document.version || isEditig) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -175,6 +175,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
+        isEditig = true;
         // await redis.sadd("currDoc", docId);
         document.submitOp(op, { source: id });
 
@@ -201,6 +202,7 @@ export default async (fastify, opts) => {
           });
         });
         logging.info("{ status: ok }", id);
+        isEditig = false;
         // await redis.srem("currDoc", docId);
         // let checkRemove = await redis.smembers("currDoc");
         // logging.info(`currDoc is now has ${checkRemove}`, id);

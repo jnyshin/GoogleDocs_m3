@@ -63,3 +63,5 @@ export const opStringify = fastJson({
   title: "op",
   type: "array",
 });
+
+export let isEditig = false;
