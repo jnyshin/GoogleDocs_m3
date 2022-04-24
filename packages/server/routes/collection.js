@@ -47,7 +47,7 @@ export default async (fastify, opts) => {
   fastify.get("/list", async (req, res) => {
     logging.info("[/collection/list] Route");
     try {
-      const query = connection.createSubscribeQuery("share_docs", {
+      const query = connection.createFetchQuery("share_docs", {
         $sort: { "_m.mtime": -1 },
         $limit: 10,
       });
