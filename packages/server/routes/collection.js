@@ -17,6 +17,7 @@ export default async (fastify, opts) => {
         _id: id,
         id: id,
         name: name,
+        version: 0,
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
@@ -47,22 +48,19 @@ export default async (fastify, opts) => {
   fastify.get("/list", async (req, res) => {
     logging.info("[/collection/list] Route");
     try {
-      const query = connection.createFetchQuery("share_docs", {
-        $sort: { "_m.mtime": -1 },
-        $limit: 10,
-      });
-      query.on("ready", async () => {
-        let ret = await Promise.all(
-          query.results.map(async (doc) => {
-            const document = await Docs.findById(doc.id);
-            ret.push({ id: document.id, name: document.name });
-          })
-        );
-        logging.info(`sent docs list`);
-        logging.info(ret);
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        return ret;
-      });
+      const docs = await Docs.find().sort({ updatedAt: -1 }).limit(10);
+      const ret = [];
+      for (const doc of docs) {
+        const ele = {
+          id: doc.id,
+          name: doc.name,
+        };
+        ret.push(ele);
+      }
+      logging.info(`sent docs list`);
+      logging.info(ret);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return ret;
     } catch (err) {
       logging.error("failed find all docs");
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");

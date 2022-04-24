@@ -179,10 +179,9 @@ export default async (fastify, opts) => {
         // const incomming = new Delta(op);
         // const old = new Delta(document.data);
         // const newDelta = old.compose(incomming);
-        // await Docs.findByIdAndUpdate(docId, {
-        //   $set: { data: newDelta },
-        //   $inc: { version: 1 },
-        // });
+        await Docs.findByIdAndUpdate(docId, {
+          $inc: { version: 1 },
+        });
         const ack = { ack: op };
 
         const clients = await redis.lrange("clients", 0, -1);
