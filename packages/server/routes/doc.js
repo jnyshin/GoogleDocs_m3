@@ -6,6 +6,7 @@ import {
   clientStringify,
   ERROR_MESSAGE,
   opStringify,
+  currEditDoc,
   payloadStringify,
   presenceStringify,
 } from "../store.js";
@@ -16,7 +17,7 @@ import IORedis from "ioredis";
 import { connection } from "../app.js";
 
 const pub = new IORedis();
-let isEditing = false;
+
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
     const docId = req.params.DOCID;
@@ -167,7 +168,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version < document.version || isEditing) {
+      if (version < document.version || currEditDoc[0] === docId) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -176,7 +177,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        isEditing = true;
+        currEditDoc.push(docId);
         // await redis.sadd("currDoc", docId);
         document.submitOp(op, { source: id });
 
@@ -203,7 +204,7 @@ export default async (fastify, opts) => {
           });
         });
         logging.info("{ status: ok }", id);
-        isEditing = false;
+        currEditDoc.pop();
         // await redis.srem("currDoc", docId);
         // let checkRemove = await redis.smembers("currDoc");
         // logging.info(`currDoc is now has ${checkRemove}`, id);
