@@ -35,6 +35,7 @@ const wss = new WebSocketServer({ port: 9001 });
 wss.on("connection", (webSocket) => {
   backend.listen(new WebSocketJSONStream(webSocket));
 });
+
 export const connection = backend.connect();
 
 fastify.register(fastifyCors, {});
@@ -124,6 +125,7 @@ const start = async () => {
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
+    wss.close();
     process.exit(1);
   }
 };
