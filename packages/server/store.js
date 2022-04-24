@@ -64,4 +64,4 @@ export const opStringify = fastJson({
   type: "array",
 });
 
-export let isEditig = false;
+export let isEditing = false;

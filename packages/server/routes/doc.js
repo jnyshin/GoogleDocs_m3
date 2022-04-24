@@ -5,7 +5,7 @@ import {
   ackStringify,
   clientStringify,
   ERROR_MESSAGE,
-  isEditig,
+  isEditing,
   opStringify,
   payloadStringify,
   presenceStringify,
@@ -13,6 +13,7 @@ import {
 import User from "../schema/user.js";
 import Delta from "quill-delta";
 import IORedis from "ioredis";
+
 import { connection } from "../app.js";
 
 const pub = new IORedis();
@@ -156,7 +157,7 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
     try {
       const document = connection.get("share_docs", docId);
-      document.preventCompose = true;
+      // document.preventCompose = true;
       // const document = await Docs.findById(docId);
 
       // const checkCurrDoc = await redis.sismember("currDoc", docId);
@@ -166,7 +167,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version < document.version || isEditig) {
+      if (version < document.version || isEditing) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -175,7 +176,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        isEditig = true;
+        isEditing = true;
         // await redis.sadd("currDoc", docId);
         document.submitOp(op, { source: id });
 
