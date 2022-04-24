@@ -52,10 +52,11 @@ export default async (fastify, opts) => {
         $limit: 10,
       });
       const ret = [];
-      query.on("ready", () => {
+      query.on("ready", async () => {
         query.results.map(async (doc) => {
           console.log(doc.id);
           const document = await Docs.findById(doc.id);
+          console.log(document);
           ret.push({ id: document.id, name: document.name });
         });
       });
