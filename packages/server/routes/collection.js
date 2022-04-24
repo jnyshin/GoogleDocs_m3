@@ -59,11 +59,11 @@ export default async (fastify, opts) => {
           console.log(document);
           ret.push({ id: document.id, name: document.name });
         });
+        logging.info(`sent docs list`);
+        logging.info(ret);
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        return ret;
       });
-      logging.info(`sent docs list`);
-      logging.info(ret);
-      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      return ret;
     } catch (err) {
       logging.error("failed find all docs");
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
