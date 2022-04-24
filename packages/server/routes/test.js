@@ -9,7 +9,7 @@ import { ERROR_MESSAGE } from "../store.js";
 import Docs from "../schema/docs.js";
 
 export default async (fastify, opts) => {
-  fastify.post(`/`, async (req, res) => {
+  fastify.get(`/`, async (req, res) => {
     return {};
   });
   fastify.get(`/pub`, async (req, res) => {

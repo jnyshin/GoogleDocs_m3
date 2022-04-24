@@ -47,15 +47,18 @@ export default async (fastify, opts) => {
   fastify.get("/list", async (req, res) => {
     logging.info("[/collection/list] Route");
     try {
-      const docs = await Docs.find().sort({ updatedAt: -1 }).limit(10);
+      const query = connection.createSubscribeQuery("share_docs", {
+        $sort: { "_m.mtime": -1 },
+        $limit: 10,
+      });
       const ret = [];
-      for (const doc of docs) {
-        const ele = {
-          id: doc.id,
-          name: doc.name,
-        };
-        ret.push(ele);
-      }
+      query.on("ready", () => {
+        query.results.map(async (doc) => {
+          // console.log(doc.id);
+          const document = await Docs.findById(doc.id);
+          ret.push({ id: document.id, name: document.name });
+        });
+      });
       logging.info(`sent docs list`);
       logging.info(ret);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");

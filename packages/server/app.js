@@ -124,6 +124,7 @@ const start = async () => {
     await fastify.listen(PORT, IP);
     logging.info(`Server started ${IP}:${PORT}`);
     await Docs.deleteMany({});
+
     logging.info("deleted docs");
   } catch (err) {
     console.log(err);
