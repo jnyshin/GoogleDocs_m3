@@ -66,7 +66,7 @@ export default async (fastify, opts) => {
     // Not sure what uid is for
     const uid = req.params.UID;
     try {
-      const doc = await Docs.findById(docId);
+      const doc = connection.get("share_db", docId);
       const ops = doc.data.ops;
       const converter = new QuillDeltaToHtmlConverter(ops, {});
       const html = converter.convert();
