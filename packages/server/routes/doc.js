@@ -90,7 +90,6 @@ export default async (fastify, opts) => {
     try {
       const share_doc = connection.get("share_docs", docId);
       // const document = await Docs.findById(docId);
-      console.log(share_doc);
       logging.info(`Found doc id = ${docId}`);
       const headers = {
         "Content-Type": "text/event-stream",
@@ -103,6 +102,7 @@ export default async (fastify, opts) => {
         content: share_doc.data.ops,
         version: share_doc.version,
       };
+      logging.info(`sent initial payload = ${payload}`);
       res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
       const newClient = {
         id: id,
