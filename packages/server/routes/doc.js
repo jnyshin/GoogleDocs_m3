@@ -156,7 +156,7 @@ export default async (fastify, opts) => {
     try {
       const document = connection.get("share_docs", docId);
       // const document = await Docs.findById(docId);
-      document.preventCompose = true;
+
       // const checkCurrDoc = await redis.sismember("currDoc", docId);
       // console.log(redis.get(docId, ""));
       // const doc = await redis.get(docId);
@@ -164,7 +164,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version !== document.version) {
+      if (version !== document.version || document.preventCompose) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -174,7 +174,9 @@ export default async (fastify, opts) => {
         return { status: "retry" };
       } else {
         // await redis.sadd("currDoc", docId);
+        document.preventCompose = true;
         document.submitOp(op, { source: id });
+        document.preventCompose = false;
 
         // const incomming = new Delta(op);
         // const old = new Delta(document.data);
