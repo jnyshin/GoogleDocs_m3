@@ -27,7 +27,6 @@ const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 ShareDB.types.register(richText.type);
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
-
 const backend = new ShareDB({
   db: docsDB,
   presence: true,
@@ -71,21 +70,21 @@ fastify.register(fastifyRedis, {
   family: 4, // 4 (IPv4) or 6 (IPv6)
 });
 fastify.register(fastifyUrlData);
-fastify.addHook("preHandler", (req, res, next) => {
-  logging.info(`incoming request from ${req.url}`);
-  if (
-    req.url.startsWith("/doc") ||
-    req.url.startsWith("/collection") ||
-    req.url.startsWith("/home") ||
-    req.url.startsWith("/media")
-  ) {
-    if (!req.session.user) {
-      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      res.send(ERROR_MESSAGE("Not logged in"));
-    }
-  }
-  next();
-});
+// fastify.addHook("preHandler", (req, res, next) => {
+//   logging.info(`incoming request from ${req.url}`);
+//   if (
+//     req.url.startsWith("/doc") ||
+//     req.url.startsWith("/collection") ||
+//     req.url.startsWith("/home") ||
+//     req.url.startsWith("/media")
+//   ) {
+//     if (!req.session.user) {
+//       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+//       res.send(ERROR_MESSAGE("Not logged in"));
+//     }
+//   }
+//   next();
+// });
 fastify.register(import("./routes/users.js"), {
   prefix: "/users",
 });

@@ -157,16 +157,7 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
     try {
       const document = connection.get("share_docs", docId);
-      // document.preventCompose = true;
-      // const document = await Docs.findById(docId);
 
-      // const checkCurrDoc = await redis.sismember("currDoc", docId);
-      // console.log(redis.get(docId, ""));
-      // const doc = await redis.get(docId);
-      // console.log(doc);
-      // logging.info(
-      //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
-      // );
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
