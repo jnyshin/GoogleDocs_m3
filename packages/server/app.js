@@ -10,6 +10,7 @@ import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
 import fastifyStatic from "fastify-static";
 import fastifyMultipart from "fastify-multipart";
+import fastifyUrlData from "fastify-url-data";
 import IORedis from "ioredis";
 import connectRedis from "connect-redis";
 import Fastify from "fastify";
@@ -69,7 +70,7 @@ fastify.register(fastifyRedis, {
   port: 6379, // Redis port
   family: 4, // 4 (IPv4) or 6 (IPv6)
 });
-
+fastify.register(fastifyUrlData);
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
   if (

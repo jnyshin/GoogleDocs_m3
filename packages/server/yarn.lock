@@ -836,6 +836,13 @@
     "secure-json-parse" "^2.4.0"
     "stream-wormhole" "^1.1.0"
 
+"fastify-plugin@^2.0.0":
+  "integrity" "sha512-I+Oaj6p9oiRozbam30sh39BiuiqBda7yK2nmSPVwDCfIBlKnT8YB3MY+pRQc2Fcd07bf6KPGklHJaQ2Qu81TYQ=="
+  "resolved" "https://registry.npmjs.org/fastify-plugin/-/fastify-plugin-2.3.4.tgz"
+  "version" "2.3.4"
+  dependencies:
+    "semver" "^7.3.2"
+
 "fastify-plugin@^2.0.1":
   "integrity" "sha512-I+Oaj6p9oiRozbam30sh39BiuiqBda7yK2nmSPVwDCfIBlKnT8YB3MY+pRQc2Fcd07bf6KPGklHJaQ2Qu81TYQ=="
   "resolved" "https://registry.npmjs.org/fastify-plugin/-/fastify-plugin-2.3.4.tgz"
@@ -865,6 +872,14 @@
     "p-limit" "^3.1.0"
     "readable-stream" "^3.4.0"
     "send" "^0.17.1"
+
+"fastify-url-data@^3.0.3":
+  "integrity" "sha512-fw9F6JhAPjg8oHm1xyZCcdj/agY8+z3xGZBUoHrUvBXOW0PDH+yDBihOsCeXYk4fbpI0KfJ9E44a5KOgpQkoBw=="
+  "resolved" "https://registry.npmjs.org/fastify-url-data/-/fastify-url-data-3.0.3.tgz"
+  "version" "3.0.3"
+  dependencies:
+    "fastify-plugin" "^2.0.0"
+    "uri-js" "^4.2.1"
 
 "fastify@^3.0.0", "fastify@^3.28.0":
   "integrity" "sha512-LAQtGllpkRe8L6Tpf3zdbvXzXFOrgaWV3Tbvp3xMv9ngcr9zht9U2/mo5zq9qp9kplSiBJ0w43aVAMqv6PBMbw=="
@@ -2323,7 +2338,7 @@
     "semver-diff" "^3.1.1"
     "xdg-basedir" "^4.0.0"
 
-"uri-js@^4.2.2":
+"uri-js@^4.2.1", "uri-js@^4.2.2":
   "integrity" "sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg=="
   "resolved" "https://registry.npmjs.org/uri-js/-/uri-js-4.4.1.tgz"
   "version" "4.4.1"
