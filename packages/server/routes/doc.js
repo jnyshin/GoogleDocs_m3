@@ -5,7 +5,6 @@ import {
   ackStringify,
   clientStringify,
   ERROR_MESSAGE,
-  isEditing,
   opStringify,
   payloadStringify,
   presenceStringify,
@@ -17,6 +16,7 @@ import IORedis from "ioredis";
 import { connection } from "../app.js";
 
 const pub = new IORedis();
+let isEditing = false;
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
     const docId = req.params.DOCID;
