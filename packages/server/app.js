@@ -16,6 +16,7 @@ import Fastify from "fastify";
 import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
 import richText from "rich-text";
+import Docs from "./schema/docs.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 const PORT = NODE_ENV === "production" ? 80 : 8000;
@@ -122,6 +123,8 @@ const start = async () => {
   try {
     await fastify.listen(PORT, IP);
     logging.info(`Server started ${IP}:${PORT}`);
+    await Docs.deleteMany({});
+    logging.info("deleted docs");
   } catch (err) {
     console.log(err);
     fastify.log.error(err);

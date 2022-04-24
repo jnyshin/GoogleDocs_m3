@@ -10,13 +10,6 @@ import Docs from "../schema/docs.js";
 
 export default async (fastify, opts) => {
   fastify.post(`/`, async (req, res) => {
-    const { redis } = fastify;
-    const id = req.body.docId;
-    const doc = connection.get("share_docs", id);
-    doc.submitOp([{ insert: "hello" }]);
-    console.log(doc.data.ops);
-    doc.preventCompose = true;
-
     return {};
   });
   fastify.get(`/pub`, async (req, res) => {
