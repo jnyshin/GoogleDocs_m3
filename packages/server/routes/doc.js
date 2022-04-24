@@ -102,7 +102,8 @@ export default async (fastify, opts) => {
         content: share_doc.data.ops,
         version: share_doc.version,
       };
-      logging.info(`sent initial payload = ${payload}`);
+      logging.info(`sent initial payload`);
+      logging.info(payload);
       res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
       const newClient = {
         id: id,
