@@ -134,6 +134,7 @@ const start = async () => {
 start();
 
 process.on("SIGINT", function () {
+  console.log("Closing WWS");
   wss.close();
   process.exit(0);
 });
