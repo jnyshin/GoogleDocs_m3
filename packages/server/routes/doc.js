@@ -203,7 +203,7 @@ export default async (fastify, opts) => {
           });
         });
         logging.info("{ status: ok }", id);
-        isEditig = false;
+        isEditing = false;
         // await redis.srem("currDoc", docId);
         // let checkRemove = await redis.smembers("currDoc");
         // logging.info(`currDoc is now has ${checkRemove}`, id);
