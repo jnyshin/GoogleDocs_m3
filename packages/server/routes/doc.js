@@ -177,7 +177,7 @@ export default async (fastify, opts) => {
         return { status: "retry" };
       } else {
         document.preventCompose = true;
-        const ack = docSubmitOp(document, op, id);
+        const ack = await docSubmitOp(document, op, id);
         const clients = await redis.lrange("clients", 0, -1);
         clients.map((c) => {
           const client = JSON.parse(c);
