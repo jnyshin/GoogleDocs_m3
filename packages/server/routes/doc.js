@@ -175,58 +175,49 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
 
     try {
-      connection.createFetchQuery(
-        SHARE_DB_NAME,
-        { _id: docId },
-        {},
-        async (err, results) => {
-          const document = results[0];
-          if (version !== document.version) {
-            logging.info(
-              `Version is not matched. client = ${version}, server=${document.version}.`,
-              id
-            );
-            res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-            logging.info("{ status: retry }", id);
-            return { status: "retry" };
-          } else if (document.preventCompose) {
-            logging.info("currently editing");
-            res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-            logging.info("{ status: retry }", id);
-            return { status: "retry" };
-          } else {
-            document.preventCompose = true;
-            await document.submitOp(op, { source: id }, async () => {
-              const ack = { ack: op };
-              const clients = await redis.lrange("clients", 0, -1);
-              clients.map((c) => {
-                const client = JSON.parse(c);
-                if (client.id === id) {
-                  logging.info("Sending ACK", id);
-                  pub.publish(client.id, ackStringify(ack));
-                }
-                if (client.id !== id && client.docId === docId) {
-                  logging.info("Sending OP", client.id);
-                  pub.publish(client.id, opStringify(op));
-                }
-              });
-              document.preventCompose = false;
+      const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
+      query.on("ready", async () => {
+        const document = query.results[0];
+        if (version !== document.version) {
+          logging.info(
+            `Version is not matched. client = ${version}, server=${document.version}.`,
+            id
+          );
+          res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+          logging.info("{ status: retry }", id);
+          return { status: "retry" };
+        } else if (document.preventCompose) {
+          logging.info("currently editing");
+          res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+          logging.info("{ status: retry }", id);
+          return { status: "retry" };
+        } else {
+          document.preventCompose = true;
+          document.submitOp(op, { source: id }, async () => {
+            const ack = { ack: op };
+            const clients = await redis.lrange("clients", 0, -1);
+            clients.map((c) => {
+              const client = JSON.parse(c);
+              if (client.id === id) {
+                logging.info("Sending ACK", id);
+                pub.publish(client.id, ackStringify(ack));
+              }
+              if (client.id !== id && client.docId === docId) {
+                logging.info("Sending OP", client.id);
+                pub.publish(client.id, opStringify(op));
+              }
             });
-            await Docs.findByIdAndUpdate(docId, {
-              $inc: { version: 1 },
-            });
-
-            logging.info("{ status: ok }", id);
-
-            // await redis.srem("currDoc", docId);
-            // let checkRemove = await redis.smembers("currDoc");
-            // logging.info(`currDoc is now has ${checkRemove}`, id);
-
-            res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-            return { status: "ok" };
-          }
+            document.preventCompose = false;
+          });
+          await Docs.findByIdAndUpdate(docId, {
+            $inc: { version: 1 },
+          });
+          logging.info("{ status: ok }", id);
+          res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+          return { status: "ok" };
         }
-      );
+      });
+      return { status: "ok" };
     } catch (err) {
       logging.error("failed to update OP", id);
       logging.error(err, id);
