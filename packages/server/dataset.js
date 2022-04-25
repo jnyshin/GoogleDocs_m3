@@ -3,6 +3,10 @@ export const quotes = [
     id: 1,
     quote: "Life isn’t about getting and having, it’s about giving and being.",
     author: "Kevin Kruse",
+    suggest_words:
+      "Life isn’t about getting and having, it’s about giving and being.".split(
+        " "
+      ),
   },
   {
     id: 2,

@@ -41,7 +41,7 @@ export default async (fastify, opts) => {
         },
       },
       highlight: {
-        fragment_size: 50,
+        fragment_size: 100,
         fields: {
           quote: {},
         },
@@ -63,25 +63,43 @@ export default async (fastify, opts) => {
   });
   fastify.get(`/suggest`, async (req, res) => {
     const keyword = url.parse(req.url, true).query.q;
+    // await ESclient.search(
+    //   {
+    //     index: "test2",
+    //     suggest: {
+    //       completer: {
+    //         prefix: keyword,
+    //         completion: {
+    //           field: "quote",
+    //           skip_duplicates: true,
+    //           fuzzy: {
+    //             fuzziness: "auto",
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    //   (err, doc) => {
+    //     if (err) {
+    //       console.log(err);
+    //     }
+    //     console.log(doc);
+    //   }
+    // );
     const result = await ESclient.search({
-      index: "test",
-      query: {
-        match: { quote: keyword },
-      },
-      suggest: {
-        gotsuggest: {
-          prefix: keyword,
-          term: { field: "quote" },
-        },
-      },
-    });
-    console.log(result);
-    return result;
+        query:{
+            prefix:{
+                title.keyword: keyword,
+            }
+        }
+    })
+    //res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    // return result;
   });
   fastify.post("/data", async (req, res) => {
     //console.log(quotes);
     const operations = quotes.flatMap((doc) => [
-      { index: { _index: "test" } },
+      { index: { _index: "test2" } },
       doc,
     ]);
     const bulkResponse = await ESclient.bulk({ refresh: true, operations });
