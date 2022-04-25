@@ -72,7 +72,7 @@ export default async (fastify, opts) => {
         { _id: docId },
         {},
         (err, results) => {
-          const doc = query.results[0];
+          const doc = results[0];
           const ops = doc.data.ops;
           const converter = new QuillDeltaToHtmlConverter(ops, {});
           const html = converter.convert();
