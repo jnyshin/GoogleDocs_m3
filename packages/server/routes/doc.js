@@ -179,7 +179,6 @@ export default async (fastify, opts) => {
       } else {
         document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
-        document.preventCompose = false;
         const clients = await redis.lrange("clients", 0, -1);
         clients.map((c) => {
           const client = JSON.parse(c);
@@ -197,6 +196,7 @@ export default async (fastify, opts) => {
         });
         logging.info("{ status: ok }", id);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        document.preventCompose = false;
         return { status: "ok" };
       }
     } catch (err) {
