@@ -74,17 +74,3 @@ export const docActionStringify = fastJson({
     docId: { type: "string" },
   },
 });
-
-export const getDoc = (docId) => {
-  connection.createFetchQuery(
-    SHARE_DB_NAME,
-    { _id: docId },
-    {},
-    (err, results) => {
-      if (err) {
-        console.log(err);
-      }
-      return results[0];
-    }
-  );
-};
