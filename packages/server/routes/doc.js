@@ -171,33 +171,35 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
-      } else if (document.preventCompose) {
-        logging.info("Someone is currently editing!");
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("{ status: retry }", id);
-        return { status: "retry" };
-      } else {
-        document.preventCompose = true;
-        const ack = await docSubmitOp(document, op, id);
-        const clients = await redis.lrange("clients", 0, -1);
-        clients.map((c) => {
-          const client = JSON.parse(c);
-          if (client.id === id) {
-            logging.info("Sending ACK", id);
-            pub.publish(client.id, ackStringify(ack));
-          }
-          if (client.id !== id && client.docId === docId) {
-            logging.info("Sending OP", client.id);
-            pub.publish(client.id, opStringify(op));
-          }
+      }
+      // else if (document.preventCompose) {
+      //   logging.info("Someone is currently editing!");
+      //   res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      //   logging.info("{ status: retry }", id);
+      //   return { status: "retry" };
+      // }
+      else {
+        document.whenNothingPending(async () => {
+          const ack = await docSubmitOp(document, op, id);
+          const clients = await redis.lrange("clients", 0, -1);
+          clients.map((c) => {
+            const client = JSON.parse(c);
+            if (client.id === id) {
+              logging.info("Sending ACK", id);
+              pub.publish(client.id, ackStringify(ack));
+            }
+            if (client.id !== id && client.docId === docId) {
+              logging.info("Sending OP", client.id);
+              pub.publish(client.id, opStringify(op));
+            }
+          });
+          await Docs.findByIdAndUpdate(docId, {
+            $inc: { version: 1 },
+          });
+          logging.info("{ status: ok }", id);
+          res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+          return { status: "ok" };
         });
-        await Docs.findByIdAndUpdate(docId, {
-          $inc: { version: 1 },
-        });
-        logging.info("{ status: ok }", id);
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        document.preventCompose = false;
-        return { status: "ok" };
       }
     } catch (err) {
       logging.error("failed to update OP", id);
