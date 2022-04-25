@@ -13,10 +13,20 @@ import logging from "../logging.js";
 import { resourceLimits } from "worker_threads";
 
 const ESclient = new Client({
-  node: "http://localhost:9200",
+  cloud: {
+    id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
+  },
+  auth: {
+    username: "elastic",
+    password: "GoitLPz9EOuuNiybaMBM6x47",
+  },
 }); //More configuration will be added after ES Cloud set up
 
 export default async (fastify, opts) => {
+  fastify.get("/info", async (req, res) => {
+    const response = await client.info();
+    return response;
+  });
   fastify.get(`/search`, async (req, res) => {
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
