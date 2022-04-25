@@ -93,7 +93,6 @@ export const docSubmitOp = (document, op, id) => {
   const docSubmitOpPromise = new Promise((resolve, reject) => {
     document.submitOp(op, { source: id }, () => {
       try {
-        document.preventCompose = false;
         resolve({ ack: op });
       } catch (err) {
         reject(err);
