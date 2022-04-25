@@ -3936,7 +3936,7 @@ delayed-stream@~1.0.0:
   resolved "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz"
   integrity sha1-3zrhmayt+31ECqrgsp4icrJOxhk=
 
-denque@^1.1.0:
+denque@^1.1.0, denque@^1.5.0:
   version "1.5.1"
   resolved "https://registry.npmjs.org/denque/-/denque-1.5.1.tgz"
   integrity sha512-XwE+iZ4D6ZUB7mfYRMb5wByE8L74HCn30FBN7sWnXksWc1LO1bPDl67pBR9o/kC4z/xSNAwkMYcGgqDV3BE3Hw==
@@ -8839,7 +8839,7 @@ redeyed@~2.1.0:
   dependencies:
     esprima "~4.0.0"
 
-redis-commands@1.7.0:
+redis-commands@1.7.0, redis-commands@^1.7.0:
   version "1.7.0"
   resolved "https://registry.npmjs.org/redis-commands/-/redis-commands-1.7.0.tgz"
   integrity sha512-nJWqw3bTFy21hX/CPKHth6sfhZbdiHP6bTawSgQBlKOVRG7EZkfHbbHwQJnrE4vsQf0CMNE+3gJ4Fmm16vdVlQ==
@@ -8860,6 +8860,16 @@ redis-parser@3.0.0, redis-parser@^3.0.0:
   integrity sha1-tm2CjNyv5rS4pCin3vTGvKwxyLQ=
   dependencies:
     redis-errors "^1.0.0"
+
+"redis@^2.6.0 || ^3.0.0":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/redis/-/redis-3.1.2.tgz#766851117e80653d23e0ed536254677ab647638c"
+  integrity sha512-grn5KoZLr/qrRQVwoSkmzdbw6pwF+/rwODtrOr6vuBRiR/f3rjSTGupbF90Zpqm2oenix8Do6RV7pYEkGwlKkw==
+  dependencies:
+    denque "^1.5.0"
+    redis-commands "^1.7.0"
+    redis-errors "^1.2.0"
+    redis-parser "^3.0.0"
 
 redis@^4.0.6:
   version "4.0.6"
@@ -9346,7 +9356,22 @@ sharedb-mongo@^1.0.0:
     mongodb "^2.1.2 || ^3.0.0 || ^4.0.0"
     sharedb "^1.9.1 || ^2.0.0"
 
-"sharedb@^1.9.1 || ^2.0.0", sharedb@^2.2.5:
+sharedb-redis-pubsub@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/sharedb-redis-pubsub/-/sharedb-redis-pubsub-2.0.1.tgz#5820d96ce541b61069245b0de06e215822b8be62"
+  integrity sha512-hBvJ9R1aEyd6D5UCEfMAggV0worZ2LiRWBotzIgKGc3MBaTUTD4y5p2/0x7QlriYBGAQ0/51xkxvGFZMpQN+8A==
+  dependencies:
+    redis "^2.6.0 || ^3.0.0"
+    sharedb "^1.0.0 || ^2.0.0"
+
+sharedb-wsbus-pubsub@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/sharedb-wsbus-pubsub/-/sharedb-wsbus-pubsub-1.1.0.tgz#0ca1e271006e068e2f01d1cb72210e46dcef91c6"
+  integrity sha1-DKHicQBuBo4vAdHLciEORtzvkcY=
+  dependencies:
+    ws-bus "*"
+
+"sharedb@^1.0.0 || ^2.0.0", "sharedb@^1.9.1 || ^2.0.0", sharedb@^2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/sharedb/-/sharedb-2.2.5.tgz#8f6e0b4db86a89c226ebb09e0c98dcec4116f467"
   integrity sha512-uCy8Npx8Azf21PmNUGqfIKRbnisH2U+N9Z0CJILWq23+HqcWRAA5n35m/dMm4ZuTQalYeWlR2/kaV8Wm0nXr3g==
@@ -10775,6 +10800,13 @@ write-file-atomic@^3.0.0:
     is-typedarray "^1.0.0"
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
+
+ws-bus@*:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ws-bus/-/ws-bus-2.0.0.tgz#6c324f7ff166b4128f02701e7b1e4838e0e68a9b"
+  integrity sha512-zkFfkyTJlWSg7O8MDOX1ReGCER8dMxOTEVcl/r6NFbjDnn1EJSDbh488TUfWH0zp8DITt9RbqRnSUHikqeLNBw==
+  dependencies:
+    debug "^2.6.0"
 
 ws@^7.4.6:
   version "7.5.7"

@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
 import { ERROR_MESSAGE } from "../store.js";
 import { connection } from "../app.js";
+import IORedis from "ioredis";
+const pub = new IORedis();
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
     logging.info("[/collection/create] Route");
@@ -18,6 +20,7 @@ export default async (fastify, opts) => {
         name: name,
         version: 1,
       });
+
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
     } catch (err) {
