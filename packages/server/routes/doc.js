@@ -162,11 +162,7 @@ export default async (fastify, opts) => {
 
     try {
       const document = await fetchDoc(docId);
-      document.preventCompose = true;
 
-      document.on("op batch", (op, source) => {
-        document.preventCompose = false;
-      });
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
@@ -181,7 +177,9 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
+        document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
+        document.preventCompose = false;
         const clients = await redis.lrange("clients", 0, -1);
         clients.map((c) => {
           const client = JSON.parse(c);
