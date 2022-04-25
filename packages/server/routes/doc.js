@@ -67,21 +67,17 @@ export default async (fastify, opts) => {
     // Not sure what uid is for
     const uid = req.params.UID;
     try {
-      connection.createFetchQuery(
-        SHARE_DB_NAME,
-        { _id: docId },
-        {},
-        (err, results) => {
-          const doc = results[0];
-          const ops = doc.data.ops;
-          const converter = new QuillDeltaToHtmlConverter(ops, {});
-          const html = converter.convert();
-          logging.info("Sent HTML: ");
-          logging.info(html);
-          res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-          return html;
-        }
-      );
+      const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
+      query.on("ready", () => {
+        const doc = results[0];
+        const ops = doc.data.ops;
+        const converter = new QuillDeltaToHtmlConverter(ops, {});
+        const html = converter.convert();
+        logging.info("Sent HTML: ");
+        logging.info(html);
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        return html;
+      });
     } catch (err) {
       logging.error("fail to convert to HTML Format");
       logging.error(err);
@@ -96,67 +92,62 @@ export default async (fastify, opts) => {
     const id = req.params.UID;
     const { redis } = fastify;
     try {
-      connection.createFetchQuery(
-        SHARE_DB_NAME,
-        { _id: docId },
-        {},
-        async (err, results) => {
-          if (err) console.log(err);
-          const share_doc = results[0];
-          logging.info(`Found doc id = ${docId}`);
-          const headers = {
-            "Content-Type": "text/event-stream",
-            Connection: "keep-alive",
-            "Access-Control-Allow-Origin": "*",
-            "X-CSE356": "61f9f57373ba724f297db6ba",
-          };
-          res.raw.writeHead(200, headers);
-          const payload = {
-            content: share_doc.data.ops,
-            version: share_doc.version,
-          };
-          logging.info(`sent initial payload`);
-          logging.info(payload);
-          res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
-          const newClient = {
-            id: id,
-            docId: docId,
-          };
+      const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
+      query.on("ready", async () => {
+        const share_doc = query.results[0];
+        logging.info(`Found doc id = ${docId}`);
+        const headers = {
+          "Content-Type": "text/event-stream",
+          Connection: "keep-alive",
+          "Access-Control-Allow-Origin": "*",
+          "X-CSE356": "61f9f57373ba724f297db6ba",
+        };
+        res.raw.writeHead(200, headers);
+        const payload = {
+          content: share_doc.data.ops,
+          version: share_doc.version,
+        };
+        logging.info(`sent initial payload`);
+        logging.info(payload);
+        res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
+        const newClient = {
+          id: id,
+          docId: docId,
+        };
 
-          redis.lpush("clients", clientStringify(newClient));
+        redis.lpush("clients", clientStringify(newClient));
 
-          const sub = new IORedis();
-          sub.subscribe(id, (err, count) => {
-            if (err) {
-              logging.error("Failed to subscribe: %s", err.message);
-            } else {
-              logging.info(
-                `Subscribed successfully! This client is currently subscribed ${id}`
-              );
+        const sub = new IORedis();
+        sub.subscribe(id, (err, count) => {
+          if (err) {
+            logging.error("Failed to subscribe: %s", err.message);
+          } else {
+            logging.info(
+              `Subscribed successfully! This client is currently subscribed ${id}`
+            );
+          }
+        });
+
+        sub.on("message", (channel, message) => {
+          logging.info("Subscriber got message", channel);
+          logging.info(message, channel);
+          res.raw.write(`data: ${message}\n\n`);
+        });
+
+        const clients = await redis.lrange("clients", 0, -1);
+        logging.info(`Current connected clients = ${clients.length}`);
+        req.raw.on("close", () => {
+          logging.info(`UID = ${id} connection closed`);
+          clients.map(async (c, index) => {
+            const client = JSON.parse(c);
+            if (client.id === id) {
+              await redis.lrem("clients", 0, c);
             }
           });
-
-          sub.on("message", (channel, message) => {
-            logging.info("Subscriber got message", channel);
-            logging.info(message, channel);
-            res.raw.write(`data: ${message}\n\n`);
-          });
-
-          const clients = await redis.lrange("clients", 0, -1);
-          logging.info(`Current connected clients = ${clients.length}`);
-          req.raw.on("close", () => {
-            logging.info(`UID = ${id} connection closed`);
-            clients.map(async (c, index) => {
-              const client = JSON.parse(c);
-              if (client.id === id) {
-                await redis.lrem("clients", 0, c);
-              }
-            });
-            logging.info(`remaining clients = ${clients.length}`);
-          });
-          res.sent = true;
-        }
-      );
+          logging.info(`remaining clients = ${clients.length}`);
+        });
+        res.sent = true;
+      });
       // const document = await Docs.findById(docId);
     } catch (err) {
       logging.error("fail to create event stream connection");

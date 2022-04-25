@@ -38,19 +38,10 @@ export default async (fastify, opts) => {
       await Docs.findByIdAndDelete(docId);
       logging.info(`deleted doc id=${docId} route`);
       let share_doc;
-      connection.createFetchQuery(
-        SHARE_DB_NAME,
-        { _id: docId },
-        {},
-        (err, results) => {
-          if (err) {
-            console.log(err);
-          }
-
-          share_doc = results[0];
-        }
-      );
-      share_doc.del();
+      const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
+      query.on("ready", () => {
+        share_doc.del();
+      });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
