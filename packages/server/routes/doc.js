@@ -5,15 +5,14 @@ import {
   ackStringify,
   clientStringify,
   ERROR_MESSAGE,
+  getDoc,
   opStringify,
   payloadStringify,
   presenceStringify,
+  SHARE_DB_NAME,
 } from "../store.js";
 import User from "../schema/user.js";
-import Delta from "quill-delta";
 import IORedis from "ioredis";
-
-import { connection } from "../app.js";
 
 const pub = new IORedis();
 
@@ -68,7 +67,7 @@ export default async (fastify, opts) => {
     // Not sure what uid is for
     const uid = req.params.UID;
     try {
-      const doc = connection.get("share_docs", docId);
+      const doc = getDoc(docId);
       const ops = doc.data.ops;
       const converter = new QuillDeltaToHtmlConverter(ops, {});
       const html = converter.convert();
@@ -90,7 +89,8 @@ export default async (fastify, opts) => {
     const id = req.params.UID;
     const { redis } = fastify;
     try {
-      const share_doc = connection.get("share_docs", docId);
+      const share_doc = getDoc(docId);
+
       // const document = await Docs.findById(docId);
       logging.info(`Found doc id = ${docId}`);
       const headers = {
@@ -111,22 +111,26 @@ export default async (fastify, opts) => {
         id: id,
         docId: docId,
       };
+
       redis.lpush("clients", clientStringify(newClient));
+
       const sub = new IORedis();
       sub.subscribe(id, (err, count) => {
         if (err) {
-          console.error("Failed to subscribe: %s", err.message);
+          logging.error("Failed to subscribe: %s", err.message);
         } else {
-          console.log(
+          logging.log(
             `Subscribed successfully! This client is currently subscribed ${id}`
           );
         }
       });
+
       sub.on("message", (channel, message) => {
         logging.info("Subscriber got message", channel);
         logging.info(message, channel);
         res.raw.write(`data: ${message}\n\n`);
       });
+
       const clients = await redis.lrange("clients", 0, -1);
       logging.info(`Current connected clients = ${clients.length}`);
       req.raw.on("close", () => {
@@ -155,8 +159,9 @@ export default async (fastify, opts) => {
     const version = req.body.version;
     const op = req.body.op;
     const { redis } = fastify;
+
     try {
-      const document = connection.get("share_docs", docId);
+      const document = getDoc(docId);
 
       if (version !== document.version) {
         logging.info(

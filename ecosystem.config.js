@@ -1,13 +1,16 @@
 module.exports = {
   apps: [
     {
-      name: "app1",
+      name: "docs",
       script: "packages/server/app.js",
+      watch: true,
+      instance_var: "INSTANCE_ID",
+      env: {
+        PORT: 8000,
+        NODE_ENV: "development",
+      },
+      exec_mode: "cluster",
+      instances: "3",
     },
   ],
-  deploy: {
-    production: {
-      host: "209.94.56.137",
-    },
-  },
 };
