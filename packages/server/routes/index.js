@@ -6,6 +6,7 @@ import { v4 as uuid } from "uuid";
 const sub = new IORedis();
 const pub = new IORedis();
 import NodeCache from "node-cache";
+import { quotes } from "../dataset.js";
 import { connection } from "../app.js";
 import { ERROR_MESSAGE } from "../store.js";
 import Docs from "../schema/docs.js";
@@ -24,22 +25,41 @@ const ESclient = new Client({
 
 export default async (fastify, opts) => {
   fastify.get("/info", async (req, res) => {
-    const response = await client.info();
+    const response = await ESclient.info();
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "m3",
-      query: {
-        match: {
-          title: keyword,
-          body: keyword,
+      index: "test",
+      body: {
+        query: {
+          multi_match: {
+            query: keyword,
+            fields: ["quote", "author"],
+          },
+        },
+      },
+      highlight: {
+        fragment_size: 50,
+        fields: {
+          quote: {},
         },
       },
     });
     console.log(result.hits.hits);
-    return result.hits.hits; //may need to arrange formats
+    const retlist = [];
+    result.hits.hits.map((r) => {
+      console.log(r);
+      let arranged = {
+        docid: r._source.id,
+        name: r._source.quote,
+        snippet: r.highlight.quote[0],
+      };
+      retlist.push(arranged);
+    });
+    return retlist; //may need to arrange formats
+
     // const query = connection.createSubscribeQuery("share_docs", {
     //   $sort: { "_m.mtime": -1 },
     //   $limit: 10,
@@ -67,5 +87,17 @@ export default async (fastify, opts) => {
     });
     console.log(result);
     return result;
+  });
+  fastify.post("/data", async (req, res) => {
+    //console.log(quotes);
+    const operations = quotes.flatMap((doc) => [
+      { index: { _index: "test" } },
+      doc,
+    ]);
+    const bulkResponse = await ESclient.bulk({ refresh: true, operations });
+    console.log(bulkResponse);
+    const count = await ESclient.count({ index: "test" });
+    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    return count;
   });
 };
