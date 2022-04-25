@@ -69,7 +69,7 @@ export default async (fastify, opts) => {
     try {
       const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
       query.on("ready", () => {
-        const doc = results[0];
+        const doc = query.results[0];
         const ops = doc.data.ops;
         const converter = new QuillDeltaToHtmlConverter(ops, {});
         const html = converter.convert();
