@@ -4,6 +4,7 @@ import logging from "../logging.js";
 import {
   ackStringify,
   clientStringify,
+  docSubmitOp,
   ERROR_MESSAGE,
   fetchDoc,
   opStringify,
@@ -170,27 +171,24 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else if (document.preventCompose) {
-        logging.info("currently editing");
+        logging.info("Someone is currently editing!");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
         document.preventCompose = true;
-        document.submitOp(op, { source: id }, async () => {
-          const ack = { ack: op };
-          const clients = await redis.lrange("clients", 0, -1);
-          clients.map((c) => {
-            const client = JSON.parse(c);
-            if (client.id === id) {
-              logging.info("Sending ACK", id);
-              pub.publish(client.id, ackStringify(ack));
-            }
-            if (client.id !== id && client.docId === docId) {
-              logging.info("Sending OP", client.id);
-              pub.publish(client.id, opStringify(op));
-            }
-          });
-          document.preventCompose = false;
+        const ack = docSubmitOp(document, op, id);
+        const clients = await redis.lrange("clients", 0, -1);
+        clients.map((c) => {
+          const client = JSON.parse(c);
+          if (client.id === id) {
+            logging.info("Sending ACK", id);
+            pub.publish(client.id, ackStringify(ack));
+          }
+          if (client.id !== id && client.docId === docId) {
+            logging.info("Sending OP", client.id);
+            pub.publish(client.id, opStringify(op));
+          }
         });
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },

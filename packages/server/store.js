@@ -88,3 +88,17 @@ export const fetchDoc = (docId) => {
   });
   return getDocPromise;
 };
+
+export const docSubmitOp = (document, op, id) => {
+  const docSubmitOpPromise = new Promise((resolve, reject) => {
+    document.submitOp(op, { source: id }, () => {
+      try {
+        document.preventCompose = false;
+        resolve(op);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+  return docSubmitOpPromise;
+};
