@@ -1,7 +1,7 @@
 import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
-import { ERROR_MESSAGE, SHARE_DB_NAME } from "../store.js";
+import { ERROR_MESSAGE, fetchDoc, SHARE_DB_NAME } from "../store.js";
 import { connection } from "../app.js";
 import IORedis from "ioredis";
 const pub = new IORedis();
@@ -37,11 +37,8 @@ export default async (fastify, opts) => {
     try {
       await Docs.findByIdAndDelete(docId);
       logging.info(`deleted doc id=${docId} route`);
-      let share_doc;
-      const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
-      query.on("ready", () => {
-        share_doc.del();
-      });
+      const document = await fetchDoc(docId);
+      document.del();
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
