@@ -49,6 +49,7 @@ export default async (fastify, opts) => {
     });
     console.log(result.hits.hits);
     const retlist = [];
+    //may need to change field names!!!
     result.hits.hits.map((r) => {
       console.log(r);
       let arranged = {
@@ -58,30 +59,19 @@ export default async (fastify, opts) => {
       };
       retlist.push(arranged);
     });
-    return retlist; //may need to arrange formats
-
-    // const query = connection.createSubscribeQuery("share_docs", {
-    //   $sort: { "_m.mtime": -1 },
-    //   $limit: 10,
-    // });
-    // const ret = [];
-    // query.on("ready", () => {
-    //   query.results.map(async (doc) => {
-    //     // console.log(doc.id);
-    //     const document = await Docs.findById(doc.id);
-    //     ret.push({ id: document.id, name: document.name });
-    //   });
-    // });
-    // return {};
+    return retlist;
   });
   fastify.get(`/suggest`, async (req, res) => {
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "m3",
+      index: "test",
+      query: {
+        match: { quote: keyword },
+      },
       suggest: {
         gotsuggest: {
-          text: keyword,
-          term: { field: "body" },
+          prefix: keyword,
+          term: { field: "quote" },
         },
       },
     });
