@@ -78,6 +78,7 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return html;
       });
+      req.sent = true;
     } catch (err) {
       logging.error("fail to convert to HTML Format");
       logging.error(err);
