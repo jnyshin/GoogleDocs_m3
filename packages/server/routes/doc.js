@@ -67,17 +67,21 @@ export default async (fastify, opts) => {
     // Not sure what uid is for
     const uid = req.params.UID;
     try {
-      const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
-      query.on("ready", () => {
-        const doc = query.results[0];
-        const ops = doc.data.ops;
-        const converter = new QuillDeltaToHtmlConverter(ops, {});
-        const html = converter.convert();
-        logging.info("Sent HTML: ");
-        logging.info(html);
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        return html;
-      });
+      connection.createFetchQuery(
+        SHARE_DB_NAME,
+        { _id: docId },
+        {},
+        (err, results) => {
+          const doc = query.results[0];
+          const ops = doc.data.ops;
+          const converter = new QuillDeltaToHtmlConverter(ops, {});
+          const html = converter.convert();
+          logging.info("Sent HTML: ");
+          logging.info(html);
+          res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+          return html;
+        }
+      );
       req.sent = true;
     } catch (err) {
       logging.error("fail to convert to HTML Format");
