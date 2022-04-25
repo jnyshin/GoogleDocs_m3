@@ -12,9 +12,11 @@ import {
 import User from "../schema/user.js";
 import Delta from "quill-delta";
 import IORedis from "ioredis";
+
 import { connection } from "../app.js";
 
 const pub = new IORedis();
+
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
     const docId = req.params.DOCID;
@@ -155,6 +157,7 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
     try {
       const document = connection.get("share_docs", docId);
+      // document.preventCompose = true;
       // const document = await Docs.findById(docId);
 
       // const checkCurrDoc = await redis.sismember("currDoc", docId);
@@ -164,7 +167,7 @@ export default async (fastify, opts) => {
       // logging.info(
       //   `checkCurrDoc is ${checkCurrDoc} with type ${typeof checkCurrDoc}`
       // );
-      if (version !== document.version || document.preventCompose) {
+      if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
           id
@@ -172,33 +175,35 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
+      } else if (document.preventCompose) {
+        logging.info("currently editing");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        logging.info("{ status: retry }", id);
+        return { status: "retry" };
       } else {
-        // await redis.sadd("currDoc", docId);
         document.preventCompose = true;
-        document.submitOp(op, { source: id });
-        document.preventCompose = false;
-
-        // const incomming = new Delta(op);
-        // const old = new Delta(document.data);
-        // const newDelta = old.compose(incomming);
+        await document.submitOp(op, { source: id }, async () => {
+          const ack = { ack: op };
+          const clients = await redis.lrange("clients", 0, -1);
+          clients.map((c) => {
+            const client = JSON.parse(c);
+            if (client.id === id) {
+              logging.info("Sending ACK", id);
+              pub.publish(client.id, ackStringify(ack));
+            }
+            if (client.id !== id && client.docId === docId) {
+              logging.info("Sending OP", client.id);
+              pub.publish(client.id, opStringify(op));
+            }
+          });
+          document.preventCompose = false;
+        });
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
         });
-        const ack = { ack: op };
 
-        const clients = await redis.lrange("clients", 0, -1);
-        clients.map((c) => {
-          const client = JSON.parse(c);
-          if (client.id === id) {
-            logging.info("Sending ACK", id);
-            pub.publish(client.id, ackStringify(ack));
-          }
-          if (client.id !== id && client.docId === docId) {
-            logging.info("Sending OP", client.id);
-            pub.publish(client.id, opStringify(op));
-          }
-        });
         logging.info("{ status: ok }", id);
+
         // await redis.srem("currDoc", docId);
         // let checkRemove = await redis.smembers("currDoc");
         // logging.info(`currDoc is now has ${checkRemove}`, id);

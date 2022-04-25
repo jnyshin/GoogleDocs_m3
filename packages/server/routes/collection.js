@@ -16,7 +16,7 @@ export default async (fastify, opts) => {
         _id: id,
         id: id,
         name: name,
-        version: 0,
+        version: 1,
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
