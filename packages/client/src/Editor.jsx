@@ -5,11 +5,7 @@ import API from "./api";
 import { DOMAIN_NAME, HOST } from "./store";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import ReconnectingWebSocket from "reconnecting-websocket";
-import Sharedb from "sharedb/lib/client";
-import richText from "rich-text";
 
-Sharedb.types.register(richText.type);
 const TOOLBAR = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
   [{ size: [] }],
@@ -36,10 +32,6 @@ const FORMAT = [
 ];
 let version = 0;
 const Editor = (props) => {
-  const websocketURL = `ws://${HOST}:9001`;
-  const connection = new Sharedb.Connection(
-    new ReconnectingWebSocket(websocketURL)
-  );
   const params = useParams();
   const [quill, setQuill] = useState();
   const [id, setId] = useState();
@@ -55,9 +47,6 @@ const Editor = (props) => {
 
   useEffect(() => {
     if (quill && !listening) {
-      const doc = connection.get("share_docs", docId);
-      doc.subscribe();
-
       const evtSource = new EventSource(
         `http://${DOMAIN_NAME}/doc/connect/${docId}/${id}`
       );

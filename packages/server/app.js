@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
-import { WebSocketServer } from "ws";
-import WebSocketJSONStream from "@teamwork/websocket-json-stream";
 import ShareDB from "sharedb";
 import MongoShareDB from "sharedb-mongo";
 import { join } from "path";
-import { ERROR_MESSAGE, __dirname } from "./store.js";
+import { ERROR_MESSAGE, SHARE_DB_NAME, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
@@ -25,16 +23,14 @@ const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
 
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
+await ioredis.del("clients");
 ShareDB.types.register(richText.type);
+
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
 const backend = new ShareDB({
   db: docsDB,
   presence: true,
   doNotForwardSendPresenceErrorsToClient: true,
-});
-const wss = new WebSocketServer({ port: 9001 });
-wss.on("connection", (webSocket) => {
-  backend.listen(new WebSocketJSONStream(webSocket));
 });
 
 export const connection = backend.connect();
@@ -122,12 +118,13 @@ fastify.register((fastifyInstance, options, done) => {
     })
     .finally(() => done());
 });
+
 const start = async () => {
   try {
     await fastify.listen(PORT, IP);
     logging.info(`Server started ${IP}:${PORT}`);
-    await Docs.deleteMany({});
 
+    await Docs.deleteMany({});
     logging.info("deleted docs");
   } catch (err) {
     console.log(err);
@@ -137,7 +134,5 @@ const start = async () => {
 start();
 
 process.on("SIGINT", function () {
-  console.log("Closing WWS");
-  wss.close();
   process.exit(0);
 });

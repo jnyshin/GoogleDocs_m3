@@ -26,6 +26,7 @@
     "quill-delta": "^5.0.0",
     "quill-delta-to-html": "^0.12.1",
     "redis-json": "^6.0.3",
+    "sharedb": "^2.2.5",
     "sharedb-mongo": "^1.0.0",
     "sharedb-redis-pubsub": "^2.0.1",
     "sharedb-wsbus-pubsub": "^1.1.0",

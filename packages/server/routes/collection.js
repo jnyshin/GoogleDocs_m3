@@ -1,18 +1,23 @@
 import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
-import { ERROR_MESSAGE } from "../store.js";
+import {
+  docActionStringify,
+  ERROR_MESSAGE,
+  getDoc,
+  SHARE_DB_NAME,
+} from "../store.js";
 import { connection } from "../app.js";
 import IORedis from "ioredis";
-const pub = new IORedis();
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
+    const { redis } = fastify;
     logging.info("[/collection/create] Route");
     const name = req.body.name;
     const id = uuidv4();
     try {
       logging.info(`created new doc id=${id} route`);
-      const share_doc = connection.get("share_docs", id);
+      const share_doc = connection.get(SHARE_DB_NAME, id);
       share_doc.create([], "rich-text");
       await Docs.create({
         _id: id,
@@ -37,7 +42,7 @@ export default async (fastify, opts) => {
     try {
       await Docs.findByIdAndDelete(docId);
       logging.info(`deleted doc id=${docId} route`);
-      const share_doc = connection.get("share_docs", docId);
+      const share_doc = getDoc(docId);
       share_doc.del();
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};

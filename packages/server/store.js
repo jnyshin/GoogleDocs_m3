@@ -1,6 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
+import { connection } from "./app.js";
 export const clients = [];
 export const DOMAIN_NAME =
   process.env.NODE_ENV === "production"
@@ -10,6 +11,7 @@ export const ERROR_MESSAGE = (message) => {
   return { error: true, message: message };
 };
 const __filename = fileURLToPath(import.meta.url);
+export const SHARE_DB_NAME = "share_docs";
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
 export const currEditDoc = [];
@@ -63,3 +65,26 @@ export const opStringify = fastJson({
   title: "op",
   type: "array",
 });
+
+export const docActionStringify = fastJson({
+  title: "doc action",
+  type: "object",
+  properties: {
+    action: { type: "string" },
+    docId: { type: "string" },
+  },
+});
+
+export const getDoc = (docId) => {
+  connection.createFetchQuery(
+    SHARE_DB_NAME,
+    { _id: docId },
+    {},
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      return results[0];
+    }
+  );
+};
