@@ -94,7 +94,7 @@ export const docSubmitOp = (document, op, id) => {
     document.submitOp(op, { source: id }, () => {
       try {
         document.preventCompose = false;
-        resolve(op);
+        resolve({ ack: op });
       } catch (err) {
         reject(err);
       }
