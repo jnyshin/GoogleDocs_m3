@@ -86,13 +86,13 @@ export default async (fastify, opts) => {
     //     console.log(doc);
     //   }
     // );
-    const result = await ESclient.search({
-        query:{
-            prefix:{
-                title.keyword: keyword,
-            }
-        }
-    })
+    // const result = await ESclient.search({
+    //     query:{
+    //         prefix:{
+    //             title.keyword: keyword,
+    //         }
+    //     }
+    // })
     //res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     // return result;
   });
