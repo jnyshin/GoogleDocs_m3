@@ -162,10 +162,10 @@ export default async (fastify, opts) => {
 
     try {
       const document = await fetchDoc(docId);
-      document.on("before op", (op, source) => {
+      document.on("before op batch", (op, source) => {
         document.preventCompose = true;
       });
-      document.on("op", (op, source) => {
+      document.on("op batch", (op, source) => {
         document.preventCompose = false;
       });
       if (version !== document.version) {
