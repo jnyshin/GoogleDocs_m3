@@ -66,11 +66,11 @@ export const opStringify = fastJson({
   type: "array",
 });
 
-export const docActionStringify = fastJson({
+export const docPreventStringify = fastJson({
   title: "doc action",
   type: "object",
   properties: {
-    action: { type: "string" },
+    preventCompose: { type: "boolean" },
     docId: { type: "string" },
   },
 });

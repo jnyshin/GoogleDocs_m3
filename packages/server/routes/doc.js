@@ -4,6 +4,7 @@ import logging from "../logging.js";
 import {
   ackStringify,
   clientStringify,
+  docPreventStringify,
   docSubmitOp,
   ERROR_MESSAGE,
   fetchDoc,
@@ -115,6 +116,7 @@ export default async (fastify, opts) => {
       redis.lpush("clients", clientStringify(newClient));
 
       const sub = new IORedis();
+      const connectionSub = new IORedis();
       sub.subscribe(id, (err, count) => {
         if (err) {
           logging.error("Failed to subscribe: %s", err.message);
@@ -124,13 +126,26 @@ export default async (fastify, opts) => {
           );
         }
       });
-
+      connectionSub.subscribe(connection.id, (err, count) => {
+        if (err) {
+          logging.error(`Failed to subscribe to connection ${connection.id}`);
+        } else {
+          logging.info(
+            `Subscribed successfully! This client is currently subscribed ${connection.id}`
+          );
+        }
+      });
       sub.on("message", (channel, message) => {
         logging.info("Subscriber got message", channel);
         logging.info(message, channel);
         res.raw.write(`data: ${message}\n\n`);
       });
-
+      connectionSub.on("message", async (channel, message) => {
+        console.log(`Received message for connection ${channel}`);
+        const { docId, preventCompose } = JSON.parse(message);
+        const document = await fetchDoc(docId);
+        document.preventCompose = preventCompose;
+      });
       const clients = await redis.lrange("clients", 0, -1);
       logging.info(`Current connected clients = ${clients.length}`);
       req.raw.on("close", () => {
@@ -161,7 +176,33 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
 
     try {
+      const connectionPub = new IORedis();
       const document = await fetchDoc(docId);
+      const connections = await redis.lrange("connections", 0, -1);
+      document.on("before op batch", () => {
+        const message = {
+          docId: docId,
+          preventCompose: true,
+        };
+        connections.map((conn) => {
+          if (conn !== connection.id) {
+            connectionPub.publish(conn, docPreventStringify(message));
+            logging.info(`published to ${connection.id}`);
+          }
+        });
+      });
+      document.on("op batch", () => {
+        const message = {
+          docId: docId,
+          preventCompose: false,
+        };
+        connections.map((conn) => {
+          if (conn !== connection.id) {
+            connectionPub.publish(conn, docPreventStringify(message));
+            logging.info(`published to ${connection.id}`);
+          }
+        });
+      });
 
       if (version !== document.version) {
         logging.info(
@@ -171,14 +212,12 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
-      }
-      // else if (document.preventCompose) {
-      //   logging.info("Someone is currently editing!");
-      //   res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      //   logging.info("{ status: retry }", id);
-      //   return { status: "retry" };
-      // }
-      else {
+      } else if (document.preventCompose) {
+        logging.info("Someone is currently editing!");
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        logging.info("{ status: retry }", id);
+        return { status: "retry" };
+      } else {
         const ack = await docSubmitOp(document, op, id);
         const clients = await redis.lrange("clients", 0, -1);
         clients.map((c) => {
