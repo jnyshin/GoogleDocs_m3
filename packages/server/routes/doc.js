@@ -163,36 +163,8 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
 
     try {
-      const connectionPub = new IORedis();
       const document = await fetchDoc(docId);
-      const connections = await redis.lrange("connections", 0, -1);
-      document.on("before op batch", () => {
-        document.preventCompose = true;
-        const message = {
-          docId: docId,
-          preventCompose: true,
-        };
-        connections.map((conn) => {
-          if (conn !== connection.id) {
-            connectionPub.publish(conn, docPreventStringify(message));
-            logging.info(`published to ${connection.id}`);
-          }
-        });
-      });
-      document.on("op batch", () => {
-        document.preventCompose = false;
-        const message = {
-          docId: docId,
-          preventCompose: false,
-        };
-        connections.map((conn) => {
-          if (conn !== connection.id) {
-            connectionPub.publish(conn, docPreventStringify(message));
-            logging.info(`published to ${connection.id}`);
-          }
-        });
-      });
-
+      const editingDocs = await redis.lrange(0, -1);
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
@@ -201,14 +173,18 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
-      } else if (document.preventCompose) {
+      } else if (editingDocs.includes(docId)) {
         logging.info("Someone is currently editing!");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
+        await redis.lpush(docId);
         const ack = await docSubmitOp(document, op, id);
         const clients = await redis.lrange("clients", 0, -1);
+        await Docs.findByIdAndUpdate(docId, {
+          $inc: { version: 1 },
+        });
         clients.map((c) => {
           const client = JSON.parse(c);
           if (client.id === id) {
@@ -220,11 +196,9 @@ export default async (fastify, opts) => {
             pub.publish(client.id, opStringify(op));
           }
         });
-        await Docs.findByIdAndUpdate(docId, {
-          $inc: { version: 1 },
-        });
         logging.info("{ status: ok }", id);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        await redis.lrem(docId);
         return { status: "ok" };
       }
     } catch (err) {
