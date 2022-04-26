@@ -24,7 +24,8 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     logging.info("[/doc/edit/:DOCID] Route");
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    return res.sendFile("/var/www/html/index.html");
+    return res.sendFile("index.html");
+    // return res.sendFile("/var/www/html/index.html");
   });
 
   fastify.post("/presence/:DOCID/:UID", async (req, res) => {

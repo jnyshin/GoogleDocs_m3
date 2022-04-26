@@ -59,7 +59,8 @@ fastify.register(fastifySession, {
 });
 
 fastify.register(fastifyStatic, {
-  root: "/",
+  root: join(__dirname, "dist"),
+  // root: "/",
 });
 
 fastify.register(fastifyMultipart);
