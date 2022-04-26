@@ -59,8 +59,8 @@ fastify.register(fastifySession, {
 });
 console.log(join(__dirname, "dist"));
 fastify.register(fastifyStatic, {
-  // root: join(__dirname, "dist"),
-  root: "/",
+  root: join(__dirname, "dist"),
+  // root: "/",
 });
 
 fastify.register(fastifyMultipart);
