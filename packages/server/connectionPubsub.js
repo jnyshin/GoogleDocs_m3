@@ -17,6 +17,7 @@ const startPubsub = () => {
     // logging.info(`Received message for connection ${channel}`);
     const { docId, preventCompose } = JSON.parse(message);
     const document = await fetchDoc(docId);
+    logging.info("connectionSub message");
     document.preventCompose = preventCompose;
   });
 };
