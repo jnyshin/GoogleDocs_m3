@@ -16,6 +16,7 @@ import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
+import startPubsub from "./connectionPubsub.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 
@@ -103,7 +104,13 @@ fastify.register(import("./routes/test.js"), {
 fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
-
+if (process.env.name === "OP Server") {
+  fastify.register(async (fastifyInstance, options, done) => {
+    await ioredis.lpush("connections", connection.id);
+    startPubsub();
+    done();
+  });
+}
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect("mongodb://localhost/docs_clone", {
