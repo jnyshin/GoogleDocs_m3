@@ -57,7 +57,7 @@ fastify.register(fastifySession, {
   saveUninitialized: true,
   resave: true,
 });
-
+console.log(join(__dirname, "dist"));
 fastify.register(fastifyStatic, {
   root: join(__dirname, "dist"),
   // root: "/",
