@@ -20,9 +20,11 @@ export default async (fastify, opts) => {
   fastify.post(
     "/upload",
     { preHandler: upload.single("file") },
+
     async (req, res) => {
       logging.info("[media/upload] Route");
       const file = req.file;
+      logging.info(file);
 
       if (!file) {
         logging.error("Did not upload a file");
@@ -32,7 +34,6 @@ export default async (fastify, opts) => {
 
       if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
         try {
-          logging.info(file);
           const mediaId = uuidv4();
           await Images.create({
             _id: mediaId,
