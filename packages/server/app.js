@@ -18,8 +18,8 @@ import richText from "rich-text";
 import Docs from "./schema/docs.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
-const PORT = NODE_ENV === "production" ? 80 : 8000;
-const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
+
+const { PORT } = process.env;
 
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
@@ -122,8 +122,8 @@ fastify.register((fastifyInstance, options, done) => {
 
 const start = async () => {
   try {
-    await fastify.listen(PORT, IP);
-    logging.info(`Server started ${IP}:${PORT}`);
+    await fastify.listen(PORT);
+    logging.info(`Server started ${PORT}`);
 
     await Docs.deleteMany({});
     logging.info("deleted docs");

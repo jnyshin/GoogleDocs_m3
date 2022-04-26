@@ -3,10 +3,10 @@ import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
 import { connection } from "./app.js";
 export const clients = [];
-export const DOMAIN_NAME =
-  process.env.NODE_ENV === "production"
-    ? "icloud.cse356.compas.cs.stonybrook.edu"
-    : "localhost:8000";
+// export const DOMAIN_NAME =
+//   process.env.NODE_ENV === "production"
+//     ? "icloud.cse356.compas.cs.stonybrook.edu"
+//     : "localhost:8000";
 export const ERROR_MESSAGE = (message) => {
   return { error: true, message: message };
 };
