@@ -24,6 +24,8 @@ const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 await ioredis.del("clients");
+await ioredis.del("connections");
+
 ShareDB.types.register(richText.type);
 
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
@@ -122,6 +124,7 @@ fastify.register((fastifyInstance, options, done) => {
 const start = async () => {
   try {
     await fastify.listen(PORT, IP);
+    ioredis.lpush("connections", connection.id);
     logging.info(`Server started ${IP}:${PORT}`);
 
     await Docs.deleteMany({});
@@ -134,5 +137,6 @@ const start = async () => {
 start();
 
 process.on("SIGINT", function () {
+  ioredis.del("connections");
   process.exit(0);
 });

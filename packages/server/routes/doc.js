@@ -184,6 +184,7 @@ export default async (fastify, opts) => {
           docId: docId,
           preventCompose: true,
         };
+        console.log(connections);
         connections.map((conn) => {
           if (conn !== connection.id) {
             connectionPub.publish(conn, docPreventStringify(message));
