@@ -32,6 +32,7 @@ export default async (fastify, opts) => {
 
       if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
         try {
+          logging.info(file);
           const mediaId = uuidv4();
           await Images.create({
             _id: mediaId,
