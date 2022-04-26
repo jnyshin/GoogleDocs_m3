@@ -20,7 +20,9 @@ const { NODE_ENV } = process.env;
 const fastify = Fastify();
 
 const { PORT } = process.env;
-
+const IP = process.env.IP
+  ? "icloud.cse356.compas.cs.stonybrook.edu"
+  : "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 await ioredis.del("clients");
@@ -122,7 +124,7 @@ fastify.register((fastifyInstance, options, done) => {
 
 const start = async () => {
   try {
-    await fastify.listen(PORT);
+    await fastify.listen(PORT, IP);
     logging.info(`Server started ${PORT}`);
 
     await Docs.deleteMany({});
