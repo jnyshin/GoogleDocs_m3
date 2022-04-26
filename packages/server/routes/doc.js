@@ -164,7 +164,6 @@ export default async (fastify, opts) => {
 
     try {
       const document = await fetchDoc(docId);
-      const check = await redis.sismember("editingDocs", docId);
       if (version !== document.version) {
         logging.info(
           `Version is not matched. client = ${version}, server=${document.version}.`,
@@ -173,13 +172,13 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
-      } else if (check === 1) {
+      } else if (document.preventCompose) {
         logging.info("Someone is currently editing!");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        await redis.sadd("editingDocs", docId);
+        document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
         const clients = await redis.lrange("clients", 0, -1);
         await Docs.findByIdAndUpdate(docId, {
@@ -197,8 +196,8 @@ export default async (fastify, opts) => {
           }
         });
         logging.info("{ status: ok }", id);
+        document.preventCompose = false;
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        await redis.srem("editingDocs", docId);
         return { status: "ok" };
       }
     } catch (err) {
