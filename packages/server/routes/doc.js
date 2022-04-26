@@ -219,7 +219,7 @@ export default async (fastify, opts) => {
                 preventCompose: false,
                 docId: docId,
               };
-              connectionPub.publish(conn.id, message);
+              connectionPub.publish(conn, docPreventStringify(message));
             }
           });
         }
