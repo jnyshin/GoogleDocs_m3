@@ -179,7 +179,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        await redis.lpush("editingDocs", docId);
+        await redis.sadd("editingDocs", docId);
         const ack = await docSubmitOp(document, op, id);
         const clients = await redis.lrange("clients", 0, -1);
         await Docs.findByIdAndUpdate(docId, {
