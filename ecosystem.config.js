@@ -9,7 +9,7 @@ module.exports = {
         NODE_ENV: "production",
       },
       exec_mode: "cluster",
-      instances: "2",
+      instances: "3",
     },
     {
       name: "OP Server",
@@ -19,8 +19,8 @@ module.exports = {
         PORT: 8001,
         NODE_ENV: "production",
       },
-      exec_mode: "cluster",
-      instances: "2",
+      exec_mode: "fork",
+      instances: "1",
     },
   ],
 };

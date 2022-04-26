@@ -177,20 +177,6 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        if (process.env.name === "OP Server") {
-          const connectionPub = new IORedis();
-          const connections = await redis.lrange("connections", 0, -1);
-          console.log(connections);
-          connections.forEach((conn) => {
-            if (conn.id !== connection.id) {
-              const message = {
-                preventCompose: true,
-                docId: docId,
-              };
-              connectionPub.publish(conn, docPreventStringify(message));
-            }
-          });
-        }
         document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
         const clients = await redis.lrange("clients", 0, -1);
@@ -210,19 +196,7 @@ export default async (fastify, opts) => {
         });
         logging.info("{ status: ok }", id);
         document.preventCompose = false;
-        if (process.env.name === "OP Server") {
-          const connectionPub = new IORedis();
-          const connections = await redis.lrange("connections", 0, -1);
-          connections.forEach((conn) => {
-            if (conn.id !== connection.id) {
-              const message = {
-                preventCompose: false,
-                docId: docId,
-              };
-              connectionPub.publish(conn, docPreventStringify(message));
-            }
-          });
-        }
+
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       }
