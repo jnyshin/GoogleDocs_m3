@@ -91,14 +91,12 @@ export const fetchDoc = (docId) => {
 
 export const docSubmitOp = (document, op, id) => {
   const docSubmitOpPromise = new Promise((resolve, reject) => {
-    document.whenNothingPending(() => {
-      document.submitOp(op, { source: id }, () => {
-        try {
-          resolve({ ack: op });
-        } catch (err) {
-          reject(err);
-        }
-      });
+    document.submitOp(op, { source: id }, () => {
+      try {
+        resolve({ ack: op });
+      } catch (err) {
+        reject(err);
+      }
     });
   });
   return docSubmitOpPromise;
