@@ -3,7 +3,6 @@ module.exports = {
     {
       name: "APi Server",
       script: "packages/server/app.js",
-      watch: true,
       instance_var: "INSTANCE_ID",
       env: {
         PORT: 8000,
@@ -15,7 +14,6 @@ module.exports = {
     {
       name: "OP Server",
       script: "packages/server/app.js",
-      watch: true,
       instance_var: "INSTANCE_ID",
       env: {
         PORT: 8001,
