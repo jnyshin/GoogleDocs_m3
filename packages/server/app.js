@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import ShareDB from "sharedb";
 import MongoShareDB from "sharedb-mongo";
 import { join } from "path";
-import { ERROR_MESSAGE, SHARE_DB_NAME, __dirname } from "./store.js";
+import { ERROR_MESSAGE, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
@@ -16,7 +16,6 @@ import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
-import startPubsub from "./connectionPubsub.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 const PORT = NODE_ENV === "production" ? 80 : 8000;
@@ -25,7 +24,6 @@ const IP = NODE_ENV === "production" ? "209.94.56.137" : "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 await ioredis.del("clients");
-await ioredis.del("connections");
 
 ShareDB.types.register(richText.type);
 
@@ -106,11 +104,6 @@ fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
 
-fastify.register((fastify, options, done) => {
-  startPubsub();
-  done();
-});
-
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect("mongodb://localhost/docs_clone", {
@@ -130,7 +123,6 @@ fastify.register((fastifyInstance, options, done) => {
 const start = async () => {
   try {
     await fastify.listen(PORT, IP);
-    ioredis.lpush("connections", connection.id);
     logging.info(`Server started ${IP}:${PORT}`);
 
     await Docs.deleteMany({});
@@ -143,6 +135,5 @@ const start = async () => {
 start();
 
 process.on("SIGINT", function () {
-  ioredis.del("connections");
   process.exit(0);
 });
