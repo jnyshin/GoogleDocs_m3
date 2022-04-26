@@ -20,7 +20,6 @@ export default async (fastify, opts) => {
   fastify.post(
     "/upload",
     { preHandler: upload.single("file") },
-
     async (req, res) => {
       logging.info("[media/upload] Route");
       const file = req.file;
@@ -37,7 +36,7 @@ export default async (fastify, opts) => {
           const mediaId = uuidv4();
           await Images.create({
             _id: mediaId,
-            file: `uploads/${file.filename}`,
+            file: `/var/www/html/uploads/${file.filename}`,
             mime: file.mimetype,
           });
           logging.info(`Created image with _id = ${mediaId}`);
