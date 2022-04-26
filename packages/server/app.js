@@ -56,9 +56,9 @@ fastify.register(fastifySession, {
   resave: true,
 });
 
-// fastify.register(fastifyStatic, {
-//   root: join(__dirname, "dist"),
-// });
+fastify.register(fastifyStatic, {
+  root: "/",
+});
 
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
