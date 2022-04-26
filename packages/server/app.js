@@ -16,6 +16,7 @@ import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
+import startPubsub from "./connectionPubsub.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 const PORT = NODE_ENV === "production" ? 80 : 8000;
@@ -103,6 +104,11 @@ fastify.register(import("./routes/test.js"), {
 });
 fastify.register(import("./routes/index.js"), {
   prefix: "/index",
+});
+
+fastify.register((fastify, options, done) => {
+  startPubsub();
+  done();
 });
 
 fastify.register((fastifyInstance, options, done) => {

@@ -116,7 +116,7 @@ export default async (fastify, opts) => {
       redis.lpush("clients", clientStringify(newClient));
 
       const sub = new IORedis();
-      const connectionSub = new IORedis();
+
       sub.subscribe(id, (err, count) => {
         if (err) {
           logging.error("Failed to subscribe: %s", err.message);
@@ -126,26 +126,13 @@ export default async (fastify, opts) => {
           );
         }
       });
-      connectionSub.subscribe(connection.id, (err, count) => {
-        if (err) {
-          logging.error(`Failed to subscribe to connection ${connection.id}`);
-        } else {
-          logging.info(
-            `Subscribed successfully! This client is currently subscribed ${connection.id}`
-          );
-        }
-      });
+
       sub.on("message", (channel, message) => {
         logging.info("Subscriber got message", channel);
         logging.info(message, channel);
         res.raw.write(`data: ${message}\n\n`);
       });
-      connectionSub.on("message", async (channel, message) => {
-        console.log(`Received message for connection ${channel}`);
-        const { docId, preventCompose } = JSON.parse(message);
-        const document = await fetchDoc(docId);
-        document.preventCompose = preventCompose;
-      });
+
       const clients = await redis.lrange("clients", 0, -1);
       logging.info(`Current connected clients = ${clients.length}`);
       req.raw.on("close", () => {
@@ -185,7 +172,6 @@ export default async (fastify, opts) => {
           docId: docId,
           preventCompose: true,
         };
-        console.log(connections);
         connections.map((conn) => {
           if (conn !== connection.id) {
             connectionPub.publish(conn, docPreventStringify(message));
