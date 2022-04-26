@@ -62,6 +62,7 @@ export default async (fastify, opts) => {
       logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
       const image = await Images.findById(mediaID);
+      logging.info(image);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return res.sendFile(image.file);
     } catch (err) {
