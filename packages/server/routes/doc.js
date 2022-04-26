@@ -180,13 +180,14 @@ export default async (fastify, opts) => {
         if (process.env.name === "OP Server") {
           const connectionPub = new IORedis();
           const connections = await redis.lrange("connections", 0, -1);
+          console.log(connections);
           connections.forEach((conn) => {
             if (conn.id !== connection.id) {
               const message = {
                 preventCompose: true,
                 docId: docId,
               };
-              connectionPub.publish(conn.id, message);
+              connectionPub.publish(conn, docPreventStringify(message));
             }
           });
         }
