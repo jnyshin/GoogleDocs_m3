@@ -177,7 +177,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else {
-        if (process.env.name === "OP server") {
+        if (process.env.name === "OP Server") {
           const connectionPub = new IORedis();
           const connections = await redis.lrange("connections", 0, -1);
           connections.forEach((conn) => {
@@ -209,7 +209,7 @@ export default async (fastify, opts) => {
         });
         logging.info("{ status: ok }", id);
         document.preventCompose = false;
-        if (process.env.name === "OP server") {
+        if (process.env.name === "OP Server") {
           const connectionPub = new IORedis();
           const connections = await redis.lrange("connections", 0, -1);
           connections.forEach((conn) => {

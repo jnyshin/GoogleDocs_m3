@@ -104,13 +104,7 @@ fastify.register(import("./routes/test.js"), {
 fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
-if (process.env.name === "OP Server") {
-  fastify.register(async (fastifyInstance, options, done) => {
-    await ioredis.lpush("connections", connection.id);
-    startPubsub();
-    done();
-  });
-}
+
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect("mongodb://localhost/docs_clone", {
