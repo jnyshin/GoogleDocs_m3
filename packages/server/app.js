@@ -69,7 +69,6 @@ fastify.register(fastifyRedis, {
 fastify.register(fastifyUrlData);
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from ${req.url}`);
-  logging.info(__dirname);
   if (
     req.url.startsWith("/doc") ||
     req.url.startsWith("/collection") ||
