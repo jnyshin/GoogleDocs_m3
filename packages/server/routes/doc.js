@@ -180,6 +180,7 @@ export default async (fastify, opts) => {
       const document = await fetchDoc(docId);
       const connections = await redis.lrange("connections", 0, -1);
       document.on("before op batch", () => {
+        document.preventCompose = true;
         const message = {
           docId: docId,
           preventCompose: true,
@@ -193,6 +194,7 @@ export default async (fastify, opts) => {
         });
       });
       document.on("op batch", () => {
+        document.preventCompose = false;
         const message = {
           docId: docId,
           preventCompose: false,
