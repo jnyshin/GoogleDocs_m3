@@ -24,6 +24,7 @@ export default async (fastify, opts) => {
     async (req, res) => {
       logging.info("[media/upload] Route");
       const file = req.file;
+      logging.info(file);
       if (!file) {
         logging.error("Did not upload a file");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
