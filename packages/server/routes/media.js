@@ -24,7 +24,6 @@ export default async (fastify, opts) => {
     async (req, res) => {
       logging.info("[media/upload] Route");
       const file = req.file;
-      logging.info(file);
       if (!file) {
         logging.error("Did not upload a file");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
@@ -43,6 +42,7 @@ export default async (fastify, opts) => {
           res.header("X-CSE356", "61f9f57373ba724f297db6ba");
           return { mediaid: mediaId };
         } catch (err) {
+          logging.error("Failed upload a file");
           logging.error(err);
           res.header("X-CSE356", "61f9f57373ba724f297db6ba");
           return ERROR_MESSAGE("Error while creating Image Object");
@@ -62,11 +62,10 @@ export default async (fastify, opts) => {
       logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
       const image = await Images.findById(mediaID);
-      logging.info(image);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return res.sendFile(image.file);
     } catch (err) {
-      logging.error("Error while sending image");
+      logging.error(`Error while sending image: ${mediaID}`);
       logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Error while sending image");

@@ -71,7 +71,7 @@ fastify.register(fastifyRedis, {
 });
 fastify.register(fastifyUrlData);
 fastify.addHook("preHandler", (req, res, next) => {
-  logging.info(`incoming request from ${req.url}`);
+  logging.info(`incoming request from [${req.url}]`);
   if (
     req.url.startsWith("/doc") ||
     req.url.startsWith("/collection") ||
@@ -126,10 +126,9 @@ fastify.register((fastifyInstance, options, done) => {
 const start = async () => {
   try {
     await fastify.listen(PORT, IP);
-    logging.info(`Server started ${IP}:${PORT} `);
+    logging.info(`* Server started ${IP}:${PORT} `);
 
     await Docs.deleteMany({});
-    logging.info("deleted docs");
   } catch (err) {
     console.log(err);
     fastify.log.error(err);

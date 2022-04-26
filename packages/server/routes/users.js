@@ -18,7 +18,7 @@ const userRouter = async (fastify, opts) => {
       if (user) {
         if (!user.enable) {
           //not verified
-          logging.error("failed to verify");
+          logging.error("Failed to verify");
           res.header("X-CSE356", "61f9f57373ba724f297db6ba");
           return ERROR_MESSAGE("did not verify");
         } else {
@@ -68,7 +68,7 @@ const userRouter = async (fastify, opts) => {
     }
   });
   fastify.post("/signup", async (req, res) => {
-    logging.info("[/user/signup] Route");
+    logging.info("[/users/signup] Route");
     const { name, email, password } = req.body;
     logging.info(
       `Signing up for name=${name} email=${email} password=${password}`
@@ -80,7 +80,6 @@ const userRouter = async (fastify, opts) => {
     } else {
       try {
         logging.info(`received new user with this email: ${email}`);
-        const key = uuid();
         const userId = uuid();
         await User.create({
           _id: userId,
@@ -108,7 +107,7 @@ const userRouter = async (fastify, opts) => {
         };
         const transporter = nodemailer.createTransport(mailOption);
         transporter.sendMail(info);
-        logging.info("Message sent: %s", info.messageId);
+        logging.info(`Message sent: ${info.messageId}`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       } catch (err) {
@@ -119,11 +118,9 @@ const userRouter = async (fastify, opts) => {
     }
   });
   fastify.get("/verify", async (req, res) => {
-    logging.info("[/user/verify] Route");
+    logging.info("[/users/verify] Route");
     const { key } = req.query;
     logging.info(`Requested querystring is key=${key}`);
-    logging.info(req.query);
-
     try {
       const user = await User.findById(key);
       if (user && key === user.key) {

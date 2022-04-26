@@ -29,10 +29,10 @@ export default async (fastify, opts) => {
   });
 
   fastify.post("/presence/:DOCID/:UID", async (req, res) => {
-    logging.info("[/doc/presence/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     const id = req.params.UID;
     const { index, length } = req.body;
+    logging.info("[/doc/presence/:DOCID/:UID] Route", id);
     logging.info(`Request with index=${index}, length=${length}`, id);
     const { redis } = fastify;
     try {
@@ -66,16 +66,16 @@ export default async (fastify, opts) => {
   });
 
   fastify.get("/get/:DOCID/:UID", async (req, res) => {
-    logging.info("[/doc/get/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     // Not sure what uid is for
     const uid = req.params.UID;
+    logging.info("[/doc/get/:DOCID/:UID] Route", uid);
     try {
       const document = await fetchDoc(docId);
       const ops = document.data.ops;
       const converter = new QuillDeltaToHtmlConverter(ops, {});
       const html = converter.convert();
-      logging.info("Sent HTML: ");
+      logging.info("Sending HTML: ", uid);
       logging.info(html);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return html;
@@ -88,13 +88,12 @@ export default async (fastify, opts) => {
   });
 
   fastify.get("/connect/:DOCID/:UID", async (req, res) => {
-    logging.info("[/doc/connect/:DOCID/:UID] Route");
     const docId = req.params.DOCID;
     const id = req.params.UID;
+    logging.info("[/doc/connect/:DOCID/:UID] Route", id);
     const { redis } = fastify;
     try {
       const document = await fetchDoc(docId);
-      logging.info(`Found doc id = ${docId}`);
       const headers = {
         "Content-Type": "text/event-stream",
         Connection: "keep-alive",
@@ -106,28 +105,26 @@ export default async (fastify, opts) => {
         content: document.data.ops,
         version: document.version,
       };
-      logging.info(`sent initial payload`);
+      logging.info(`Content and Version:`, id);
       logging.info(payload);
       res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
       const newClient = {
         id: id,
         docId: docId,
       };
-
       redis.lpush("clients", clientStringify(newClient));
 
       const sub = new IORedis();
-
       sub.subscribe(id, (err, count) => {
         if (err) {
-          logging.error("Failed to subscribe: %s", err.message);
+          logging.error(`Failed to subscribe: ${err.message}`, id);
         } else {
           logging.info(
-            `Subscribed successfully! This client is currently subscribed ${id}`
+            `Subscribed successfully! This client is currently subscribed ${id}`,
+            id
           );
         }
       });
-
       sub.on("message", (channel, message) => {
         logging.info(`message: ${message}`, channel);
         res.raw.write(`data: ${message}\n\n`);
@@ -136,7 +133,7 @@ export default async (fastify, opts) => {
       const clients = await redis.lrange("clients", 0, -1);
       logging.info(`Current connected clients = ${clients.length}`);
       req.raw.on("close", () => {
-        logging.info(`UID = ${id} connection closed`);
+        logging.info(`${id} connection closed`);
         clients.map(async (c, index) => {
           const client = JSON.parse(c);
           if (client.id === id) {
@@ -173,7 +170,7 @@ export default async (fastify, opts) => {
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else if (document.preventCompose) {
-        logging.info("Someone is currently editing!");
+        logging.info("Someone is currently editing");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
@@ -187,23 +184,20 @@ export default async (fastify, opts) => {
         clients.map((c) => {
           const client = JSON.parse(c);
           if (client.id === id) {
-            logging.info("Sending ACK", id);
             pub.publish(client.id, ackStringify(ack));
           }
           if (client.id !== id && client.docId === docId) {
-            logging.info("Sending OP", client.id);
             pub.publish(client.id, opStringify(op));
           }
         });
         logging.info("{ status: ok }", id);
         document.preventCompose = false;
-
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       }
     } catch (err) {
       logging.error("failed to update OP", id);
-      logging.error(err, id);
+      logging.error(err);
       return ERROR_MESSAGE("failed to update OP");
     }
   });
