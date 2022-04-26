@@ -7,8 +7,8 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "dist", "uploads"));
-    // cb(null, "/var/www/html/uploads");
+    // cb(null, path.join(__dirname, "dist", "uploads"));
+    cb(null, "/var/www/html/uploads");
   },
 
   filename: function (req, file, cb) {
@@ -36,8 +36,7 @@ export default async (fastify, opts) => {
           const mediaId = uuidv4();
           await Images.create({
             _id: mediaId,
-            file: `/uploads/${file.filename}`,
-            // file: `/var/www/html/uploads/${file.filename}`,
+            file: `/var/www/html/uploads/${file.filename}`,
             mime: file.mimetype,
           });
           logging.info(`Created image with _id = ${mediaId}`);
