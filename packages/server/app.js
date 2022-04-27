@@ -87,6 +87,7 @@ fastify.addHook("onRequest", (req, res, next) => {
     const { mediaID } = req.params;
     ioredis.get(mediaID, (err, data) => {
       if (data) {
+        res.header("Cache-Control", `max-age=${90 * 24 * 3600}`);
         logging.info("image cache hit");
         return res.sendFile(data);
       } else {
