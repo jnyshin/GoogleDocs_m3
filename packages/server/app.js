@@ -89,6 +89,7 @@ fastify.addHook("onRequest", (req, res, next) => {
       if (data) {
         res.header("Cache-Control", `max-age=${90 * 24 * 3600}`);
         logging.info("image cache hit");
+        logging.info(data);
         return res.sendFile(data);
       } else {
         next();

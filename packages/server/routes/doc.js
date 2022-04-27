@@ -15,7 +15,6 @@ import {
 } from "../store.js";
 import User from "../schema/user.js";
 import IORedis from "ioredis";
-import { connection } from "../app.js";
 
 const pub = new IORedis();
 

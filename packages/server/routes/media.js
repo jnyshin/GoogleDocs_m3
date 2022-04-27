@@ -69,8 +69,8 @@ export default async (fastify, opts) => {
       const mediaID = req.params.mediaID;
       const image = await Images.findById(mediaID);
       const { redis } = fastify;
-      redis.setex(mediaID, 3600, image.file);
-      res.header("Cache-Control", `max-age=${90 * 24 * 3600}`);
+      await redis.setex(mediaID, 3600, image.file);
+
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return res.sendFile(image.file);
     } catch (err) {
