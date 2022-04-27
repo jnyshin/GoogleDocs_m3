@@ -19,7 +19,7 @@ module.exports = {
         PORT: 8002,
         NODE_ENV: "production",
       },
-      exec_mode: "fork",
+      exec_mode: "cluster",
       instances: "1",
     },
   ],
