@@ -26,11 +26,30 @@ const ESclient = new Client({
 }); //More configuration will be added after ES Cloud set up
 
 //get docs from DB
-const updateIndex = (index) => {
+const makeData = () => {
   const newest = fetchAllDocs();
-  console.log(newest);
+  const retlist = [];
+  newest.map((n) => {
+    console.log(n);
+    const ops = n.data.ops;
+    const converter = new QuillDeltaToHtmlConverter(ops, {});
+    const html = converter.convert();
+    let dum = html.replace(/(<([^>]+)>)/gi, "");
+    let d = { name: n.name, body: dum };
+    retlist.push(d);
+  });
+  return retlist;
 };
 
+const updateIndex = async (index) => {
+  const newest = makeData();
+  const operations = newest.flatMap((doc) => [
+    { index: { _index: index } },
+    doc,
+  ]);
+  const bulkResponse = await ESclient.bulk({ refresh: true, operations });
+  console.log(bulkResponse);
+};
 export default async (fastify, opts) => {
   //get info of our elasticsearch cloud
   fastify.get("/info", async (req, res) => {
@@ -38,7 +57,7 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    updateIndex();
+    await updateIndex();
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "test3", //CHANGE test3 -> search_index
@@ -76,6 +95,7 @@ export default async (fastify, opts) => {
     return retlist;
   });
   fastify.get(`/suggest`, async (req, res) => {
+    await updateIndex();
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "test2", //CHANGE test2 => suggest_index
