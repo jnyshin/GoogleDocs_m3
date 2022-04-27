@@ -82,23 +82,23 @@ fastify.addHook("preHandler", (req, res, next) => {
   next();
 });
 
-fastify.addHook("onRequest", (req, res, next) => {
-  if (req.url.startsWith("/media/access")) {
-    const { mediaID } = req.params;
-    ioredis.get(mediaID, (err, data) => {
-      if (data) {
-        logging.info("image cache hit");
-        logging.info(data);
-        req.sent = true;
-        return res.sendFile(data);
-      } else {
-        next();
-      }
-    });
-  } else {
-    next();
-  }
-});
+// fastify.addHook("onRequest", (req, res, next) => {
+//   if (req.url.startsWith("/media/access")) {
+//     const { mediaID } = req.params;
+//     ioredis.get(mediaID, (err, data) => {
+//       if (data) {
+//         logging.info("image cache hit");
+//         logging.info(data);
+//         req.sent = true;
+//         return res.sendFile(data);
+//       } else {
+//         next();
+//       }
+//     });
+//   } else {
+//     next();
+//   }
+// });
 fastify.register(import("./routes/users.js"), {
   prefix: "/users",
 });

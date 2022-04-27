@@ -67,8 +67,11 @@ export default async (fastify, opts) => {
     try {
       logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
-      const image = await Images.findById(mediaID);
       const { redis } = fastify;
+      // redis.get(mediaID, (err, data) => {
+
+      // })
+      const image = await Images.findById(mediaID);
       await redis.setex(mediaID, 3600, image.file);
 
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
