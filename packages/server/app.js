@@ -89,11 +89,14 @@ fastify.addHook("onRequest", (req, res, next) => {
       if (data) {
         logging.info("image cache hit");
         logging.info(data);
+        req.sent = true;
         return res.sendFile(data);
       } else {
         next();
       }
     });
+  } else {
+    next();
   }
 });
 fastify.register(import("./routes/users.js"), {
