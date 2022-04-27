@@ -163,3 +163,15 @@ export const quotes = [
     author: "Johann Wolfgang von Goethe",
   },
 ];
+export const updateQuotes = [
+  {
+    id: 1,
+    quote: "I WANT TO SLEEP",
+    author: "YEJIN SHIN the SLEEP",
+  },
+  {
+    id: 2,
+    quote: "HIRE ME",
+    author: "YEJIN SHIN the DEVELOPER",
+  },
+];

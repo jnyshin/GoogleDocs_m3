@@ -94,6 +94,20 @@ export const fetchAllDocs = () => {
   const getDocPromise = new Promise((resolve, reject) => {
     query.on("ready", () => {
       try {
+        resolve(query.results[0]);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+  return getDocPromise;
+};
+
+export const fetchUpdateDocs = () => {
+  const query = connection.createFetchQuery(SHARE_DB_NAME);
+  const getDocPromise = new Promise((resolve, reject) => {
+    query.on("ready", () => {
+      try {
         resolve(query.results);
       } catch (err) {
         reject(err);
