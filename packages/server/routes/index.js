@@ -39,8 +39,19 @@ const makeData = () => {
 };
 
 const updateIndex = async (index) => {
-  const newest = makeData();
-  const operations = newest.flatMap((doc) => [
+  //const newest = makeData();
+  //console.log(newest);
+  //clear all existing document
+  await ESclient.deleteByQuery({
+    index: index,
+    body: {
+      query: {
+        match_all: {},
+      },
+    },
+  });
+  const operations = quotes.flatMap((doc) => [
+    //CHANGE quotes -> newest
     { index: { _index: index } },
     doc,
   ]);
@@ -54,15 +65,15 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    await updateIndex("search_index");
+    await updateIndex("test3");
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "search_index", //CHANGE test3 -> search_index
+      index: "test3", //CHANGE test3 -> search_index
       body: {
         query: {
           multi_match: {
             query: keyword,
-            fields: ["name", "body"],
+            fields: ["quote", "author"],
           },
         },
       },
@@ -70,8 +81,8 @@ export default async (fastify, opts) => {
         fragment_size: 100,
         number_of_fragments: 1,
         fields: {
-          name: {},
-          body: {},
+          quote: {},
+          author: {},
         },
       },
     });
@@ -80,8 +91,10 @@ export default async (fastify, opts) => {
     result.hits.hits.map((r) => {
       let arranged = {
         docid: r._source.id,
-        name: r._source.name,
-        snippet: r.highlight.body ? r.highlight.body[0] : r.highlight.name[0],
+        name: r._source.author,
+        snippet: r.highlight.quote
+          ? r.highlight.quote[0]
+          : r.highlight.author[0],
       };
       retlist.push(arranged);
     });
@@ -90,15 +103,15 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    await updateIndex("suggest_index");
+    await updateIndex("test2");
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "suggest_index", //CHANGE test2 => suggest_index
+      index: "test2", //CHANGE test2 => suggest_index
       body: {
         query: {
           multi_match: {
             query: prefix,
-            fields: ["body", "name"],
+            fields: ["quote", "author"],
           },
         },
       },
@@ -106,17 +119,17 @@ export default async (fastify, opts) => {
         fragment_size: 100,
         number_of_fragments: 1,
         fields: {
-          body: {},
-          name: {},
+          quote: {},
+          author: {},
         },
       },
     });
     const retlist = [];
     let regexp = /<em>([\d\w]+)<\/em>/;
     result.hits.hits.map((r) => {
-      let sugg = r.highlight.body
-        ? r.highlight.body[0].match(regexp)
-        : r.highlight.name[0].match(regexp);
+      let sugg = r.highlight.quote
+        ? r.highlight.quote[0].match(regexp)
+        : r.highlight.author[0].match(regexp);
       console.log(sugg[1]);
       retlist.push(sugg[1].toLowerCase());
     });
