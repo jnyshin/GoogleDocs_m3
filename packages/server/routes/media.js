@@ -29,7 +29,7 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE("Please upload a file");
       }
-
+      logging.info(file);
       if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
         try {
           const mediaId = uuidv4();
