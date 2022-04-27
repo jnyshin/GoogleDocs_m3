@@ -8,6 +8,7 @@ module.exports = {
         PORT: 8000,
         NODE_ENV: "production",
       },
+      cron_restart: "0 0 * * *",
       exec_mode: "cluster",
       instances: "4",
     },
