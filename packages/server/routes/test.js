@@ -1,9 +1,7 @@
-const myCache = new NodeCache();
 import IORedis from "ioredis";
 import { v4 as uuid } from "uuid";
 const sub = new IORedis();
 const pub = new IORedis();
-import NodeCache from "node-cache";
 import { connection } from "../app.js";
 import { ERROR_MESSAGE, SHARE_DB_NAME } from "../store.js";
 import Docs from "../schema/docs.js";

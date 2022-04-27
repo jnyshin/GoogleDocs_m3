@@ -43,6 +43,7 @@ export default async (fastify, opts) => {
       return {};
     } catch (err) {
       logging.error(`failed to delete doc id = ${docId}`);
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(`failed to delete doc id = ${docId}`);
     }
@@ -65,6 +66,7 @@ export default async (fastify, opts) => {
       return ret;
     } catch (err) {
       logging.error("failed find all docs");
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("failed find all docs");
     }
