@@ -24,8 +24,8 @@ const ESclient = new Client({
 });
 var freshData = [];
 setInterval(async function () {
-  freshData = await makeData(await fetchAllDocs());
-  console.log("Fresh data updated");
+  //freshData = await makeData(await fetchAllDocs());
+  console.log(await fetchAllDocs());
 }, 5000);
 
 const makeData = async (docs) => {

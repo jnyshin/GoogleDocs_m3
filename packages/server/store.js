@@ -90,11 +90,11 @@ export const fetchDoc = (docId) => {
 };
 
 export const fetchAllDocs = () => {
-  const query = connection.createFetchQuery(SHARE_DB_NAME);
+  const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
     query.on("ready", () => {
       try {
-        resolve(query.results[0]);
+        resolve(query.results);
       } catch (err) {
         reject(err);
       }
