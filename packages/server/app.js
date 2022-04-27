@@ -20,10 +20,7 @@ const { NODE_ENV } = process.env;
 const fastify = Fastify();
 
 const { PORT } = process.env;
-const IP =
-  NODE_ENV === "production"
-    ? "icloud.cse356.compas.cs.stonybrook.edu"
-    : "127.0.0.1";
+const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 await ioredis.del("clients");
