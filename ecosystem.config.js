@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "APi Server",
+      name: "API Server",
       script: "packages/server/app.js",
       instance_var: "INSTANCE_ID",
       env: {
