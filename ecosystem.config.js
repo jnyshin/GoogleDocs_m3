@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "API Server",
+      name: "API Server 1",
       script: "packages/server/app.js",
       instance_var: "INSTANCE_ID",
       env: {
@@ -10,7 +10,45 @@ module.exports = {
       },
       cron_restart: "0 0 * * *",
       exec_mode: "cluster",
-      instances: "4",
+      instances: "1",
+    },
+    {
+      name: "API Server 2",
+      script: "packages/server/app.js",
+      instance_var: "INSTANCE_ID",
+      env: {
+        PORT: 8001,
+        NODE_ENV: "production",
+      },
+      cron_restart: "0 0 * * *",
+      exec_mode: "cluster",
+      instances: "1",
+    },
+
+    {
+      name: "API Server 3",
+      script: "packages/server/app.js",
+      instance_var: "INSTANCE_ID",
+      env: {
+        PORT: 8002,
+        NODE_ENV: "production",
+      },
+      cron_restart: "0 0 * * *",
+      exec_mode: "cluster",
+      instances: "1",
+    },
+
+    {
+      name: "API Server 4",
+      script: "packages/server/app.js",
+      instance_var: "INSTANCE_ID",
+      env: {
+        PORT: 8003,
+        NODE_ENV: "production",
+      },
+      cron_restart: "0 0 * * *",
+      exec_mode: "cluster",
+      instances: "1",
     },
   ],
 };
