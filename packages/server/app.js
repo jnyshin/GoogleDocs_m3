@@ -18,7 +18,6 @@ import richText from "rich-text";
 import Docs from "./schema/docs.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
-
 const { PORT } = process.env;
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
@@ -117,6 +116,20 @@ fastify.register(import("./routes/test.js"), {
 });
 fastify.register(import("./routes/index.js"), {
   prefix: "/index",
+});
+fastify.post("/deleteAll", () => {
+  const database = docsDB.db("docs_clone");
+  const share_docs = database.collection("share_docs");
+  const o_share_docs = database.collection("o_share_docs");
+  const docs = database.collection("docs");
+  const image = database.collectino("images");
+  const users = database.collection("users");
+  share_docs.remove({});
+  o_share_docs.remove({});
+  docs.remove({});
+  image.remove({});
+  users.remove({});
+  await ioredis.flushall();
 });
 
 fastify.register((fastifyInstance, options, done) => {
