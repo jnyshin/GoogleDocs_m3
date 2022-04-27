@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import ShareDB from "sharedb";
 import MongoShareDB from "sharedb-mongo";
-import { join } from "path";
 import { ERROR_MESSAGE, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
@@ -14,21 +13,20 @@ import connectRedis from "connect-redis";
 import Fastify from "fastify";
 import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
+import { join } from "path";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 
-const PORT = 8000;
-const IP = process.env.IP
-  ? "icloud.cse356.compas.cs.stonybrook.edu"
-  : "127.0.0.1";
+const { PORT } = process.env;
+const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 await ioredis.del("clients");
 
 ShareDB.types.register(richText.type);
-
+console.log();
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
 const backend = new ShareDB({
   db: docsDB,
@@ -57,10 +55,8 @@ fastify.register(fastifySession, {
   saveUninitialized: true,
   resave: true,
 });
-console.log(join(__dirname, "dist"));
 fastify.register(fastifyStatic, {
-  // root: join(__dirname, "dist"),
-  root: "/",
+  root: process.env.NODE_ENV === "production" ? "/" : join(__dirname, "dist"),
 });
 
 fastify.register(fastifyMultipart);
@@ -71,7 +67,7 @@ fastify.register(fastifyRedis, {
 });
 fastify.register(fastifyUrlData);
 fastify.addHook("preHandler", (req, res, next) => {
-  logging.info(`incoming request from ${req.url}`);
+  logging.info(`incoming request from [${req.url}]`);
   if (
     req.url.startsWith("/doc") ||
     req.url.startsWith("/collection") ||
@@ -84,6 +80,22 @@ fastify.addHook("preHandler", (req, res, next) => {
     }
   }
   next();
+});
+
+fastify.addHook("onRequest", (req, res, next) => {
+  if (req.url.startsWith("/media/access")) {
+    const { mediaID } = req.params;
+    ioredis.get(mediaID, (err, data) => {
+      if (data) {
+        logging.info("image cache hit");
+        return res.sendFile(data);
+      } else {
+        next();
+      }
+    });
+  } else {
+    next();
+  }
 });
 fastify.register(import("./routes/users.js"), {
   prefix: "/users",
@@ -126,10 +138,8 @@ fastify.register((fastifyInstance, options, done) => {
 const start = async () => {
   try {
     await fastify.listen(PORT, IP);
-    logging.info(`Server started ${IP}:${PORT} `);
-
+    logging.info(`* Server started ${IP}:${PORT} `);
     await Docs.deleteMany({});
-    logging.info("deleted docs");
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
