@@ -21,9 +21,8 @@ const ESclient = new Client({
     username: "elastic",
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
-}); //More configuration will be added after ES Cloud set up
+});
 
-//get docs from DB
 const makeData = () => {
   const newest = fetchAllDocs();
   const retlist = [];
@@ -33,7 +32,7 @@ const makeData = () => {
     const converter = new QuillDeltaToHtmlConverter(ops, {});
     const html = converter.convert();
     let dum = html.replace(/(<([^>]+)>)/gi, "");
-    let d = { name: n.name, body: dum };
+    let d = { name: n.name, body: dum, id: n.id };
     retlist.push(d);
   });
   return retlist;
@@ -55,15 +54,15 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    await updateIndex();
+    await updateIndex("search_index");
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "test3", //CHANGE test3 -> search_index
+      index: "search_index", //CHANGE test3 -> search_index
       body: {
         query: {
           multi_match: {
             query: keyword,
-            fields: ["quote", "author"],
+            fields: ["name", "body"],
           },
         },
       },
@@ -71,37 +70,35 @@ export default async (fastify, opts) => {
         fragment_size: 100,
         number_of_fragments: 1,
         fields: {
-          quote: {},
-          author: {},
+          name: {},
+          body: {},
         },
       },
     });
     console.log(result.hits.hits);
     const retlist = [];
-    //may need to change field names!!!
     result.hits.hits.map((r) => {
       let arranged = {
         docid: r._source.id,
-        name: r._source.quote,
-        snippet: r.highlight.quote
-          ? r.highlight.quote[0]
-          : r.highlight.author[0],
+        name: r._source.name,
+        snippet: r.highlight.body ? r.highlight.body[0] : r.highlight.name[0],
       };
       retlist.push(arranged);
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return retlist;
   });
+
   fastify.get(`/suggest`, async (req, res) => {
-    await updateIndex();
+    await updateIndex("suggest_index");
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "test2", //CHANGE test2 => suggest_index
+      index: "suggest_index", //CHANGE test2 => suggest_index
       body: {
         query: {
           multi_match: {
             query: prefix,
-            fields: ["quote", "author"],
+            fields: ["body", "name"],
           },
         },
       },
@@ -109,33 +106,21 @@ export default async (fastify, opts) => {
         fragment_size: 100,
         number_of_fragments: 1,
         fields: {
-          quote: {},
-          author: {},
+          body: {},
+          name: {},
         },
       },
     });
     const retlist = [];
     let regexp = /<em>([\d\w]+)<\/em>/;
     result.hits.hits.map((r) => {
-      let sugg = r.highlight.quote
-        ? r.highlight.quote[0].match(regexp)
-        : r.highlight.author[0].match(regexp);
+      let sugg = r.highlight.body
+        ? r.highlight.body[0].match(regexp)
+        : r.highlight.name[0].match(regexp);
       console.log(sugg[1]);
       retlist.push(sugg[1].toLowerCase());
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return { retlist };
-  });
-  fastify.post("/data", async (req, res) => {
-    //console.log(quotes);
-    const operations = quotes.flatMap((doc) => [
-      { index: { _index: "test3" } },
-      doc,
-    ]);
-    const bulkResponse = await ESclient.bulk({ refresh: true, operations });
-    console.log(bulkResponse);
-    const count = await ESclient.count({ index: "test3" });
-    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    return count;
   });
 };
