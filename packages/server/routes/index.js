@@ -1,9 +1,11 @@
 import { Client } from "@elastic/elasticsearch";
+const myCache = new NodeCache();
 import IORedis from "ioredis";
 import url from "url";
 import { v4 as uuid } from "uuid";
 const sub = new IORedis();
 const pub = new IORedis();
+import NodeCache from "node-cache";
 import { quotes } from "../dataset.js";
 import { connection } from "../app.js";
 import { ERROR_MESSAGE } from "../store.js";

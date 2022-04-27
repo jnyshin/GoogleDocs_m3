@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ShareDB from "sharedb";
 import MongoShareDB from "sharedb-mongo";
+import { join } from "path";
 import { ERROR_MESSAGE, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
@@ -19,10 +20,9 @@ const { NODE_ENV } = process.env;
 const fastify = Fastify();
 
 const { PORT } = process.env;
-const IP = "127.0.0.1";
-// const IP = process.env.IP
-//   ? "icloud.cse356.compas.cs.stonybrook.edu"
-//   : "127.0.0.1";
+const IP = process.env.IP
+  ? "icloud.cse356.compas.cs.stonybrook.edu"
+  : "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 await ioredis.del("clients");
@@ -57,6 +57,7 @@ fastify.register(fastifySession, {
   saveUninitialized: true,
   resave: true,
 });
+console.log(join(__dirname, "dist"));
 fastify.register(fastifyStatic, {
   // root: join(__dirname, "dist"),
   root: "/",
