@@ -117,25 +117,25 @@ fastify.register(import("./routes/test.js"), {
 fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
-fastify.post("/deleteAll", () => {
+fastify.post("/deleteAll", async () => {
   try {
-  const database = docsDB.db("docs_clone");
-  const share_docs = database.collection("share_docs");
-  const o_share_docs = database.collection("o_share_docs");
-  const docs = database.collection("docs");
-  const image = database.collection("images");
-  const users = database.collection("users");
-  share_docs.remove({});
-  o_share_docs.remove({});
-  docs.remove({});
-  image.remove({});
-  users.remove({});
-  await ioredis.flushall();
-} catch(err) {
-  logging.error(err)
-  logging.error("Failed to delete")
-  return ERROR_MESSAGE("Failed to delete all")
-}
+    const database = docsDB.db("docs_clone");
+    const share_docs = database.collection("share_docs");
+    const o_share_docs = database.collection("o_share_docs");
+    const docs = database.collection("docs");
+    const image = database.collection("images");
+    const users = database.collection("users");
+    share_docs.remove({});
+    o_share_docs.remove({});
+    docs.remove({});
+    image.remove({});
+    users.remove({});
+    await ioredis.flushall();
+  } catch (err) {
+    logging.error(err);
+    logging.error("Failed to delete");
+    return ERROR_MESSAGE("Failed to delete all");
+  }
 });
 
 fastify.register((fastifyInstance, options, done) => {
