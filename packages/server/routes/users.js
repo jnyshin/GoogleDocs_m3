@@ -6,8 +6,11 @@ import nodemailer from "nodemailer";
 const userRouter = async (fastify, opts) => {
   fastify.get("/login", (req, res) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    // return res.sendFile("index.html");
-    res.sendFile("/var/www/html/index.html");
+    return res.sendFile(
+      process.env.NODE_ENV === "production"
+        ? "/var/www/html/index.html"
+        : "index.html"
+    );
   });
   fastify.post("/login", async (req, res) => {
     logging.info("[/user/login] Route");

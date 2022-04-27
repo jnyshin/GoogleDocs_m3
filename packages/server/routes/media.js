@@ -3,12 +3,15 @@ import multer from "fastify-multer";
 import Images from "../schema/images.js";
 import logging from "../logging.js";
 import { __dirname, ERROR_MESSAGE } from "../store.js";
-import path from "path";
-
+import { join } from "path";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // cb(null, path.join(__dirname, "dist", "uploads"));
-    cb(null, "/var/www/html/uploads");
+    cb(
+      null,
+      process.env.NODE_ENV === "production"
+        ? "/var/www/html/uploads"
+        : join(__dirname, "dist", "uploads")
+    );
   },
 
   filename: function (req, file, cb) {
@@ -35,7 +38,10 @@ export default async (fastify, opts) => {
           const mediaId = uuidv4();
           await Images.create({
             _id: mediaId,
-            file: `/var/www/html/uploads/${file.filename}`,
+            file:
+              process.env.NODE_ENV === "production"
+                ? `/var/www/html/uploads/${file.filename}`
+                : `/uploads/${file.filename}`,
             mime: file.mimetype,
           });
           logging.info(`Created image with _id = ${mediaId}`);
@@ -62,6 +68,8 @@ export default async (fastify, opts) => {
       logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
       const image = await Images.findById(mediaID);
+      const { redis } = fastify;
+      redis.setex(mediaID, 3600, image.file);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return res.sendFile(image.file);
     } catch (err) {

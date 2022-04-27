@@ -28,7 +28,7 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "dev": "NODE_ENV=development nodemon app.js",
+    "dev": "PORT=8000 NODE_ENV=development nodemon app.js",
     "production": "NODE_ENV=production nodemon app.js",
     "pm-dev": "NODE_ENV=development pm2 start app.js -i 3 --attach --watch",
     "pm-pro": "NODE_ENV=production pm2 start app.js -i max --attach"
