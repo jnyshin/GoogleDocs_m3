@@ -13,10 +13,10 @@ module.exports = {
     },
     {
       name: "OP Server",
-      script: "packages/server/app.js",
+      script: "packages/opServer/app.js",
       instance_var: "INSTANCE_ID",
       env: {
-        PORT: 8001,
+        PORT: 8002,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
