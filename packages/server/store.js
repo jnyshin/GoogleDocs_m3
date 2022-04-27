@@ -89,6 +89,20 @@ export const fetchDoc = (docId) => {
   return getDocPromise;
 };
 
+export const fetchAllDocs = () => {
+  const query = connection.createFetchQuery(SHARE_DB_NAME);
+  const getDocPromise = new Promise((resolve, reject) => {
+    query.on("ready", () => {
+      try {
+        resolve(query.results);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  });
+  return getDocPromise;
+};
+
 export const docSubmitOp = (document, op, id) => {
   const docSubmitOpPromise = new Promise((resolve, reject) => {
     document.submitOp(op, { source: id }, () => {

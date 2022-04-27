@@ -19,7 +19,7 @@ import Docs from "./schema/docs.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 
-const { PORT } = process.env;
+const PORT = 8000;
 const IP = process.env.IP
   ? "icloud.cse356.compas.cs.stonybrook.edu"
   : "127.0.0.1";

@@ -10,8 +10,10 @@ import { quotes } from "../dataset.js";
 import { connection } from "../app.js";
 import { ERROR_MESSAGE } from "../store.js";
 import Docs from "../schema/docs.js";
+import { fetchAllDocs } from "../store.js";
 import logging from "../logging.js";
 import { resourceLimits } from "worker_threads";
+import { text } from "express";
 
 const ESclient = new Client({
   cloud: {
@@ -23,15 +25,23 @@ const ESclient = new Client({
   },
 }); //More configuration will be added after ES Cloud set up
 
+//get docs from DB
+const updateIndex = (index) => {
+  const newest = fetchAllDocs();
+  console.log(newest);
+};
+
 export default async (fastify, opts) => {
+  //get info of our elasticsearch cloud
   fastify.get("/info", async (req, res) => {
     const response = await ESclient.info();
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
+    updateIndex();
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "test",
+      index: "test3", //CHANGE test3 -> search_index
       body: {
         query: {
           multi_match: {
@@ -42,8 +52,10 @@ export default async (fastify, opts) => {
       },
       highlight: {
         fragment_size: 100,
+        number_of_fragments: 1,
         fields: {
           quote: {},
+          author: {},
         },
       },
     });
@@ -51,60 +63,60 @@ export default async (fastify, opts) => {
     const retlist = [];
     //may need to change field names!!!
     result.hits.hits.map((r) => {
-      console.log(r);
       let arranged = {
         docid: r._source.id,
         name: r._source.quote,
-        snippet: r.highlight.quote[0],
+        snippet: r.highlight.quote
+          ? r.highlight.quote[0]
+          : r.highlight.author[0],
       };
       retlist.push(arranged);
     });
+    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return retlist;
   });
   fastify.get(`/suggest`, async (req, res) => {
-    const keyword = url.parse(req.url, true).query.q;
-    // await ESclient.search(
-    //   {
-    //     index: "test2",
-    //     suggest: {
-    //       completer: {
-    //         prefix: keyword,
-    //         completion: {
-    //           field: "quote",
-    //           skip_duplicates: true,
-    //           fuzzy: {
-    //             fuzziness: "auto",
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    //   (err, doc) => {
-    //     if (err) {
-    //       console.log(err);
-    //     }
-    //     console.log(doc);
-    //   }
-    // );
-    // const result = await ESclient.search({
-    //     query:{
-    //         prefix:{
-    //             title.keyword: keyword,
-    //         }
-    //     }
-    // })
-    //res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    // return result;
+    const prefix = url.parse(req.url, true).query.q;
+    const result = await ESclient.search({
+      index: "test2", //CHANGE test2 => suggest_index
+      body: {
+        query: {
+          multi_match: {
+            query: prefix,
+            fields: ["quote", "author"],
+          },
+        },
+      },
+      highlight: {
+        fragment_size: 100,
+        number_of_fragments: 1,
+        fields: {
+          quote: {},
+          author: {},
+        },
+      },
+    });
+    const retlist = [];
+    let regexp = /<em>([\d\w]+)<\/em>/;
+    result.hits.hits.map((r) => {
+      let sugg = r.highlight.quote
+        ? r.highlight.quote[0].match(regexp)
+        : r.highlight.author[0].match(regexp);
+      console.log(sugg[1]);
+      retlist.push(sugg[1].toLowerCase());
+    });
+    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    return { retlist };
   });
   fastify.post("/data", async (req, res) => {
     //console.log(quotes);
     const operations = quotes.flatMap((doc) => [
-      { index: { _index: "test2" } },
+      { index: { _index: "test3" } },
       doc,
     ]);
     const bulkResponse = await ESclient.bulk({ refresh: true, operations });
     console.log(bulkResponse);
-    const count = await ESclient.count({ index: "test" });
+    const count = await ESclient.count({ index: "test3" });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return count;
   });
