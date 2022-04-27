@@ -16,7 +16,7 @@ module.exports = {
       script: "packages/opServer/app.js",
       instance_var: "INSTANCE_ID",
       env: {
-        PORT: 8002,
+        PORT: 8001,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
