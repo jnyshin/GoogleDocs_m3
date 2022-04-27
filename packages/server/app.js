@@ -118,11 +118,12 @@ fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
 fastify.post("/deleteAll", () => {
+  try {
   const database = docsDB.db("docs_clone");
   const share_docs = database.collection("share_docs");
   const o_share_docs = database.collection("o_share_docs");
   const docs = database.collection("docs");
-  const image = database.collectino("images");
+  const image = database.collection("images");
   const users = database.collection("users");
   share_docs.remove({});
   o_share_docs.remove({});
@@ -130,6 +131,11 @@ fastify.post("/deleteAll", () => {
   image.remove({});
   users.remove({});
   await ioredis.flushall();
+} catch(err) {
+  logging.error(err)
+  logging.error("Failed to delete")
+  return ERROR_MESSAGE("Failed to delete all")
+}
 });
 
 fastify.register((fastifyInstance, options, done) => {
