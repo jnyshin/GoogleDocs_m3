@@ -4,11 +4,11 @@ import url from "url";
 import { v4 as uuid } from "uuid";
 const sub = new IORedis();
 const pub = new IORedis();
-import { quotes } from "../dataset.js";
+import { quotes, updateQuotes } from "../dataset.js";
 import { connection } from "../app.js";
 import { ERROR_MESSAGE } from "../store.js";
 import Docs from "../schema/docs.js";
-import { fetchAllDocs } from "../store.js";
+import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
 import logging from "../logging.js";
 import { resourceLimits } from "worker_threads";
 import { text } from "express";
@@ -22,9 +22,14 @@ const ESclient = new Client({
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
 });
+var freshData = [];
+setInterval(async function () {
+  freshData = await makeData(await fetchAllDocs());
+  console.log("Fresh data updated");
+}, 5000);
 
-const makeData = () => {
-  const newest = fetchAllDocs();
+const makeData = async (docs) => {
+  const newest = docs;
   const retlist = [];
   newest.map((n) => {
     console.log(n);
@@ -38,15 +43,36 @@ const makeData = () => {
   return retlist;
 };
 
-const updateIndex = async (index) => {
-  const newest = makeData();
-  const operations = newest.flatMap((doc) => [
-    { index: { _index: index } },
+const setIndex = async (index) => {
+  //   let docs = await fetchAllDocs();
+  //   const newest = await makeData(docs);
+  await ESclient.deleteByQuery({
+    index: index,
+    body: {
+      query: {
+        match_all: {},
+      },
+    },
+  });
+  const operations = freshData.flatMap((doc) => [
+    { index: { _index: index, _id: doc.id } },
     doc,
   ]);
   const bulkResponse = await ESclient.bulk({ refresh: true, operations });
   console.log(bulkResponse);
 };
+const updateIndex = async (index) => {
+  //let docs = await fetchUpdateDocs();
+  //   let docs = await fetchAllDocs();
+  //   const updatedDocs = await makeData(docs);
+  const operations = freshData.flatMap((doc) => [
+    { update: { _id: doc.id, _index: index } },
+    { doc: { name: doc.name, body: doc.body } },
+  ]);
+  const bulkResponse = await ESclient.bulk({ refresh: true, operations });
+  console.log(bulkResponse);
+};
+
 export default async (fastify, opts) => {
   //get info of our elasticsearch cloud
   fastify.get("/info", async (req, res) => {
@@ -54,7 +80,12 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    await updateIndex("search_index");
+    const count = await ESclient.count({ index: "search_index" });
+    if (count < 1) {
+      await setIndex("search_index");
+    } else {
+      await updateIndex("search_index");
+    }
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "search_index", //CHANGE test3 -> search_index
@@ -90,7 +121,12 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    await updateIndex("suggest_index");
+    const count = await ESclient.count({ index: "suggest_index" });
+    if (count < 1) {
+      await setIndex("suggest_index");
+    } else {
+      await updateIndex("suggest_index");
+    }
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "suggest_index", //CHANGE test2 => suggest_index
@@ -98,7 +134,7 @@ export default async (fastify, opts) => {
         query: {
           multi_match: {
             query: prefix,
-            fields: ["body", "name"],
+            fields: ["name", "body"],
           },
         },
       },
@@ -106,8 +142,8 @@ export default async (fastify, opts) => {
         fragment_size: 100,
         number_of_fragments: 1,
         fields: {
-          body: {},
           name: {},
+          body: {},
         },
       },
     });
@@ -121,6 +157,7 @@ export default async (fastify, opts) => {
       retlist.push(sugg[1].toLowerCase());
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    return { retlist };
+    let remdup = [...new Set(retlist)];
+    return { remdup };
   });
 };
