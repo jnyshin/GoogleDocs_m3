@@ -94,8 +94,6 @@ fastify.addHook("onRequest", (req, res, next) => {
         next();
       }
     });
-  } else {
-    next();
   }
 });
 fastify.register(import("./routes/users.js"), {
