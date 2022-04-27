@@ -16,6 +16,7 @@ import fastifyRedis from "fastify-redis";
 import { join } from "path";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
+import { v4 as uuid } from "uuid";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
 const { PORT } = process.env;
@@ -119,18 +120,26 @@ fastify.register(import("./routes/index.js"), {
 });
 fastify.post("/deleteAll", async () => {
   try {
-    const database = docsDB.db("docs_clone");
-    const share_docs = database.collection("share_docs");
-    const o_share_docs = database.collection("o_share_docs");
-    const docs = database.collection("docs");
-    const image = database.collection("images");
-    const users = database.collection("users");
-    share_docs.remove({});
-    o_share_docs.remove({});
-    docs.remove({});
-    image.remove({});
-    users.remove({});
+    const connection = mongoose.connection;
+    const share_docs = connection.db.collection("share_docs");
+    const o_share_docs = connection.db.collection("o_share_docs");
+    const docs = connection.db.collection("docs");
+    const image = connection.db.collection("images");
+    const users = connection.db.collection("users");
+    share_docs.deleteMany({});
+    o_share_docs.deleteMany({});
+    docs.deleteMany({});
+    image.deleteMany({});
+    users.deleteMany({});
+    users.insertOne({
+      _id: uuid(),
+      email: "admin",
+      password: "admin",
+      name: "admin",
+      enable: true,
+    });
     await ioredis.flushall();
+    return { status: "ok" };
   } catch (err) {
     logging.error(err);
     logging.error("Failed to delete");
