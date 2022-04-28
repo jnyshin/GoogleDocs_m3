@@ -63,16 +63,15 @@ export default async (fastify, opts) => {
     } else {
       const freshData = await fetchAllDocs();
       await setIndex("search_index", freshData);
-      const keyword = url.parse(req.url, true).query.q;
-      var re = new RegExp(keyword, "g");
+      var re = new RegExp(q, "g");
       const result = await ESclient.search({
         index: "search_index",
         body: {
           query: {
             dis_max: {
               queries: [
-                { match_phrase: { body: keyword } },
-                { match_phrase: { name: keyword } },
+                { match_phrase: { body: q } },
+                { match_phrase: { name: q } },
               ],
             },
           },
