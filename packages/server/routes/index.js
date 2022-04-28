@@ -9,7 +9,10 @@ class MySerializer extends Serializer {
 }
 const clientOptions =
   process.env.NODE_ENV === "production"
-    ? { node: "http://localhost:9200", Serializer: MySerializer }
+    ? {
+        node: "http://localhost:9200",
+        // Serializer: MySerializer
+      }
     : {
         cloud: {
           id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
@@ -18,7 +21,7 @@ const clientOptions =
           username: "elastic",
           password: "gzq9AcKIBr3BKi7UXuvuutHr",
         },
-        Serializer: MySerializer,
+        // Serializer: MySerializer,
       };
 
 const ESclient = new Client(clientOptions);
