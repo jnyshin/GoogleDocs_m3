@@ -124,7 +124,6 @@ export default async (fastify, opts) => {
         );
         logging.info(`remaining clients = ${clients.length}`);
       });
-      return {};
     } catch (err) {
       logging.error("fail to create event stream connection");
       logging.error(err);
