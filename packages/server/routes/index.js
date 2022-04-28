@@ -11,7 +11,7 @@ const clientOptions =
   process.env.NODE_ENV === "production"
     ? {
         node: "http://localhost:9200",
-        Serializer: MySerializer,
+        // Serializer: MySerializer,
       }
     : {
         cloud: {
@@ -21,7 +21,7 @@ const clientOptions =
           username: "elastic",
           password: "gzq9AcKIBr3BKi7UXuvuutHr",
         },
-        Serializer: MySerializer,
+        // Serializer: MySerializer,
       };
 
 const ESclient = new Client(clientOptions);
