@@ -49,7 +49,7 @@ export default async (fastify, opts) => {
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
           logging.info(`sent message to UID = ${client.id}`, id);
-          client.res.raw.write(`data: ${presenceStringify(presence)}\n\n`);
+          client.res.write(`data: ${presenceStringify(presence)}\n\n`);
         }
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
@@ -107,10 +107,13 @@ export default async (fastify, opts) => {
       const newClient = {
         id: id,
         docId: docId,
-        res,
+        res: res.raw,
       };
       clients.push(newClient);
-      logging.info(`New client connected! UID = ${id}`);
+      logging.info(`New client connected!`);
+      logging.info(newClient);
+      logging.info(`Current Clients = `);
+      logging.info(clients);
       logging.info(
         `Current connected clients = ${clients.length} for docId = ${docId}`
       );
@@ -121,7 +124,7 @@ export default async (fastify, opts) => {
         );
         logging.info(`remaining clients = ${clients.length}`);
       });
-      res.sent = true;
+      return {};
     } catch (err) {
       logging.error("fail to create event stream connection");
       logging.error(err);
@@ -160,11 +163,11 @@ export default async (fastify, opts) => {
         clients.forEach((client) => {
           if (client.id === id) {
             logging.info(`Sending ACK to UID = ${client.id}`, id);
-            client.res.raw.write(`data: ${ackStringify(ack)}\n\n`);
+            client.res.write(`data: ${ackStringify(ack)}\n\n`);
           }
           if (client.docId === docId && client.id !== id) {
             logging.info(`Sending OP to UID = ${client.id}`, id);
-            client.res.raw.write(`data: ${opStringify(op)}\n\n`);
+            client.res.write(`data: ${opStringify(op)}\n\n`);
           }
         });
 
