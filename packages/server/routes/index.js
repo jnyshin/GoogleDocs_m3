@@ -31,16 +31,14 @@ const setIndex = async (index) => {
     { index: { _index: index, _id: doc.id } },
     doc,
   ]);
-  const bulkResponse = await ESclient.bulk({ refresh: true, operations });
-  console.log(bulkResponse);
+  ESclient.bulk({ refresh: true, operations });
 };
 const updateIndex = async (index) => {
   const operations = freshData.flatMap((doc) => [
     { update: { _id: doc.id, _index: index } },
     { doc: { name: doc.name, body: doc.body } },
   ]);
-  const bulkResponse = await ESclient.bulk({ refresh: true, operations });
-  console.log(bulkResponse);
+  ESclient.bulk({ refresh: true, operations });
 };
 
 export default async (fastify, opts) => {
@@ -76,7 +74,6 @@ export default async (fastify, opts) => {
         },
       },
     });
-    console.log(result.hits.hits);
     const retlist = [];
     result.hits.hits.map((r) => {
       let arranged = {
