@@ -47,11 +47,13 @@ const setIndex = async (index, freshData) => {
     { index: { _id: doc.id } },
     doc,
   ]);
+  logging.info(operations);
   const upload = await ESclient.bulk({
     refresh: true,
     index: index,
     operations,
   });
+  logging.info(5);
   logging.error(upload.errors);
 };
 
@@ -64,13 +66,16 @@ export default async (fastify, opts) => {
     const { q } = req.query;
     const { redis } = fastify;
     const cache = await redis.get(q);
+    console.log(1);
     if (cache) {
       logging.info("search cache hit");
       logging.info(cache);
       return JSON.parse(cache);
     } else {
       const freshData = await fetchAllDocs();
+      console.log(2);
       await setIndex("search_index", freshData);
+      console.log(3);
       var re = new RegExp(q, "g");
       const result = await ESclient.search({
         index: "search_index",
