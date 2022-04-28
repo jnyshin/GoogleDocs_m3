@@ -19,14 +19,6 @@ setInterval(async function () {
 }, 5000);
 
 const setIndex = async (index) => {
-  await ESclient.deleteByQuery({
-    index: index,
-    body: {
-      query: {
-        match_all: {},
-      },
-    },
-  });
   const operations = freshData.flatMap((doc) => [
     { index: { _index: index, _id: doc.id } },
     doc,
