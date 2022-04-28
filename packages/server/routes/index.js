@@ -21,6 +21,19 @@ const ESclient = new Client({
 // }, 5000);
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
+
+//call resetIndex(research_index) to reset it!!
+const resetIndex = async (index) => {
+  await ESclient.deleteByQuery({
+    index: index,
+    body: {
+      query: {
+        match_all: {},
+      },
+    },
+  });
+};
+
 const setIndex = async (index, freshData) => {
   const operations = freshData.flatMap((doc) => [
     { index: { _id: doc.id } },
@@ -49,27 +62,18 @@ const updateIndex = async (index) => {
 };
 
 export default async (fastify, opts) => {
-  //get info of our elasticsearch cloud
   fastify.get("/info", async (req, res) => {
     const response = await ESclient.info();
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
     let freshData = await fetchAllDocs();
-    //const count = await ESclient.count({ index: "search_index" });
-    //console.log("search_index has count ", count.count);
-    console.log(freshData);
     await setIndex("search_index", freshData);
-    // if (count.count < 1) {
-    //   await setIndex("search_index");
-    // } else {
-    //   await updateIndex("search_index");
-    // }
     const { q } = req.query;
     const keyword = url.parse(req.url, true).query.q;
     var re = new RegExp(keyword, "g");
     const result = await ESclient.search({
-      index: "search_index", //CHANGE test3 -> search_index
+      index: "search_index",
       body: {
         query: {
           dis_max: {
@@ -107,18 +111,11 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    // const count = await ESclient.count({ index: "suggest_index" });
-    // if (count.count < 1) {
-    //   await setIndex("suggest_index");
-    // } else {
-    //   await updateIndex("suggest_index");
-    // }
     let freshData = await fetchAllDocs();
-
     await setIndex("suggest_index", freshData);
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "suggest_index", //CHANGE test2 => suggest_index
+      index: "suggest_index",
       body: {
         query: {
           multi_match: {
@@ -141,12 +138,11 @@ export default async (fastify, opts) => {
       let sugg = r.highlight.body
         ? r.highlight.body[0].match(regexp)
         : r.highlight.name[0].match(regexp);
-      //console.log(sugg[1]);
       retlist.push(sugg[1].toLowerCase());
     });
-    console.log(result.hits.hits);
     let remdup = [...new Set(retlist)];
+    const rmshorter = remdup.filter((word) => word.length > prefix.length);
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    return remdup;
+    return rmshorter;
   });
 };
