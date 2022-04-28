@@ -3,7 +3,7 @@ import url from "url";
 import { fetchAllDocs } from "../store.js";
 import logging from "../logging.js";
 
-t ESclient = new Client({
+const ESclient = new Client({
   cloud: {
     id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
   },
@@ -73,7 +73,7 @@ export default async (fastify, opts) => {
         },
       },
     });
-    
+
     const retlist = [];
     result.hits.hits.map((r) => {
       let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
