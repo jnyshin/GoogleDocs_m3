@@ -110,7 +110,7 @@ const userRouter = async (fastify, opts) => {
         };
         const transporter = nodemailer.createTransport(mailOption);
         transporter.sendMail(info);
-        logging.info(`Message sent: ${info.messageId}`);
+        logging.info(`Message sent to: ${email}`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       } catch (err) {

@@ -67,12 +67,18 @@ export default async (fastify, opts) => {
     try {
       logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
-      const image = await Images.findById(mediaID);
       const { redis } = fastify;
-      redis.setex(mediaID, 3600, image.file);
-      res.header("Cache-Control", `max-age=${90 * 24 * 3600}`);
-      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      return res.sendFile(image.file);
+      const cache = await redis.get(mediaID);
+      if (cache) {
+        logging.info("image cache hit");
+        return res.sendFile(cache);
+      } else {
+        const image = await Images.findById(mediaID);
+        redis.setex(mediaID, 3600, image.file);
+
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        return res.sendFile(image.file);
+      }
     } catch (err) {
       logging.error(`Error while sending image: ${mediaID}`);
       logging.error(err);

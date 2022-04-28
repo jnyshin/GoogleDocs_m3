@@ -7,7 +7,7 @@
     "yarn": ">=1.21.0 <2.0.0"
   },
   "scripts": {
-    "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
+    "dev": "concurrently \"yarn workspace server dev\" ",
     "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" ",
     "pm": "concurrently \"pm2 start ecosystem.config.js --attach\"",
     "pm-dev": "concurrently \"yarn workspace server pm-dev\"",
@@ -22,6 +22,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "http": "*",
     "prettier": "^2.6.1",
+    "quill-delta-to-html": "^0.12.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "url": "^0.11.0",

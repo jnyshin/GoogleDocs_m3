@@ -1,12 +1,11 @@
-import path from "path";
+import path, { resolve } from "path";
 import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
 import { connection } from "./app.js";
+import Docs from "./schema/docs.js";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 export const clients = [];
-// export const DOMAIN_NAME =
-//   process.env.NODE_ENV === "production"
-//     ? "icloud.cse356.compas.cs.stonybrook.edu"
-//     : "localhost:8000";
+
 export const ERROR_MESSAGE = (message) => {
   return { error: true, message: message };
 };
@@ -90,17 +89,42 @@ export const fetchDoc = (docId) => {
 };
 
 export const fetchAllDocs = () => {
+  const ret = [];
+  // const { name:"", op: "", docId: ""}
+  const getDocNamePromise = new Promise(async (resolve, reject) => {
+    const docsNames = await Docs.find({}).select("name");
+    try {
+      resolve(docsNames);
+    } catch (err) {
+      reject(err);
+    }
+  });
   const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
     query.on("ready", () => {
       try {
-        resolve(query.results);
+        const ret = [];
+        query.results.map((doc) => ret.push({ ops: doc.data.ops }));
+        resolve(ret);
       } catch (err) {
         reject(err);
       }
     });
   });
-  return getDocPromise;
+  return Promise.all([getDocNamePromise, getDocPromise]).then((values) => {
+    const ret = [];
+    const nameAndIds = values[0];
+    const ops = values[1];
+    nameAndIds.map((value, index) => {
+      const newObj = {
+        id: value._id,
+        name: value.name,
+        body: new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert(),
+      };
+      ret.push(newObj);
+    });
+    return ret;
+  });
 };
 
 export const fetchUpdateDocs = () => {

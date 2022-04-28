@@ -12,7 +12,7 @@ import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
 import logging from "../logging.js";
 import { resourceLimits } from "worker_threads";
 import { text } from "express";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import QuillDeltaToHtmlConverter from "quill-delta-to-html";
 
 const ESclient = new Client({
   cloud: {
@@ -23,26 +23,12 @@ const ESclient = new Client({
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
 });
-var freshData = [];
+let freshData = [];
 setInterval(async function () {
-  freshData = await makeData(await fetchAllDocs());
-  console.log(await fetchAllDocs());
+  freshData = await fetchAllDocs();
+  console.log(freshData);
+  console.log("Fresh data updated");
 }, 5000);
-
-const makeData = async (docs) => {
-  const newest = docs;
-  const retlist = [];
-  newest.map((n) => {
-    console.log(n);
-    const ops = n.data.ops;
-    const converter = new QuillDeltaToHtmlConverter(ops, {});
-    const html = converter.convert();
-    let dum = html.replace(/(<([^>]+)>)/gi, "");
-    let d = { name: n.name, body: dum, id: n.id };
-    retlist.push(d);
-  });
-  return retlist;
-};
 
 const setIndex = async (index) => {
   //   let docs = await fetchAllDocs();
