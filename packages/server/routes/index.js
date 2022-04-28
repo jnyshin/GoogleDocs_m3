@@ -21,6 +21,14 @@ setInterval(async function () {
 
 const setIndex = async (index) => {
   console.log("ENTERED setIndex");
+  await ESclient.deleteByQuery({
+    index: index,
+    body: {
+      query: {
+        match_all: {},
+      },
+    },
+  });
   const operations = freshData.flatMap((doc) => [
     { index: { _id: doc.id } },
     doc,
@@ -53,13 +61,14 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    const count = await ESclient.count({ index: "search_index" });
-    console.log("search_index has count ", count.count);
-    if (count.count < 1) {
-      await setIndex("search_index");
-    } else {
-      await updateIndex("search_index");
-    }
+    //const count = await ESclient.count({ index: "search_index" });
+    //console.log("search_index has count ", count.count);
+    await setIndex("search_index");
+    // if (count.count < 1) {
+    //   await setIndex("search_index");
+    // } else {
+    //   await updateIndex("search_index");
+    // }
     const { q } = req.query;
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
@@ -95,12 +104,13 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    const count = await ESclient.count({ index: "suggest_index" });
-    if (count.count < 1) {
-      await setIndex("suggest_index");
-    } else {
-      await updateIndex("suggest_index");
-    }
+    // const count = await ESclient.count({ index: "suggest_index" });
+    // if (count.count < 1) {
+    //   await setIndex("suggest_index");
+    // } else {
+    //   await updateIndex("suggest_index");
+    // }
+    await updateIndex("suggest_index");
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "suggest_index", //CHANGE test2 => suggest_index
