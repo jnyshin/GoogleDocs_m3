@@ -60,7 +60,6 @@ export default async (fastify, opts) => {
     const { q } = req.query;
     const { redis } = fastify;
     const cache = await redis.get(q);
-    logging.info(q);
     if (cache) {
       logging.info("search cache hit");
       logging.info(cache);
@@ -89,7 +88,6 @@ export default async (fastify, opts) => {
           },
         },
       });
-      logging.info(result);
       const retlist = [];
       result.hits.hits.map((r) => {
         let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
