@@ -129,8 +129,10 @@ const start = async () => {
 
     logging.info(`* Server started ${IP}:${PORT} `);
     await Docs.deleteMany({});
-    await resetIndex("search_index");
-    await resetIndex("suggest_index");
+    if (process.env.instance_var === 1) {
+      await resetIndex("search_index");
+      await resetIndex("suggest_index");
+    }
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
