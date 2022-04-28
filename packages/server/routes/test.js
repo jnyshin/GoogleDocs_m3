@@ -1,8 +1,21 @@
+import { fetchAllDocs } from "../store";
+
 export default async (fastify, opts) => {
-  fastify.get(`/123`, async (req, res) => {
-    return { hello };
+  fastify.get(`/`, async (req, res) => {
+    const performanceCheck = performaceSensitiveFunc();
+    return { 'took': `${performanceCheck}ms`}
   });
   fastify.post(`/pub`, async (req, res) => {
     return {};
   });
 };
+
+
+
+
+function performaceSensitiveFunc() {
+  const start = performance.now()
+  await fetchAllDocs()
+  const duration = performance.now() - start;
+  return duration
+}
