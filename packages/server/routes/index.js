@@ -15,9 +15,9 @@ const ESclient = new Client({
 let freshData = [];
 setInterval(async function () {
   freshData = await fetchAllDocs();
-  await setIndex("search_index");
-  await setIndex("suggest_index");
-  //logging.info("Fresh data updated");
+  //await setIndex("search_index");
+  //await setIndex("suggest_index");
+  logging.info("Fresh data updated");
   //console.log(freshData);
 }, 5000);
 
@@ -65,7 +65,7 @@ export default async (fastify, opts) => {
   fastify.get(`/search`, async (req, res) => {
     //const count = await ESclient.count({ index: "search_index" });
     //console.log("search_index has count ", count.count);
-    //await setIndex("search_index");
+    await setIndex("search_index");
     // if (count.count < 1) {
     //   await setIndex("search_index");
     // } else {
@@ -112,7 +112,7 @@ export default async (fastify, opts) => {
     // } else {
     //   await updateIndex("suggest_index");
     // }
-    // await setIndex("suggest_index");
+    await setIndex("suggest_index");
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "suggest_index", //CHANGE test2 => suggest_index
