@@ -3,6 +3,7 @@ import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
 import { connection } from "./app.js";
 import Docs from "./schema/docs.js";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 export const clients = [];
 
 export const ERROR_MESSAGE = (message) => {
@@ -116,9 +117,9 @@ export const fetchAllDocs = () => {
     const ops = values[1];
     nameAndIds.map((value, index) => {
       const newObj = {
-        _id: value._id,
+        id: value._id,
         name: value.name,
-        ...ops[index],
+        body: new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert(),
       };
       ret.push(newObj);
     });

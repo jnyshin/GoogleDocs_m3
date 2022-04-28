@@ -23,27 +23,12 @@ const ESclient = new Client({
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
 });
-var freshData = [];
-// setInterval(async function () {
-//   freshData = await makeData(await fetchAllDocs());
-//   console.log("Fresh data updated");
-// }, 5000);
-
-const makeData = async (docs) => {
-  console.log(docs);
-  const newest = [...docs];
-  const retlist = [];
-  // newest.map((n) => {
-  //   console.log(n);
-  //   const ops = n.data.ops;
-  //   const converter = new QuillDeltaToHtmlConverter(ops, {});
-  //   const html = converter.convert();
-  //   let dum = html.replace(/(<([^>]+)>)/gi, "");
-  //   let d = { name: n.name, body: dum, id: n.id };
-  //   retlist.push(d);
-  // });
-  return retlist;
-};
+let freshData = [];
+setInterval(async function () {
+  freshData = await fetchAllDocs();
+  console.log(freshData);
+  console.log("Fresh data updated");
+}, 5000);
 
 const setIndex = async (index) => {
   //   let docs = await fetchAllDocs();
