@@ -12,6 +12,7 @@ import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
 import logging from "../logging.js";
 import { resourceLimits } from "worker_threads";
 import { text } from "express";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
 const ESclient = new Client({
   cloud: {
@@ -24,7 +25,7 @@ const ESclient = new Client({
 });
 var freshData = [];
 setInterval(async function () {
-  //freshData = await makeData(await fetchAllDocs());
+  freshData = await makeData(await fetchAllDocs());
   console.log(await fetchAllDocs());
 }, 5000);
 
