@@ -59,7 +59,7 @@ export const opStringify = fastJson({
 export const elasticStringify = fastJson({
   type: "object",
   properties: {
-    docid: { type: "string" },
+    id: { type: "string" },
     name: { type: "string" },
     body: { type: "string" },
   },
