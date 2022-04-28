@@ -22,15 +22,6 @@ setInterval(async function () {
 }, 5000);
 
 const setIndex = async (index) => {
-  await ESclient.deleteByQuery({
-    refresh: true,
-    index: index,
-    body: {
-      query: {
-        match_all: {},
-      },
-    },
-  });
   const operations = freshData.flatMap((doc) => [
     { index: { _id: doc.id } },
     doc,
@@ -50,6 +41,7 @@ const updateIndex = async (index) => {
   ]);
   const upload = await ESclient.bulk({
     refresh: true,
+    conflicts: "proceed",
     index: index,
     operations,
   });
@@ -75,6 +67,8 @@ export default async (fastify, opts) => {
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "search_index", //CHANGE test3 -> search_index
+      conflicts: "proceed",
+      refresh: "true",
       body: {
         query: {
           multi_match: {
@@ -141,9 +135,9 @@ export default async (fastify, opts) => {
       //console.log(sugg[1]);
       retlist.push(sugg[1].toLowerCase());
     });
-    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    //console.log(result.hits.hits);
+    console.log(result.hits.hits);
     let remdup = [...new Set(retlist)];
+    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return remdup;
   });
 };
