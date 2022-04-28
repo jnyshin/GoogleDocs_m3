@@ -1,19 +1,21 @@
-import { Client } from "@elastic/elasticsearch";
+import { Client, Serializer } from "@elastic/elasticsearch";
 import url from "url";
-import { fetchAllDocs } from "../store.js";
+import { fetchAllDocs, elasticStringify } from "../store.js";
 import logging from "../logging.js";
-
-// const ESclient = new Client({
-//   cloud: {
-//     id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
-//   },
-//   auth: {
-//     username: "elastic",
-//     password: "GoitLPz9EOuuNiybaMBM6x47",
-//   },
-// });
+class MySerializer extends Serializer {
+  serialize(obj) {
+    return elasticStringify(obj);
+  }
+}
 const ESclient = new Client({
-  node: "http://localhost:9200",
+  cloud: {
+    id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
+  },
+  auth: {
+    username: "elastic",
+    password: "GoitLPz9EOuuNiybaMBM6x47",
+  },
+  Serializer: MySerializer,
 });
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
