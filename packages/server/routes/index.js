@@ -1,18 +1,7 @@
 import { Client } from "@elastic/elasticsearch";
-import IORedis from "ioredis";
 import url from "url";
-import { v4 as uuid } from "uuid";
-const sub = new IORedis();
-const pub = new IORedis();
-import { quotes, updateQuotes } from "../dataset.js";
-import { connection } from "../app.js";
-import { ERROR_MESSAGE } from "../store.js";
-import Docs from "../schema/docs.js";
 import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
 import logging from "../logging.js";
-import { resourceLimits } from "worker_threads";
-import { text } from "express";
-import QuillDeltaToHtmlConverter from "quill-delta-to-html";
 
 const ESclient = new Client({
   cloud: {
@@ -26,13 +15,11 @@ const ESclient = new Client({
 let freshData = [];
 setInterval(async function () {
   freshData = await fetchAllDocs();
-  console.log(freshData);
-  console.log("Fresh data updated");
+  logging.info("Fresh data updated");
+  logging.info(freshData);
 }, 5000);
 
 const setIndex = async (index) => {
-  //   let docs = await fetchAllDocs();
-  //   const newest = await makeData(docs);
   await ESclient.deleteByQuery({
     index: index,
     body: {
@@ -49,9 +36,6 @@ const setIndex = async (index) => {
   console.log(bulkResponse);
 };
 const updateIndex = async (index) => {
-  //let docs = await fetchUpdateDocs();
-  //   let docs = await fetchAllDocs();
-  //   const updatedDocs = await makeData(docs);
   const operations = freshData.flatMap((doc) => [
     { update: { _id: doc.id, _index: index } },
     { doc: { name: doc.name, body: doc.body } },
