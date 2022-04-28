@@ -23,7 +23,8 @@ let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
 
 //call resetIndex(research_index) to reset it!!
-const resetIndex = async (index) => {
+export const resetIndex = async (index) => {
+  logging.info("resetIndex Reached");
   await ESclient.deleteByQuery({
     index: index,
     body: {
