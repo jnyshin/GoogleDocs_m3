@@ -18,7 +18,7 @@ import richText from "rich-text";
 import Docs from "./schema/docs.js";
 import { v4 as uuid } from "uuid";
 import { resetIndex } from "./routes/index.js";
-const { NODE_ENV } = process.env;
+const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
