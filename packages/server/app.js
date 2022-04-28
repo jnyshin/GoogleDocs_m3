@@ -17,13 +17,12 @@ import { join } from "path";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
 import { v4 as uuid } from "uuid";
+import { resetIndex } from "./routes/index.js";
 const { NODE_ENV } = process.env;
 const fastify = Fastify();
-const { PORT } = process.env;
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
-await ioredis.del("clients");
 
 ShareDB.types.register(richText.type);
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
@@ -102,6 +101,7 @@ fastify.register(import("./routes/test.js"), {
 fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
+
 fastify.post("/deleteAll", async () => {
   deleteAll();
 });
@@ -129,6 +129,8 @@ const start = async () => {
 
     logging.info(`* Server started ${IP}:${PORT} `);
     await Docs.deleteMany({});
+    await resetIndex("search_index");
+    await resetIndex("suggest_index");
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
@@ -160,7 +162,9 @@ const deleteAll = async () => {
       name: "admin",
       enable: true,
     });
-    // await ioredis.flushall();
+    if (NODE_ENV === "production") {
+      await ioredis.flushall();
+    }
     return { status: "ok" };
   } catch (err) {
     logging.error(err);

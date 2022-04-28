@@ -43,15 +43,6 @@ export const presenceStringify = fastJson({
   },
 });
 
-export const clientStringify = fastJson({
-  title: "new client",
-  type: "object",
-  properties: {
-    id: { type: "string" },
-    docId: { type: "string" },
-  },
-});
-
 export const ackStringify = fastJson({
   title: "ack",
   type: "object",
@@ -63,15 +54,6 @@ export const ackStringify = fastJson({
 export const opStringify = fastJson({
   title: "op",
   type: "array",
-});
-
-export const docPreventStringify = fastJson({
-  title: "doc action",
-  type: "object",
-  properties: {
-    preventCompose: { type: "boolean" },
-    docId: { type: "string" },
-  },
 });
 
 export const fetchDoc = (docId) => {
@@ -116,10 +98,13 @@ export const fetchAllDocs = () => {
     const nameAndIds = values[0];
     const ops = values[1];
     nameAndIds.map((value, index) => {
+      let html = new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert();
+      let newhtml = html.replace(/<[\w]*>/, "");
+      let newnewhtml = newhtml.replace(/<\/[\w]*>/, "");
       const newObj = {
         id: value._id,
         name: value.name,
-        body: new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert(),
+        body: newnewhtml,
       };
       ret.push(newObj);
     });
@@ -139,6 +124,18 @@ export const fetchUpdateDocs = () => {
     });
   });
   return getDocPromise;
+};
+export const fetchCreateDocs = (docId) => {
+  const share_doc = connection.get(SHARE_DB_NAME, docId);
+  const promise = new Promise((resolve, reject) => {
+    share_doc.fetch((err) => {
+      if (err) reject(err);
+      else {
+        resolve(share_doc.create([], "rich-text"));
+      }
+    });
+  });
+  return promise;
 };
 
 export const docSubmitOp = (document, op, id) => {

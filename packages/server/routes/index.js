@@ -1,18 +1,7 @@
 import { Client } from "@elastic/elasticsearch";
-import IORedis from "ioredis";
 import url from "url";
-import { v4 as uuid } from "uuid";
-const sub = new IORedis();
-const pub = new IORedis();
-import { quotes, updateQuotes } from "../dataset.js";
-import { connection } from "../app.js";
-import { ERROR_MESSAGE } from "../store.js";
-import Docs from "../schema/docs.js";
-import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
+import { fetchAllDocs } from "../store.js";
 import logging from "../logging.js";
-import { resourceLimits } from "worker_threads";
-import { text } from "express";
-import QuillDeltaToHtmlConverter from "quill-delta-to-html";
 
 const ESclient = new Client({
   cloud: {
@@ -23,16 +12,13 @@ const ESclient = new Client({
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
 });
-let freshData = [];
-setInterval(async function () {
-  freshData = await fetchAllDocs();
-  console.log(freshData);
-  console.log("Fresh data updated");
-}, 5000);
 
-const setIndex = async (index) => {
-  //   let docs = await fetchAllDocs();
-  //   const newest = await makeData(docs);
+let rmopen = /<[\w]*>/gi;
+let rmclose = /<\/[\w]*>/gi;
+
+//call resetIndex(research_index) to reset it!!
+export const resetIndex = async (index) => {
+  logging.info("resetIndex Reached");
   await ESclient.deleteByQuery({
     index: index,
     body: {
@@ -41,82 +27,78 @@ const setIndex = async (index) => {
       },
     },
   });
+};
+
+const setIndex = async (index, freshData) => {
   const operations = freshData.flatMap((doc) => [
-    { index: { _index: index, _id: doc.id } },
+    { index: { _id: doc.id } },
     doc,
   ]);
-  const bulkResponse = await ESclient.bulk({ refresh: true, operations });
-  console.log(bulkResponse);
-};
-const updateIndex = async (index) => {
-  //let docs = await fetchUpdateDocs();
-  //   let docs = await fetchAllDocs();
-  //   const updatedDocs = await makeData(docs);
-  const operations = freshData.flatMap((doc) => [
-    { update: { _id: doc.id, _index: index } },
-    { doc: { name: doc.name, body: doc.body } },
-  ]);
-  const bulkResponse = await ESclient.bulk({ refresh: true, operations });
-  console.log(bulkResponse);
+  const upload = await ESclient.bulk({
+    refresh: true,
+    index: index,
+    operations,
+  });
+  logging.error(upload.errors);
 };
 
 export default async (fastify, opts) => {
-  //get info of our elasticsearch cloud
   fastify.get("/info", async (req, res) => {
     const response = await ESclient.info();
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    const count = await ESclient.count({ index: "search_index" });
-    if (count < 1) {
-      await setIndex("search_index");
-    } else {
-      await updateIndex("search_index");
-    }
+    let freshData = await fetchAllDocs();
+    await setIndex("search_index", freshData);
+    const { q } = req.query;
     const keyword = url.parse(req.url, true).query.q;
+    var re = new RegExp(keyword, "g");
     const result = await ESclient.search({
-      index: "search_index", //CHANGE test3 -> search_index
+      index: "search_index",
       body: {
         query: {
-          multi_match: {
-            query: keyword,
-            fields: ["name", "body"],
+          dis_max: {
+            queries: [
+              { match_phrase: { name: keyword } },
+              { match_phrase: { body: keyword } },
+            ],
           },
         },
       },
       highlight: {
         fragment_size: 100,
-        number_of_fragments: 1,
         fields: {
           name: {},
           body: {},
         },
       },
     });
-    console.log(result.hits.hits);
+
     const retlist = [];
     result.hits.hits.map((r) => {
+      let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
       let arranged = {
         docid: r._source.id,
         name: r._source.name,
-        snippet: r.highlight.body ? r.highlight.body[0] : r.highlight.name[0],
+        snippet: s
+          .replaceAll(rmopen, "")
+          .replaceAll(rmclose, "")
+          .replaceAll(re, "<em>" + keyword + "</em>"),
       };
       retlist.push(arranged);
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    logging.info(`Result searching keyword = ${q}`);
+    logging.info(retlist);
     return retlist;
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    const count = await ESclient.count({ index: "suggest_index" });
-    if (count < 1) {
-      await setIndex("suggest_index");
-    } else {
-      await updateIndex("suggest_index");
-    }
+    let freshData = await fetchAllDocs();
+    await setIndex("suggest_index", freshData);
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
-      index: "suggest_index", //CHANGE test2 => suggest_index
+      index: "suggest_index",
       body: {
         query: {
           multi_match: {
@@ -127,7 +109,6 @@ export default async (fastify, opts) => {
       },
       highlight: {
         fragment_size: 100,
-        number_of_fragments: 1,
         fields: {
           name: {},
           body: {},
@@ -140,11 +121,13 @@ export default async (fastify, opts) => {
       let sugg = r.highlight.body
         ? r.highlight.body[0].match(regexp)
         : r.highlight.name[0].match(regexp);
-      console.log(sugg[1]);
       retlist.push(sugg[1].toLowerCase());
     });
-    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     let remdup = [...new Set(retlist)];
-    return { remdup };
+    const rmshorter = remdup.filter((word) => word.length > prefix.length);
+    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    logging.info(`Result Suggestions for keyword = ${prefix}`);
+    logging.info(retlist);
+    return rmshorter;
   });
 };
