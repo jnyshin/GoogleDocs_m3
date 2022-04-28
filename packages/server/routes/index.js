@@ -17,7 +17,6 @@ const ESclient = new Client({
   },
   Serializer: MySerializer,
 });
-
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
 
@@ -109,15 +108,15 @@ export default async (fastify, opts) => {
         query: {
           multi_match: {
             query: prefix,
-            fields: ["name", "body"],
+            fields: ["body", "name"],
           },
         },
       },
       highlight: {
-        fragment_size: 100,
+        fragment_size: 50,
         fields: {
-          name: {},
           body: {},
+          name: {},
         },
       },
     });
