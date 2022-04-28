@@ -16,7 +16,6 @@ let freshData = [];
 setInterval(async function () {
   freshData = await fetchAllDocs();
   logging.info("Fresh data updated");
-  logging.info(freshData);
 }, 5000);
 
 const setIndex = async (index) => {
