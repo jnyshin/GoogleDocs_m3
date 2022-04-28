@@ -48,7 +48,7 @@ const Editor = (props) => {
   useEffect(() => {
     if (quill && !listening) {
       const evtSource = new EventSource(
-        `http://${DOMAIN_NAME}/doc/connect/${docId}/${id}`
+        `https://${DOMAIN_NAME}/doc/connect/${docId}/${id}`
       );
       evtSource.onopen = function () {
         console.log("connection establised");

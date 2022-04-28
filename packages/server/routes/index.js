@@ -61,9 +61,7 @@ export default async (fastify, opts) => {
       await updateIndex("search_index");
     }
     const { q } = req.query;
-    console.log(q);
     const keyword = url.parse(req.url, true).query.q;
-    console.log(keyword);
     const result = await ESclient.search({
       index: "search_index", //CHANGE test3 -> search_index
       body: {

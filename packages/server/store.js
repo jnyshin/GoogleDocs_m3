@@ -43,15 +43,6 @@ export const presenceStringify = fastJson({
   },
 });
 
-export const clientStringify = fastJson({
-  title: "new client",
-  type: "object",
-  properties: {
-    id: { type: "string" },
-    docId: { type: "string" },
-  },
-});
-
 export const ackStringify = fastJson({
   title: "ack",
   type: "object",
@@ -63,15 +54,6 @@ export const ackStringify = fastJson({
 export const opStringify = fastJson({
   title: "op",
   type: "array",
-});
-
-export const docPreventStringify = fastJson({
-  title: "doc action",
-  type: "object",
-  properties: {
-    preventCompose: { type: "boolean" },
-    docId: { type: "string" },
-  },
 });
 
 export const fetchDoc = (docId) => {

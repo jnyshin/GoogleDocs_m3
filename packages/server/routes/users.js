@@ -97,7 +97,7 @@ const userRouter = async (fastify, opts) => {
           from: "icloud@icloud.cse356.compas.cs.stonybrook.edu",
           to: email,
           subject: "Verification Code",
-          html: `http://icloud.cse356.compas.cs.stonybrook.edu/users/verify?key=${userId}`,
+          html: `https://icloud.cse356.compas.cs.stonybrook.edu/users/verify?key=${userId}`,
         };
 
         const mailOption = {
