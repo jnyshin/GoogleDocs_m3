@@ -98,6 +98,7 @@ fastify.register(import("./routes/media.js"), {
 fastify.register(import("./routes/test.js"), {
   prefix: "/test",
 });
+console.log(process.env.instance_var);
 if (process.env.instance_var === "6") {
   fastify.register(import("./routes/index.js"), {
     prefix: "/index",

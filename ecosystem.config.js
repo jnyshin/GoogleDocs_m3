@@ -71,7 +71,7 @@ module.exports = {
     {
       name: "API Server 7",
       script: "packages/server/app.js",
-      instance_var: "6",
+      instance_var: "7",
       env: {
         PORT: 8007,
         NODE_ENV: "production",
@@ -82,7 +82,7 @@ module.exports = {
     {
       name: "API Server 8",
       script: "packages/server/app.js",
-      instance_var: "6",
+      instance_var: "8",
       env: {
         PORT: 8008,
         NODE_ENV: "production",
