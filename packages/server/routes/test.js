@@ -1,4 +1,4 @@
-import { fetchAllDocs } from "../store";
+import { fetchAllDocs } from "../store.js";
 
 export default async (fastify, opts) => {
   fastify.get(`/`, async (req, res) => {
