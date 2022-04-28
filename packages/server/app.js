@@ -17,7 +17,8 @@ import { join } from "path";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
 import { v4 as uuid } from "uuid";
-const { NODE_ENV, PORT } = process.env;
+import { resetIndex } from "./routes/index.js";
+const { NODE_ENV } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
@@ -128,6 +129,8 @@ const start = async () => {
 
     logging.info(`* Server started ${IP}:${PORT} `);
     await Docs.deleteMany({});
+    await resetIndex("search_index");
+    await resetIndex("suggest_index");
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
