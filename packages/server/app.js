@@ -26,7 +26,6 @@ const ioredis = new IORedis();
 await ioredis.del("clients");
 
 ShareDB.types.register(richText.type);
-console.log();
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
 const backend = new ShareDB({
   db: docsDB,
@@ -82,23 +81,6 @@ fastify.addHook("preHandler", (req, res, next) => {
   next();
 });
 
-// fastify.addHook("onRequest", (req, res, next) => {
-//   if (req.url.startsWith("/media/access")) {
-//     const { mediaID } = req.params;
-//     ioredis.get(mediaID, (err, data) => {
-//       if (data) {
-//         logging.info("image cache hit");
-//         logging.info(data);
-//         req.sent = true;
-//         return res.sendFile(data);
-//       } else {
-//         next();
-//       }
-//     });
-//   } else {
-//     next();
-//   }
-// });
 fastify.register(import("./routes/users.js"), {
   prefix: "/users",
 });
@@ -121,6 +103,44 @@ fastify.register(import("./routes/index.js"), {
   prefix: "/index",
 });
 fastify.post("/deleteAll", async () => {
+  deleteAll();
+});
+
+fastify.register((fastifyInstance, options, done) => {
+  mongoose
+    .connect("mongodb://localhost/docs_clone", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    })
+    .then(() => {
+      deleteAll();
+      console.log("mongoose connected");
+    })
+    .catch((err) => {
+      console.error("failed to connect with MongoDB", err);
+      fastifyInstance.close();
+    })
+    .finally(() => done());
+});
+
+const start = async () => {
+  try {
+    await fastify.listen(PORT, IP);
+
+    logging.info(`* Server started ${IP}:${PORT} `);
+    await Docs.deleteMany({});
+  } catch (err) {
+    console.log(err);
+    fastify.log.error(err);
+  }
+};
+start();
+
+process.on("SIGINT", function () {
+  process.exit(0);
+});
+
+const deleteAll = async () => {
   try {
     const connection = mongoose.connection;
     const share_docs = connection.db.collection("share_docs");
@@ -140,43 +160,11 @@ fastify.post("/deleteAll", async () => {
       name: "admin",
       enable: true,
     });
-    await ioredis.flushall();
+    // await ioredis.flushall();
     return { status: "ok" };
   } catch (err) {
     logging.error(err);
     logging.error("Failed to delete");
     return ERROR_MESSAGE("Failed to delete all");
   }
-});
-
-fastify.register((fastifyInstance, options, done) => {
-  mongoose
-    .connect("mongodb://localhost/docs_clone", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then(() => {
-      console.log("mongoose connected");
-    })
-    .catch((err) => {
-      console.error("failed to connect with MongoDB", err);
-      fastifyInstance.close();
-    })
-    .finally(() => done());
-});
-
-const start = async () => {
-  try {
-    await fastify.listen(PORT, IP);
-    logging.info(`* Server started ${IP}:${PORT} `);
-    await Docs.deleteMany({});
-  } catch (err) {
-    console.log(err);
-    fastify.log.error(err);
-  }
 };
-start();
-
-process.on("SIGINT", function () {
-  process.exit(0);
-});

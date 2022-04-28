@@ -12,6 +12,7 @@ import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
 import logging from "../logging.js";
 import { resourceLimits } from "worker_threads";
 import { text } from "express";
+import QuillDeltaToHtmlConverter from "quill-delta-to-html";
 
 const ESclient = new Client({
   cloud: {
@@ -23,23 +24,24 @@ const ESclient = new Client({
   },
 });
 var freshData = [];
-setInterval(async function () {
-  freshData = await makeData(await fetchAllDocs());
-  console.log("Fresh data updated");
-}, 5000);
+// setInterval(async function () {
+//   freshData = await makeData(await fetchAllDocs());
+//   console.log("Fresh data updated");
+// }, 5000);
 
 const makeData = async (docs) => {
-  const newest = docs;
+  console.log(docs);
+  const newest = [...docs];
   const retlist = [];
-  newest.map((n) => {
-    console.log(n);
-    const ops = n.data.ops;
-    const converter = new QuillDeltaToHtmlConverter(ops, {});
-    const html = converter.convert();
-    let dum = html.replace(/(<([^>]+)>)/gi, "");
-    let d = { name: n.name, body: dum, id: n.id };
-    retlist.push(d);
-  });
+  // newest.map((n) => {
+  //   console.log(n);
+  //   const ops = n.data.ops;
+  //   const converter = new QuillDeltaToHtmlConverter(ops, {});
+  //   const html = converter.convert();
+  //   let dum = html.replace(/(<([^>]+)>)/gi, "");
+  //   let d = { name: n.name, body: dum, id: n.id };
+  //   retlist.push(d);
+  // });
   return retlist;
 };
 
