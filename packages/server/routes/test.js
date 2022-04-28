@@ -2,7 +2,7 @@ import { fetchAllDocs } from "../store.js";
 
 export default async (fastify, opts) => {
   fastify.get(`/`, async (req, res) => {
-    const performanceCheck = performaceSensitiveFunc();
+    const performanceCheck = await performaceSensitiveFunc();
     return { took: `${performanceCheck}ms` };
   });
   fastify.post(`/pub`, async (req, res) => {
