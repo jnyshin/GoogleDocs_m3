@@ -98,10 +98,13 @@ export const fetchAllDocs = () => {
     const nameAndIds = values[0];
     const ops = values[1];
     nameAndIds.map((value, index) => {
+      let html = new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert();
+      let newhtml = html.replace(/<[\w]*>/, "");
+      let newnewhtml = newhtml.replace(/<\/[\w]*>/, "");
       const newObj = {
         id: value._id,
         name: value.name,
-        body: new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert(),
+        body: newnewhtml,
       };
       ret.push(newObj);
     });

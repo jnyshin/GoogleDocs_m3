@@ -12,7 +12,7 @@ const ESclient = new Client({
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
 });
-let freshData = [];
+//let freshData = [];
 // setInterval(async function () {
 //   //await setIndex("search_index");
 //   //await setIndex("suggest_index");
@@ -20,7 +20,7 @@ let freshData = [];
 //   //console.log(freshData);
 // }, 5000);
 
-const setIndex = async (index) => {
+const setIndex = async (index, freshData) => {
   const operations = freshData.flatMap((doc) => [
     { index: { _id: doc.id } },
     doc,
@@ -54,10 +54,11 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    freshData = await fetchAllDocs();
+    let freshData = await fetchAllDocs();
     //const count = await ESclient.count({ index: "search_index" });
     //console.log("search_index has count ", count.count);
-    await setIndex("search_index");
+    console.log(freshData);
+    await setIndex("search_index", freshData);
     // if (count.count < 1) {
     //   await setIndex("search_index");
     // } else {
@@ -67,25 +68,25 @@ export default async (fastify, opts) => {
     const keyword = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "search_index", //CHANGE test3 -> search_index
-      conflicts: "proceed",
-      refresh: "true",
       body: {
         query: {
-          multi_match: {
-            query: keyword,
-            fields: ["name", "body"],
+          dis_max: {
+            queries: [
+              { match_phrase: { name: keyword } },
+              { match_phrase: { body: keyword } },
+            ],
           },
         },
       },
       highlight: {
         fragment_size: 100,
-        number_of_fragments: 1,
         fields: {
           name: {},
           body: {},
         },
       },
     });
+    console.log(result);
     const retlist = [];
     result.hits.hits.map((r) => {
       let arranged = {
@@ -106,9 +107,9 @@ export default async (fastify, opts) => {
     // } else {
     //   await updateIndex("suggest_index");
     // }
-    freshData = await fetchAllDocs();
+    let freshData = await fetchAllDocs();
 
-    await setIndex("suggest_index");
+    await setIndex("suggest_index", freshData);
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "suggest_index", //CHANGE test2 => suggest_index
@@ -141,5 +142,13 @@ export default async (fastify, opts) => {
     let remdup = [...new Set(retlist)];
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return remdup;
+  });
+  fastify.get("/rmhtml", (req, res) => {
+    let html = "<br>I want to eat apple pie</p>";
+    let rmopen = /<[\w]*>/;
+    let rmclose = /<\/[\w]*>/;
+    let newhtml = html.replace(rmopen, "");
+    let newnewhtml = newhtml.replace(rmclose, "");
+    return newnewhtml;
   });
 };
