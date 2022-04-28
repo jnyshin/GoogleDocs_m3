@@ -3,16 +3,18 @@ import url from "url";
 import { fetchAllDocs } from "../store.js";
 import logging from "../logging.js";
 
+// const ESclient = new Client({
+//   cloud: {
+//     id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
+//   },
+//   auth: {
+//     username: "elastic",
+//     password: "GoitLPz9EOuuNiybaMBM6x47",
+//   },
+// });
 const ESclient = new Client({
-  cloud: {
-    id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
-  },
-  auth: {
-    username: "elastic",
-    password: "GoitLPz9EOuuNiybaMBM6x47",
-  },
+  node: "http://localhost:9200",
 });
-
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
 
@@ -104,15 +106,15 @@ export default async (fastify, opts) => {
         query: {
           multi_match: {
             query: prefix,
-            fields: ["name", "body"],
+            fields: ["body", "name"],
           },
         },
       },
       highlight: {
-        fragment_size: 100,
+        fragment_size: 50,
         fields: {
-          name: {},
           body: {},
+          name: {},
         },
       },
     });
