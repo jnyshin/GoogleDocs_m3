@@ -110,6 +110,7 @@ export default async (fastify, opts) => {
         res,
       };
       clients.push(newClient);
+      logging.info(`New client connected! UID = ${id}`);
       logging.info(
         `Current connected clients = ${clients.length} for docId = ${docId}`
       );
