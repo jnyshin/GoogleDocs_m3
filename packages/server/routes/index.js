@@ -13,12 +13,12 @@ const ESclient = new Client({
   },
 });
 let freshData = [];
-setInterval(async function () {
-  //await setIndex("search_index");
-  //await setIndex("suggest_index");
-  logging.info("Fresh data updated");
-  //console.log(freshData);
-}, 5000);
+// setInterval(async function () {
+//   //await setIndex("search_index");
+//   //await setIndex("suggest_index");
+//   logging.info("Fresh data updated");
+//   //console.log(freshData);
+// }, 5000);
 
 const setIndex = async (index) => {
   const operations = freshData.flatMap((doc) => [
