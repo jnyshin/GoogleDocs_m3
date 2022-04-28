@@ -90,6 +90,7 @@ export default async (fastify, opts) => {
     logging.info("[/doc/connect/:DOCID/:UID] Route", id);
     try {
       const document = await fetchDoc(docId);
+      logging.info("fetched Doc", id);
       const headers = {
         "Content-Type": "text/event-stream",
         Connection: "keep-alive",
@@ -102,7 +103,7 @@ export default async (fastify, opts) => {
         version: document.version,
       };
       logging.info(`Content and Version:`, id);
-      logging.info(payload);
+      logging.info(payload, id);
       res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
       const newClient = {
         id: id,
