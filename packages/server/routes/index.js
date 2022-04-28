@@ -59,8 +59,8 @@ export default async (fastify, opts) => {
         query: {
           dis_max: {
             queries: [
-              { match_phrase: { name: keyword } },
               { match_phrase: { body: keyword } },
+              { match_phrase: { name: keyword } },
             ],
           },
         },
@@ -68,8 +68,8 @@ export default async (fastify, opts) => {
       highlight: {
         fragment_size: 100,
         fields: {
-          name: {},
-          body: {},
+          body: { fragmenter: "span", type: "fvh" },
+          name: { fragmenter: "span", type: "fvh" },
         },
       },
     });
@@ -80,10 +80,11 @@ export default async (fastify, opts) => {
       let arranged = {
         docid: r._source.id,
         name: r._source.name,
-        snippet: s
-          .replaceAll(rmopen, "")
-          .replaceAll(rmclose, "")
-          .replaceAll(re, "<em>" + keyword + "</em>"),
+        // snippet: s
+        //   .replaceAll(rmopen, "")
+        //   .replaceAll(rmclose, "")
+        //   .replaceAll(re, "<em>" + keyword + "</em>"),
+        snippet: s,
       };
       retlist.push(arranged);
     });
