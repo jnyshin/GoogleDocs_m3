@@ -19,7 +19,8 @@ const ESclient = new Client({
 //   logging.info("Fresh data updated");
 //   //console.log(freshData);
 // }, 5000);
-
+let rmopen = /<[\w]*>/gi;
+let rmclose = /<\/[\w]*>/gi;
 const setIndex = async (index, freshData) => {
   const operations = freshData.flatMap((doc) => [
     { index: { _id: doc.id } },
@@ -66,6 +67,7 @@ export default async (fastify, opts) => {
     // }
     const { q } = req.query;
     const keyword = url.parse(req.url, true).query.q;
+    var re = new RegExp(keyword, "g");
     const result = await ESclient.search({
       index: "search_index", //CHANGE test3 -> search_index
       body: {
@@ -89,10 +91,14 @@ export default async (fastify, opts) => {
     console.log(result);
     const retlist = [];
     result.hits.hits.map((r) => {
+      let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
       let arranged = {
         docid: r._source.id,
         name: r._source.name,
-        snippet: r.highlight.body ? r.highlight.body[0] : r.highlight.name[0],
+        snippet: s
+          .replaceAll(rmopen, "")
+          .replaceAll(rmclose, "")
+          .replaceAll(re, "<em>" + keyword + "</em>"),
       };
       retlist.push(arranged);
     });
@@ -142,13 +148,5 @@ export default async (fastify, opts) => {
     let remdup = [...new Set(retlist)];
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return remdup;
-  });
-  fastify.get("/rmhtml", (req, res) => {
-    let html = "<br>I want to eat apple pie</p>";
-    let rmopen = /<[\w]*>/;
-    let rmclose = /<\/[\w]*>/;
-    let newhtml = html.replace(rmopen, "");
-    let newnewhtml = newhtml.replace(rmclose, "");
-    return newnewhtml;
   });
 };
