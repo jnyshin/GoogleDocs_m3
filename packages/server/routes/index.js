@@ -1,9 +1,9 @@
 import { Client } from "@elastic/elasticsearch";
 import url from "url";
-import { fetchAllDocs, fetchUpdateDocs } from "../store.js";
+import { fetchAllDocs } from "../store.js";
 import logging from "../logging.js";
 
-const ESclient = new Client({
+t ESclient = new Client({
   cloud: {
     id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
   },
@@ -12,13 +12,7 @@ const ESclient = new Client({
     password: "GoitLPz9EOuuNiybaMBM6x47",
   },
 });
-//let freshData = [];
-// setInterval(async function () {
-//   //await setIndex("search_index");
-//   //await setIndex("suggest_index");
-//   logging.info("Fresh data updated");
-//   //console.log(freshData);
-// }, 5000);
+
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
 
@@ -42,20 +36,6 @@ const setIndex = async (index, freshData) => {
   ]);
   const upload = await ESclient.bulk({
     refresh: true,
-    index: index,
-    operations,
-  });
-  logging.error(upload.errors);
-};
-
-const updateIndex = async (index) => {
-  const operations = freshData.flatMap((doc) => [
-    { update: { _id: doc.id } },
-    { doc: { body: doc.body } },
-  ]);
-  const upload = await ESclient.bulk({
-    refresh: true,
-    conflicts: "proceed",
     index: index,
     operations,
   });
@@ -93,7 +73,7 @@ export default async (fastify, opts) => {
         },
       },
     });
-    console.log(result);
+    
     const retlist = [];
     result.hits.hits.map((r) => {
       let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
@@ -108,6 +88,8 @@ export default async (fastify, opts) => {
       retlist.push(arranged);
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    logging.info(`Result searching keyword = ${q}`);
+    logging.info(retlist);
     return retlist;
   });
 
@@ -144,6 +126,8 @@ export default async (fastify, opts) => {
     let remdup = [...new Set(retlist)];
     const rmshorter = remdup.filter((word) => word.length > prefix.length);
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    logging.info(`Result Suggestions for keyword = ${prefix}`);
+    logging.info(retlist);
     return rmshorter;
   });
 };
