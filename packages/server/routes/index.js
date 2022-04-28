@@ -61,9 +61,10 @@ export default async (fastify, opts) => {
     const { q } = req.query;
     const { redis } = fastify;
     const cache = await redis.get(q);
-    logging.info("search cache hit");
-    logging.info(cache);
+
     if (cache) {
+      logging.info("search cache hit");
+      logging.info(cache);
       return JSON.parse(cache);
     } else {
       const freshData = await fetchAllDocs();
