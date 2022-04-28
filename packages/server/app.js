@@ -17,9 +17,8 @@ import { join } from "path";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
 import { v4 as uuid } from "uuid";
-const { NODE_ENV } = process.env;
+const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
-const { PORT } = process.env;
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
@@ -160,7 +159,9 @@ const deleteAll = async () => {
       name: "admin",
       enable: true,
     });
-    // await ioredis.flushall();
+    if (NODE_ENV === "production") {
+      await ioredis.flushall();
+    }
     return { status: "ok" };
   } catch (err) {
     logging.error(err);
