@@ -15,6 +15,8 @@ const ESclient = new Client({
 let freshData = [];
 setInterval(async function () {
   freshData = await fetchAllDocs();
+  await setIndex("search_index");
+  await setIndex("suggest_index");
   logging.info("Fresh data updated");
   //console.log(freshData);
 }, 5000);
@@ -22,6 +24,7 @@ setInterval(async function () {
 const setIndex = async (index) => {
   console.log("ENTERED setIndex");
   await ESclient.deleteByQuery({
+    refresh: true,
     index: index,
     body: {
       query: {
@@ -40,6 +43,7 @@ const setIndex = async (index) => {
   });
   console.log(upload.errors);
 };
+
 const updateIndex = async (index) => {
   console.log("ENTERED updateIndex");
   const operations = freshData.flatMap((doc) => [
