@@ -16,21 +16,34 @@ let freshData = [];
 setInterval(async function () {
   freshData = await fetchAllDocs();
   logging.info("Fresh data updated");
+  //console.log(freshData);
 }, 5000);
 
 const setIndex = async (index) => {
+  console.log("ENTERED setIndex");
   const operations = freshData.flatMap((doc) => [
-    { index: { _index: index, _id: doc.id } },
+    { index: { _id: doc.id } },
     doc,
   ]);
-  ESclient.bulk({ refresh: true, operations });
+  const upload = await ESclient.bulk({
+    refresh: true,
+    index: index,
+    operations,
+  });
+  console.log(upload.errors);
 };
 const updateIndex = async (index) => {
+  console.log("ENTERED updateIndex");
   const operations = freshData.flatMap((doc) => [
-    { update: { _id: doc.id, _index: index } },
-    { doc: { name: doc.name, body: doc.body } },
+    { update: { _id: doc.id } },
+    { doc: { body: doc.body } },
   ]);
-  ESclient.bulk({ refresh: true, operations });
+  const upload = await ESclient.bulk({
+    refresh: true,
+    index: index,
+    operations,
+  });
+  console.log(upload.errors);
 };
 
 export default async (fastify, opts) => {
@@ -41,7 +54,8 @@ export default async (fastify, opts) => {
   });
   fastify.get(`/search`, async (req, res) => {
     const count = await ESclient.count({ index: "search_index" });
-    if (count < 1) {
+    console.log("search_index has count ", count.count);
+    if (count.count < 1) {
       await setIndex("search_index");
     } else {
       await updateIndex("search_index");
@@ -84,7 +98,7 @@ export default async (fastify, opts) => {
 
   fastify.get(`/suggest`, async (req, res) => {
     const count = await ESclient.count({ index: "suggest_index" });
-    if (count < 1) {
+    if (count.count < 1) {
       await setIndex("suggest_index");
     } else {
       await updateIndex("suggest_index");
