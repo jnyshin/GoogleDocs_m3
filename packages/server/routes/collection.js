@@ -1,7 +1,12 @@
 import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
-import { ERROR_MESSAGE, fetchDoc, SHARE_DB_NAME } from "../store.js";
+import {
+  ERROR_MESSAGE,
+  fetchCreateDocs,
+  fetchDoc,
+  SHARE_DB_NAME,
+} from "../store.js";
 import { connection } from "../app.js";
 import IORedis from "ioredis";
 export default async (fastify, opts) => {
@@ -11,8 +16,7 @@ export default async (fastify, opts) => {
     const id = uuidv4();
     try {
       logging.info(`created new doc id=${id} route`);
-      const share_doc = connection.get(SHARE_DB_NAME, id);
-      share_doc.create([], "rich-text");
+      await fetchCreateDocs(id);
       await Docs.create({
         _id: id,
         id: id,

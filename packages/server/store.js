@@ -125,6 +125,18 @@ export const fetchUpdateDocs = () => {
   });
   return getDocPromise;
 };
+export const fetchCreateDocs = (docId) => {
+  const share_doc = connection.get(SHARE_DB_NAME, docId);
+  const promise = new Promise((resolve, reject) => {
+    share_doc.fetch((err) => {
+      if (err) reject(err);
+      else {
+        resolve(share_doc.create([], "rich-text"));
+      }
+    });
+  });
+  return promise;
+};
 
 export const docSubmitOp = (document, op, id) => {
   const docSubmitOpPromise = new Promise((resolve, reject) => {
