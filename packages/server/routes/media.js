@@ -33,7 +33,11 @@ export default async (fastify, opts) => {
         return ERROR_MESSAGE("Please upload a file");
       }
       logging.info(file);
-      if (file.mimetype === "image/png" || file.mimetype === "image/jpeg") {
+      if (
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/gif"
+      ) {
         try {
           const mediaId = uuidv4();
           await Images.create({

@@ -4,7 +4,6 @@ import logging from "../logging.js";
 import { ERROR_MESSAGE, fetchDoc, SHARE_DB_NAME } from "../store.js";
 import { connection } from "../app.js";
 import IORedis from "ioredis";
-const pub = new IORedis();
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
     logging.info("[/collection/create] Route");
