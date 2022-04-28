@@ -99,9 +99,11 @@ fastify.register(import("./routes/media.js"), {
 fastify.register(import("./routes/test.js"), {
   prefix: "/test",
 });
-fastify.register(import("./routes/index.js"), {
-  prefix: "/index",
-});
+if (process.env.instance_var === "6") {
+  fastify.register(import("./routes/index.js"), {
+    prefix: "/index",
+  });
+}
 fastify.post("/deleteAll", async () => {
   deleteAll();
 });
