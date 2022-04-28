@@ -17,12 +17,11 @@ setInterval(async function () {
   freshData = await fetchAllDocs();
   await setIndex("search_index");
   await setIndex("suggest_index");
-  logging.info("Fresh data updated");
+  //logging.info("Fresh data updated");
   //console.log(freshData);
 }, 5000);
 
 const setIndex = async (index) => {
-  console.log("ENTERED setIndex");
   await ESclient.deleteByQuery({
     refresh: true,
     index: index,
@@ -41,11 +40,10 @@ const setIndex = async (index) => {
     index: index,
     operations,
   });
-  console.log(upload.errors);
+  logging.error(upload.errors);
 };
 
 const updateIndex = async (index) => {
-  console.log("ENTERED updateIndex");
   const operations = freshData.flatMap((doc) => [
     { update: { _id: doc.id } },
     { doc: { body: doc.body } },
@@ -55,7 +53,7 @@ const updateIndex = async (index) => {
     index: index,
     operations,
   });
-  console.log(upload.errors);
+  logging.error(upload.errors);
 };
 
 export default async (fastify, opts) => {
@@ -140,11 +138,11 @@ export default async (fastify, opts) => {
       let sugg = r.highlight.body
         ? r.highlight.body[0].match(regexp)
         : r.highlight.name[0].match(regexp);
-      console.log(sugg[1]);
+      //console.log(sugg[1]);
       retlist.push(sugg[1].toLowerCase());
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    console.log(result.hits.hits);
+    //console.log(result.hits.hits);
     let remdup = [...new Set(retlist)];
     return remdup;
   });
