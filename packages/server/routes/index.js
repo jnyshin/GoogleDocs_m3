@@ -110,7 +110,7 @@ export default async (fastify, opts) => {
     // } else {
     //   await updateIndex("suggest_index");
     // }
-    await updateIndex("suggest_index");
+    await setIndex("suggest_index");
     const prefix = url.parse(req.url, true).query.q;
     const result = await ESclient.search({
       index: "suggest_index", //CHANGE test2 => suggest_index
@@ -124,7 +124,6 @@ export default async (fastify, opts) => {
       },
       highlight: {
         fragment_size: 100,
-        number_of_fragments: 1,
         fields: {
           name: {},
           body: {},
@@ -141,7 +140,8 @@ export default async (fastify, opts) => {
       retlist.push(sugg[1].toLowerCase());
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+    console.log(result.hits.hits);
     let remdup = [...new Set(retlist)];
-    return { remdup };
+    return remdup;
   });
 };
