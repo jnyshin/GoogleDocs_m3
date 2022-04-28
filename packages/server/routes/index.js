@@ -1,4 +1,5 @@
 import { Client, Serializer } from "@elastic/elasticsearch";
+
 import { fetchAllDocs, elasticStringify, searchStringify } from "../store.js";
 import logging from "../logging.js";
 class MySerializer extends Serializer {
@@ -21,6 +22,7 @@ const clientOptions =
       };
 
 const ESclient = new Client(clientOptions);
+
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
 
@@ -67,12 +69,14 @@ export default async (fastify, opts) => {
       var re = new RegExp(q, "g");
       const result = await ESclient.search({
         index: "search_index",
-        query: {
-          dis_max: {
-            queries: [
-              { match_phrase: { body: q } },
-              { match_phrase: { name: q } },
-            ],
+        body: {
+          query: {
+            dis_max: {
+              queries: [
+                { match_phrase: { body: q } },
+                { match_phrase: { name: q } },
+              ],
+            },
           },
         },
         highlight: {
