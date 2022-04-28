@@ -7,16 +7,19 @@ class MySerializer extends Serializer {
     return elasticStringify(obj);
   }
 }
-const ESclient = new Client({
-  cloud: {
-    id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
-  },
-  auth: {
-    username: "elastic",
-    password: "GoitLPz9EOuuNiybaMBM6x47",
-  },
-  Serializer: MySerializer,
-});
+const clientOptions =
+  process.env.NODE_ENV === "production"
+    ? { node: "http://localhost:9200" }
+    : {
+        cloud: {
+          id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
+        },
+        auth: {
+          username: "elastic",
+          password: "gzq9AcKIBr3BKi7UXuvuutHr",
+        },
+      };
+const ESclient = new Client(clientOptions);
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
 
