@@ -56,6 +56,15 @@ export const opStringify = fastJson({
   type: "array",
 });
 
+export const elasticStringify = fastJson({
+  type: "object",
+  properties: {
+    docid: { type: "string" },
+    name: { type: "string" },
+    body: { type: "string" },
+  },
+});
+
 export const fetchDoc = (docId) => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
   const getDocPromise = new Promise((resolve, reject) => {
