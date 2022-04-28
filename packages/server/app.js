@@ -23,7 +23,6 @@ const { PORT } = process.env;
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
-await ioredis.del("clients");
 
 ShareDB.types.register(richText.type);
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");

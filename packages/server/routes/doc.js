@@ -3,20 +3,16 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import logging from "../logging.js";
 import {
   ackStringify,
-  clientStringify,
-  docPreventStringify,
+  clients,
   docSubmitOp,
   ERROR_MESSAGE,
   fetchDoc,
   opStringify,
   payloadStringify,
   presenceStringify,
-  SHARE_DB_NAME,
 } from "../store.js";
 import User from "../schema/user.js";
 import IORedis from "ioredis";
-
-const pub = new IORedis();
 
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
@@ -36,7 +32,6 @@ export default async (fastify, opts) => {
     const { index, length } = req.body;
     logging.info("[/doc/presence/:DOCID/:UID] Route", id);
     logging.info(`Request with index=${index}, length=${length}`, id);
-    const { redis } = fastify;
     try {
       const _id = req.session.user.id;
       const user = await User.findById(_id);
@@ -51,11 +46,11 @@ export default async (fastify, opts) => {
           },
         },
       };
-      const clients = await redis.lrange("clients", 0, -1);
-      clients.map((c) => {
-        const client = JSON.parse(c);
-        if (client.id !== id && client.docId === docId)
-          pub.publish(client.id, presenceStringify(presence));
+      clients.forEach((client) => {
+        if (client.id !== id && client.docId === docId) {
+          logging.info(`sent message to UID = ${client.id}`, id);
+          client.res.raw.write(`data: ${presenceStringify(presence)}\n\n`);
+        }
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
@@ -93,7 +88,6 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     const id = req.params.UID;
     logging.info("[/doc/connect/:DOCID/:UID] Route", id);
-    const { redis } = fastify;
     try {
       const document = await fetchDoc(docId);
       const headers = {
@@ -113,35 +107,17 @@ export default async (fastify, opts) => {
       const newClient = {
         id: id,
         docId: docId,
+        res,
       };
-      redis.lpush("clients", clientStringify(newClient));
-
-      const sub = new IORedis();
-      sub.subscribe(id, (err, count) => {
-        if (err) {
-          logging.error(`Failed to subscribe: ${err.message}`, id);
-        } else {
-          logging.info(
-            `Subscribed successfully! This client is currently subscribed ${id}`,
-            id
-          );
-        }
-      });
-      sub.on("message", (channel, message) => {
-        logging.info(`message: ${message}`, channel);
-        res.raw.write(`data: ${message}\n\n`);
-      });
-
-      const clients = await redis.lrange("clients", 0, -1);
-      logging.info(`Current connected clients = ${clients.length}`);
+      clients.push(newClient);
+      logging.info(
+        `Current connected clients = ${clients.length} for docId = ${docId}`
+      );
       req.raw.on("close", () => {
-        logging.info(`${id} connection closed`);
-        clients.map(async (c, index) => {
-          const client = JSON.parse(c);
-          if (client.id === id) {
-            await redis.lrem("clients", 0, c);
-          }
-        });
+        logging.info(`UID = ${id} connection closed`);
+        clients.map((c, index) =>
+          c.id === id ? clients.splice(index, 1) : clients
+        );
         logging.info(`remaining clients = ${clients.length}`);
       });
       res.sent = true;
@@ -159,8 +135,6 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
-    const { redis } = fastify;
-
     try {
       const document = await fetchDoc(docId);
       if (version !== document.version) {
@@ -179,19 +153,20 @@ export default async (fastify, opts) => {
       } else {
         document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
-        const clients = await redis.lrange("clients", 0, -1);
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
         });
-        clients.map((c) => {
-          const client = JSON.parse(c);
+        clients.forEach((client) => {
           if (client.id === id) {
-            pub.publish(client.id, ackStringify(ack));
+            logging.info(`Sending ACK to UID = ${client.id}`, id);
+            client.res.raw.write(`data: ${ackStringify(ack)}\n\n`);
           }
-          if (client.id !== id && client.docId === docId) {
-            pub.publish(client.id, opStringify(op));
+          if (client.docId === docId && client.id !== id) {
+            logging.info(`Sending OP to UID = ${client.id}`, id);
+            client.res.raw.write(`data: ${opStringify(op)}\n\n`);
           }
         });
+
         logging.info("{ status: ok }", id);
         document.preventCompose = false;
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
