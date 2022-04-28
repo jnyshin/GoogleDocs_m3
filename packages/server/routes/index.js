@@ -1,5 +1,4 @@
 import { Client, Serializer } from "@elastic/elasticsearch";
-import url from "url";
 import { fetchAllDocs, elasticStringify, searchStringify } from "../store.js";
 import logging from "../logging.js";
 class MySerializer extends Serializer {
@@ -20,6 +19,7 @@ const clientOptions =
         },
         Serializer: MySerializer,
       };
+
 const ESclient = new Client(clientOptions);
 let rmopen = /<[\w]*>/gi;
 let rmclose = /<\/[\w]*>/gi;
@@ -67,14 +67,12 @@ export default async (fastify, opts) => {
       var re = new RegExp(q, "g");
       const result = await ESclient.search({
         index: "search_index",
-        body: {
-          query: {
-            dis_max: {
-              queries: [
-                { match_phrase: { body: q } },
-                { match_phrase: { name: q } },
-              ],
-            },
+        query: {
+          dis_max: {
+            queries: [
+              { match_phrase: { body: q } },
+              { match_phrase: { name: q } },
+            ],
           },
         },
         highlight: {
@@ -111,15 +109,13 @@ export default async (fastify, opts) => {
   fastify.get(`/suggest`, async (req, res) => {
     let freshData = await fetchAllDocs();
     await setIndex("suggest_index", freshData);
-    const prefix = url.parse(req.url, true).query.q;
+    const { q } = req.query;
     const result = await ESclient.search({
       index: "suggest_index",
-      body: {
-        query: {
-          multi_match: {
-            query: prefix,
-            fields: ["body", "name"],
-          },
+      query: {
+        multi_match: {
+          query: q,
+          fields: ["body", "name"],
         },
       },
       highlight: {
@@ -139,9 +135,9 @@ export default async (fastify, opts) => {
       retlist.push(sugg[1].toLowerCase());
     });
     let remdup = [...new Set(retlist)];
-    const rmshorter = remdup.filter((word) => word.length > prefix.length);
+    const rmshorter = remdup.filter((word) => word.length > q.length);
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    logging.info(`Result Suggestions for keyword = ${prefix}`);
+    logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
     return rmshorter;
   });
