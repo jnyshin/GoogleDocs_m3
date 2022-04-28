@@ -47,13 +47,11 @@ const setIndex = async (index, freshData) => {
     { index: { _id: doc.id } },
     doc,
   ]);
-  logging.info(operations);
   const upload = await ESclient.bulk({
     refresh: true,
     index: index,
     operations,
   });
-  logging.info(5);
   logging.error(upload.errors);
 };
 
@@ -73,9 +71,7 @@ export default async (fastify, opts) => {
       return JSON.parse(cache);
     } else {
       const freshData = await fetchAllDocs();
-      console.log(2);
       await setIndex("search_index", freshData);
-      console.log(3);
       var re = new RegExp(q, "g");
       const result = await ESclient.search({
         index: "search_index",
