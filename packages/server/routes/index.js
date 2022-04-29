@@ -139,7 +139,7 @@ export default async (fastify, opts) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
-    redis.setex(q, 3600, searchStringify(retlist));
+    redis.setex(q, 3600, JSON.stringify(retlist));
     return rmshorter;
   });
 };
