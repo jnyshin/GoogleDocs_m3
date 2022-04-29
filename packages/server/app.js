@@ -44,34 +44,24 @@ class MySerializer extends Serializer {
     return elasticStringify(obj);
   }
 }
-// const clientOptions =
-//   process.env.NODE_ENV === "production"
-//     ? {
-//         node: "http://localhost:9200",
-//         // Serializer: MySerializer,
-//       }
-//     : {
-//         cloud: {
-//           id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
-//         },
-//         auth: {
-//           username: "elastic",
-//           password: "gzq9AcKIBr3BKi7UXuvuutHr",
-//         },
-//         // Serializer: MySerializer,
-//       };
+const clientOptions =
+  process.env.NODE_ENV === "production"
+    ? {
+        node: "http://localhost:9200",
+        // Serializer: MySerializer,
+      }
+    : {
+        cloud: {
+          id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
+        },
+        auth: {
+          username: "elastic",
+          password: "gzq9AcKIBr3BKi7UXuvuutHr",
+        },
+        // Serializer: MySerializer,
+      };
 
-// export const ESclient = new Client(clientOptions);
-
-export const ESclient = new Client({
-  cloud: {
-    id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
-  },
-  auth: {
-    username: "elastic",
-    password: "gzq9AcKIBr3BKi7UXuvuutHr",
-  },
-});
+export const ESclient = new Client(clientOptions);
 
 fastify.register(fastifyCors, {});
 fastify.register(fastifyCookie, {
