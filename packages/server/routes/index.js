@@ -3,17 +3,17 @@ import logging from "../logging.js";
 import { ESclient } from "../app.js";
 // import debounce from "loadsh";
 var freshData = [];
-// if (process.env.instance_var === "8") {
-//   setInterval(async function () {
-//     try {
-//       await updateAllDocs();
-//       logging.info("updated elastic search docs");
-//     } catch (err) {
-//       logging.error("Error while updating");
-//       logging.error(err);
-//     }
-//   }, 5000);
-// }
+if (process.env.instance_var === "8") {
+  setInterval(() => {
+    try {
+      updateAllDocs();
+      logging.info("updated elastic search docs");
+    } catch (err) {
+      logging.error("Error while updating");
+      logging.error(err);
+    }
+  }, 5000);
+}
 
 export default async (fastify, opts) => {
   fastify.get("/info", async (req, res) => {
