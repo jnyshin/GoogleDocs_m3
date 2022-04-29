@@ -9,11 +9,11 @@ import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
 console.log("Set Interval called!");
-setInterval(async () => {
+setInterval(() => {
   try {
     const start = performance.now();
-    const promises = [];
-    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
+    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, async (err, results) => {
+      const promises = [];
       results.map(async (doc) => {
         const ops = doc.data.ops;
         const body = new QuillDeltaToHtmlConverter(ops, {})
@@ -33,11 +33,11 @@ setInterval(async () => {
           })
         );
       });
+      await Promise.all(promises);
+      const duration = performance.now() - start;
+      logging.info(`took ${duration}ms`);
+      logging.info("updated elastic search docs");
     });
-    await Promise.all(promises);
-    const duration = performance.now() - start;
-    logging.info(`took ${duration}ms`);
-    logging.info("updated elastic search docs");
   } catch (err) {
     logging.error(err);
   }
