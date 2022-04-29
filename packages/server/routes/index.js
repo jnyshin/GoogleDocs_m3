@@ -17,7 +17,7 @@ if (process.env.instance_var === "8") {
       connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
         if (err) logging.error(err);
         const ret = [];
-        results.map(async (doc) => {
+        results.map((doc) => {
           const ops = doc.data.ops;
           const body = new QuillDeltaToHtmlConverter(ops, {})
             .convert()
@@ -29,12 +29,15 @@ if (process.env.instance_var === "8") {
           //   { index: { _id: doc.id } },
           //   { doc: { suggest_body: body, search_body: body } }
           // );
-          await ESclient.update({
+          ESclient.update({
             index: ELASTIC_INDEX,
             id: doc.id,
             doc: {
               suggest_body: body,
               search_body: body,
+            },
+            script: {
+              lang: "painless",
             },
           });
         });
