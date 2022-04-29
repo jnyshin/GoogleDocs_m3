@@ -15,11 +15,11 @@ const clientOptions =
       }
     : {
         cloud: {
-          id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
+          id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
         },
         auth: {
           username: "elastic",
-          password: "gzq9AcKIBr3BKi7UXuvuutHr",
+          password: "GoitLPz9EOuuNiybaMBM6x47",
         },
         // Serializer: MySerializer,
       };
@@ -65,61 +65,51 @@ export default async (fastify, opts) => {
   fastify.get(`/search`, async (req, res) => {
     const { q } = req.query;
     const { redis } = fastify;
+
     const cache = await redis.get(q);
     if (cache) {
       logging.info("search cache hit");
       logging.info(cache);
       return JSON.parse(cache);
     } else {
-      try {
-        const freshData = await fetchAllDocs();
-        await setIndex("search_index", freshData);
-        var re = new RegExp(keyword, "g");
-        const result = await ESclient.search({
-          index: "search_index",
-          body: {
-            query: {
-              dis_max: {
-                queries: [
-                  { match_phrase: { body: q } },
-                  { match_phrase: { name: q } },
-                ],
-              },
+      const freshData = await fetchAllDocs();
+      await setIndex("search_index", freshData);
+      const result = await ESclient.search({
+        index: "search_index",
+        body: {
+          query: {
+            dis_max: {
+              queries: [
+                { match_phrase: { body: q } },
+                { match_phrase: { name: q } },
+              ],
             },
           },
-          highlight: {
-            fragment_size: 100,
-            fields: {
-              body: { fragmenter: "span", type: "fvh" },
-              name: { fragmenter: "span", type: "fvh" },
-            },
+        },
+        highlight: {
+          fragment_size: 100,
+          fields: {
+            body: { fragmenter: "span", type: "fvh" },
+            name: { fragmenter: "span", type: "fvh" },
           },
-        });
-
-        const retlist = [];
-        result.hits.hits.map((r) => {
-          let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
-          let arranged = {
-            docid: r._source.id,
-            name: r._source.name,
-            // snippet: s
-            //   .replaceAll(rmopen, "")
-            //   .replaceAll(rmclose, "")
-            //   .replaceAll(re, "<em>" + keyword + "</em>"),
-            snippet: s,
-          };
-          retlist.push(arranged);
-        });
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info(`Result searching keyword = ${q}`);
-        logging.info(retlist);
-        // redis.setex(q, 3600, searchStringify(retlist));
-        return retlist;
-      } catch {
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info(`There was no match = ${q}`);
-        return [];
-      }
+        },
+      });
+      console.log(result);
+      const retlist = [];
+      result.hits.hits.map((r) => {
+        let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
+        let arranged = {
+          docid: r._source.id,
+          name: r._source.name,
+          snippet: s,
+        };
+        retlist.push(arranged);
+      });
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      logging.info(`Result searching keyword = ${q}`);
+      logging.info(retlist);
+      redis.setex(q, 3600, searchStringify(retlist));
+      return retlist;
     }
   });
 
