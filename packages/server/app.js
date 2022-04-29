@@ -145,7 +145,7 @@ fastify.register((fastifyInstance, options, done) => {
       useUnifiedTopology: true,
     })
     .then(() => {
-      //deleteAll();
+      deleteAll();
       console.log("mongoose connected");
     })
     .catch((err) => {
