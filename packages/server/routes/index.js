@@ -1,50 +1,50 @@
-import { ELASTIC_INDEX, searchStringify, SHARE_DB_NAME } from "../store.js";
+import {
+  ELASTIC_INDEX,
+  searchStringify,
+  SHARE_DB_NAME,
+  suggestStringify,
+} from "../store.js";
 import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
-if (process.env.instance_var === "8") {
-  setInterval(async function () {
-    try {
-      const start = performance.now();
-      connection.createFetchQuery(
-        SHARE_DB_NAME,
-        {},
-        {},
-        async (err, results) => {
-          const ret = [];
-          results.map((doc) => {
-            const ops = doc.data.ops;
-            const body = new QuillDeltaToHtmlConverter(ops, {})
-              .convert()
-              .replaceAll(/<[\w]*>/gi, "")
-              .replaceAll(/<\/[\w]*>/gi, "")
-              .replaceAll(/<[\w]*\/>/gi, "");
-            ret.push({ docid: doc.id, suggest_body: body, search_body: body });
-          });
-          if (!ret.length) {
-            return;
-          }
-          const operations = ret.flatMap((doc) => [
-            { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
-            {
-              doc: doc,
-            },
-          ]);
-          await ESclient.bulk({
-            index: ELASTIC_INDEX,
-            operations,
-          });
-          const duration = performance.now() - start;
-          logging.info(`Updaing elastic search took ${duration}ms`);
-        }
-      );
-    } catch (err) {
-      logging.error("Error while updating");
-      logging.error(err);
-    }
-  }, 5000);
-}
+// if (process.env.instance_var === "8") {
+setInterval(async function () {
+  try {
+    const start = performance.now();
+    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, async (err, results) => {
+      const ret = [];
+      results.map((doc) => {
+        const ops = doc.data.ops;
+        const body = new QuillDeltaToHtmlConverter(ops, {})
+          .convert()
+          .replaceAll(/<[\w]*>/gi, "")
+          .replaceAll(/<\/[\w]*>/gi, "")
+          .replaceAll(/<[\w]*\/>/gi, "");
+        ret.push({ docid: doc.id, suggest_body: body, search_body: body });
+      });
+      if (!ret.length) {
+        return;
+      }
+      const operations = ret.flatMap((doc) => [
+        { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
+        {
+          doc: doc,
+        },
+      ]);
+      await ESclient.bulk({
+        index: ELASTIC_INDEX,
+        operations,
+      });
+      const duration = performance.now() - start;
+      logging.info(`Updaing elastic search took ${duration}ms`);
+    });
+  } catch (err) {
+    logging.error("Error while updating");
+    logging.error(err);
+  }
+}, 5000);
+// }
 
 export default async (fastify, opts) => {
   fastify.get("/info", async (req, res) => {
@@ -106,7 +106,7 @@ export default async (fastify, opts) => {
     const { redis } = fastify;
     const cache = await redis.get(q);
     if (cache) {
-      logging.info("search cache hit");
+      logging.info("suggest cache hit");
       logging.info(cache);
       return JSON.parse(cache);
     }
@@ -139,7 +139,7 @@ export default async (fastify, opts) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
-    redis.setex(q, 3600, JSON.stringify(retlist));
+    redis.setex(q, 3600, suggestStringify(retlist));
     return rmshorter;
   });
 };

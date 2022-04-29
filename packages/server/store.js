@@ -58,22 +58,37 @@ export const opStringify = fastJson({
   type: "array",
 });
 
-export const elasticStringify = fastJson({
+const index = {
   type: "object",
-  items: {
-    default: [
-      {
-        type: "object",
-        properties: {
-          docid: { type: "string" },
-          suggest_name: { type: "string" },
-          search_name: { type: "string" },
-          suggest_body: { type: "string" },
-          search_name: { type: "string" },
-        },
-      },
-    ],
+  properties: {
+    docid: { type: "string" },
+    suggest_name: { type: "string" },
+    search_name: { type: "string" },
+    suggest_body: { type: "string" },
+    search_body: { type: "string" },
   },
+};
+const update = {
+  type: "object",
+  properties: {
+    update: {
+      _id: { type: "string" },
+      _index: { type: "string" },
+    },
+  },
+};
+const partialDoc = {
+  type: "object",
+  properties: {
+    doc: {
+      docid: { type: "string" },
+      suggest_body: { type: "string" },
+      search_body: { type: "string" },
+    },
+  },
+};
+export const elasticStringify = fastJson({
+  anyOf: [index, update, partialDoc],
 });
 
 export const searchStringify = fastJson({
@@ -87,6 +102,16 @@ export const searchStringify = fastJson({
           body: { type: "string" },
           snippet: { type: "string" },
         },
+      },
+    ],
+  },
+});
+export const suggestStringify = fastJson({
+  type: "array",
+  items: {
+    default: [
+      {
+        type: "string",
       },
     ],
   },
