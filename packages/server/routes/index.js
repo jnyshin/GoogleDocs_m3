@@ -9,7 +9,7 @@ import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
 console.log("Set Interval called!");
-setInterval(() => {
+setInterval(async () => {
   try {
     const start = performance.now();
     const promises = [];
@@ -38,7 +38,7 @@ setInterval(() => {
     const duration = performance.now() - start;
     logging.info(`took ${duration}ms`);
     logging.info("updated elastic search docs");
-  } catch(err) {
+  } catch (err) {
     logging.error(err);
   }
 }, 5000);
