@@ -1,5 +1,5 @@
 import { Client, Serializer } from "@elastic/elasticsearch";
-
+import url from "url";
 import { fetchAllDocs, elasticStringify, searchStringify } from "../store.js";
 import logging from "../logging.js";
 class MySerializer extends Serializer {
