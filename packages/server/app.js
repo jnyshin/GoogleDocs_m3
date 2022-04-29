@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
 import ShareDB from "sharedb";
 import MongoShareDB from "sharedb-mongo";
-import { ERROR_MESSAGE, resetIndex, __dirname } from "./store.js";
+import {
+  ERROR_MESSAGE,
+  resetIndex,
+  __dirname,
+  elasticStringify,
+  ELASTIC_INDEX,
+} from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
@@ -22,7 +28,7 @@ const fastify = Fastify();
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
-import { Client } from "@elastic/elasticsearch";
+import { Client, Serializer } from "@elastic/elasticsearch";
 ShareDB.types.register(richText.type);
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
 const backend = new ShareDB({
@@ -33,6 +39,11 @@ const backend = new ShareDB({
 
 export const connection = backend.connect();
 
+class MySerializer extends Serializer {
+  serialize(obj) {
+    return elasticStringify(obj);
+  }
+}
 const clientOptions =
   process.env.NODE_ENV === "production"
     ? {
@@ -95,6 +106,9 @@ fastify.addHook("preHandler", (req, res, next) => {
       res.send(ERROR_MESSAGE("Not logged in"));
     }
   }
+  if (NODE_ENV === "development" && req.url === "/") {
+    res.redirect(303, "/users/login");
+  }
   next();
 });
 
@@ -149,8 +163,7 @@ const start = async () => {
     await Docs.deleteMany({});
     if (process.env.instance_var === "1") {
       logging.info("Clear elastic search");
-      await resetIndex("search_index");
-      await resetIndex("suggest_index");
+      await resetIndex(ELASTIC_INDEX);
     }
   } catch (err) {
     console.log(err);
