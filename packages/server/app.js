@@ -129,7 +129,8 @@ const start = async () => {
 
     logging.info(`* Server started ${IP}:${PORT} `);
     await Docs.deleteMany({});
-    if (process.env.instance_var === 1) {
+    if (process.env.instance_var === "1") {
+      logging.info("Clear elastic search");
       await resetIndex("search_index");
       await resetIndex("suggest_index");
     }
