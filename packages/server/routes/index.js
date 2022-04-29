@@ -9,39 +9,46 @@ import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
 console.log("Set Interval called!");
-setInterval(() => {
-  try {
-    const start = performance.now();
-    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, async (err, results) => {
-      const promises = [];
-      results.map(async (doc) => {
-        const ops = doc.data.ops;
-        const body = new QuillDeltaToHtmlConverter(ops, {})
-          .convert()
-          .replaceAll(/<[\w]*>/gi, "")
-          .replaceAll(/<\/[\w]*>/gi, "")
-          .replaceAll(/<[\w]*\/>/gi, "");
+if (process.env.instance_var === "8") {
+  setInterval(() => {
+    try {
+      const start = performance.now();
+      connection.createFetchQuery(
+        SHARE_DB_NAME,
+        {},
+        {},
+        async (err, results) => {
+          const promises = [];
+          results.map(async (doc) => {
+            const ops = doc.data.ops;
+            const body = new QuillDeltaToHtmlConverter(ops, {})
+              .convert()
+              .replaceAll(/<[\w]*>/gi, "")
+              .replaceAll(/<\/[\w]*>/gi, "")
+              .replaceAll(/<[\w]*\/>/gi, "");
 
-        promises.push(
-          await ESclient.update({
-            index: ELASTIC_INDEX,
-            id: doc.id,
-            doc: {
-              suggest_body: body,
-              search_body: body,
-            },
-          })
-        );
-      });
-      await Promise.all(promises);
-      const duration = performance.now() - start;
-      logging.info(`took ${duration}ms`);
-      logging.info("updated elastic search docs");
-    });
-  } catch (err) {
-    logging.error(err);
-  }
-}, 5000);
+            promises.push(
+              await ESclient.update({
+                index: ELASTIC_INDEX,
+                id: doc.id,
+                doc: {
+                  suggest_body: body,
+                  search_body: body,
+                },
+              })
+            );
+          });
+          await Promise.all(promises);
+          const duration = performance.now() - start;
+          logging.info(`took ${duration}ms`);
+          logging.info("updated elastic search docs");
+        }
+      );
+    } catch (err) {
+      logging.error(err);
+    }
+  }, 5000);
+}
 
 export default async (fastify, opts) => {
   fastify.get("/info", async (req, res) => {
