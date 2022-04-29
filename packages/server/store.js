@@ -112,7 +112,7 @@ export const updateAllDocs = () => {
   const getDocPromise = new Promise((resolve, reject) => {
     query.once("ready", () => {
       try {
-        query.results.map((doc) => {
+        query.results.map(async (doc) => {
           const ops = doc.data.ops;
           const body = new QuillDeltaToHtmlConverter(ops, {})
             .convert()
