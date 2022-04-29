@@ -64,52 +64,55 @@ export default async (fastify, opts) => {
     // const { q } = req.query;
     const keyword = url.parse(req.url, true).query.q;
     const { redis } = fastify;
-    // const cache = await redis.get(q);
-    // if (cache) {
-    //   logging.info("search cache hit");
-    //   logging.info(cache);
-    //   return JSON.parse(cache);
-    // } else {
-    const freshData = await fetchAllDocs();
-    await setIndex("search_index", freshData);
-    var re = new RegExp(keyword, "g");
-    const result = await ESclient.search({
-      index: "search_index",
-      query: {
-        multi_match: {
-          query: keyword,
-          type: "phrase",
-          fields: ["name", "body"],
+    const cache = await redis.get(q);
+    if (cache) {
+      logging.info("search cache hit");
+      logging.info(cache);
+      return JSON.parse(cache);
+    } else {
+      const freshData = await fetchAllDocs();
+      await setIndex("search_index", freshData);
+      var re = new RegExp(keyword, "g");
+      const result = await ESclient.search({
+        index: "search_index",
+        body: {
+          query: {
+            dis_max: {
+              queries: [
+                { match_phrase: { body: keyword } },
+                { match_phrase: { name: keyword } },
+              ],
+            },
+          },
         },
-      },
-      highlight: {
-        fragment_size: 100,
-        fields: {
-          body: { fragmenter: "span", type: "fvh" },
-          name: { fragmenter: "span", type: "fvh" },
+        highlight: {
+          fragment_size: 100,
+          fields: {
+            body: { fragmenter: "span", type: "fvh" },
+            name: { fragmenter: "span", type: "fvh" },
+          },
         },
-      },
-    });
-    const retlist = [];
-    result.hits.hits.map((r) => {
-      let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
-      let arranged = {
-        docid: r._source.id,
-        name: r._source.name,
-        // snippet: s
-        //   .replaceAll(rmopen, "")
-        //   .replaceAll(rmclose, "")
-        //   .replaceAll(re, "<em>" + keyword + "</em>"),
-        snippet: s,
-      };
-      retlist.push(arranged);
-    });
-    res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    logging.info(`Result searching keyword = ${keyword}`);
-    logging.info(retlist);
-    // redis.setex(q, 3600, searchStringify(retlist));
-    return retlist;
-    // }
+      });
+      const retlist = [];
+      result.hits.hits.map((r) => {
+        let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
+        let arranged = {
+          docid: r._source.id,
+          name: r._source.name,
+          // snippet: s
+          //   .replaceAll(rmopen, "")
+          //   .replaceAll(rmclose, "")
+          //   .replaceAll(re, "<em>" + keyword + "</em>"),
+          snippet: s,
+        };
+        retlist.push(arranged);
+      });
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      logging.info(`Result searching keyword = ${keyword}`);
+      logging.info(retlist);
+      // redis.setex(q, 3600, searchStringify(retlist));
+      return retlist;
+    }
   });
 
   fastify.get(`/suggest`, async (req, res) => {
