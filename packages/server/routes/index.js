@@ -8,16 +8,18 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
-if (process.env.instance_var === "8") {
-  console.log("Set Interval called!");
-  setInterval(async () => {
+console.log("Set Interval called!");
+// setInterval(() => {
+
+// }, 5000);
+
+export default async (fastify, opts) => {
+  fastify.get("/info", async (req, res) => {
     try {
       const start = performance.now();
-
+      const promises = [];
       connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
-        if (err) logging.error(err);
-        const ret = [];
-        results.map((doc) => {
+        results.map(async (doc) => {
           const ops = doc.data.ops;
           const body = new QuillDeltaToHtmlConverter(ops, {})
             .convert()
@@ -25,39 +27,60 @@ if (process.env.instance_var === "8") {
             .replaceAll(/<\/[\w]*>/gi, "")
             .replaceAll(/<[\w]*\/>/gi, "");
 
-          // ret.push(
-          //   { index: { _id: doc.id } },
-          //   { doc: { suggest_body: body, search_body: body } }
-          // );
-          ESclient.update({
-            index: ELASTIC_INDEX,
-            id: doc.id,
-            doc: {
-              suggest_body: body,
-              search_body: body,
-            },
-          });
+          promises.push(
+            await ESclient.update({
+              index: ELASTIC_INDEX,
+              id: doc.id,
+              doc: {
+                suggest_body: body,
+                search_body: body,
+              },
+            })
+          );
         });
-        //   await ESclient.bulk({
-        //     index: "ss_index",
-        //     refresh: true,
-        //     ret,
-        //});
-        const duration = performance.now() - start;
-        logging.info(`took ${duration}ms`);
-        logging.info("updated elastic search docs");
       });
+      await Promise.all(promises);
+      // connection.createFetchQuery(
+      //   SHARE_DB_NAME,
+      //   {},
+      //   {},
+      //   async (err, results) => {
+      //     if (err) logging.error(err);
+      //     const ret = [];
+      //     results.map((doc) => {
+      //       const ops = doc.data.ops;
+      //       const body = new QuillDeltaToHtmlConverter(ops, {})
+      //         .convert()
+      //         .replaceAll(/<[\w]*>/gi, "")
+      //         .replaceAll(/<\/[\w]*>/gi, "")
+      //         .replaceAll(/<[\w]*\/>/gi, "");
+
+      //       ret.push({ docid: doc.id, suggest_body: body, search_body: body });
+      //     });
+      //     const operations = ret.flatMap((value) => [
+      //       {
+      //         id: value.id,
+      //         doc: {
+      //           suggest_body: value.suggest_body,
+      //           search_body: value.search_body,
+      //         },
+      //       },
+      //     ]);
+      //     await ESclient.bulk({
+      //       index: ELASTIC_INDEX,
+      //       refresh: true,
+      //       operations,
+      //     });
+      //     const duration = performance.now() - start;
+      //     logging.info(`took ${duration}ms`);
+      //     logging.info("updated elastic search docs");
+      //   }
+      // );
     } catch (err) {
       logging.error("Error while updating");
       logging.error(err);
     }
-  }, 5000);
-}
-
-export default async (fastify, opts) => {
-  fastify.get("/info", async (req, res) => {
-    const response = await ESclient.info();
-    return response;
+    return {};
   });
   fastify.get(`/search`, async (req, res) => {
     const { q } = req.query;
