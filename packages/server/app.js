@@ -58,7 +58,7 @@ const clientOptions =
           username: "elastic",
           password: "gzq9AcKIBr3BKi7UXuvuutHr",
         },
-        // Serializer: MySerializer,
+        Serializer: MySerializer,
       };
 
 export const ESclient = new Client(clientOptions);
