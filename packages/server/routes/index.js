@@ -1,13 +1,39 @@
 import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
 import logging from "../logging.js";
-import { ESclient } from "../app.js";
+import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
 if (process.env.instance_var === "8") {
   console.log("Set Interval called!");
   setInterval(async () => {
     try {
-      await updateAllDocs();
-      logging.info("updated elastic search docs");
+      connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
+        if (err) logging.error(err);
+        const ret = [];
+        results.map(async (doc) => {
+          const ops = doc.data.ops;
+          const body = new QuillDeltaToHtmlConverter(ops, {})
+            .convert()
+            .replaceAll(/<[\w]*>/gi, "")
+            .replaceAll(/<\/[\w]*>/gi, "")
+            .replaceAll(/<[\w]*\/>/gi, "");
+          const obj = {
+            id: doc.id,
+            doc: {
+              suggest_body: body,
+              search_body: body,
+            },
+          };
+          // await ESclient.update({
+          //   index: ELASTIC_INDEX,
+          //   id: doc.id,
+          //   doc: {
+          //     suggest_body: body,
+          //     search_body: body,
+          //   },
+          // });
+        });
+        logging.info("updated elastic search docs");
+      });
     } catch (err) {
       logging.error("Error while updating");
       logging.error(err);
