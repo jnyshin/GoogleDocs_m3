@@ -1,22 +1,16 @@
-import { Serializer } from "@elastic/elasticsearch";
-import { fetchAllDocs, elasticStringify, searchStringify } from "../store.js";
+import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
 import logging from "../logging.js";
 import { ESclient } from "../app.js";
-class MySerializer extends Serializer {
-  serialize(obj) {
-    return elasticStringify(obj);
-  }
-}
 
 var freshData = [];
 setInterval(async function () {
   try {
-    freshData = await fetchAllDocs();
-    await setIndex("search_index");
-    await setIndex("suggest_index");
-    console.log("Fresh data updated");
-  } catch {
-    logging.warn("No income data yet");
+    // await updateAllDocs();
+
+    logging.info("updated elastic search docs");
+  } catch (err) {
+    logging.error("Error while updating");
+    logging.error(err);
   }
 }, 5000);
 
@@ -43,7 +37,6 @@ export default async (fastify, opts) => {
   fastify.get(`/search`, async (req, res) => {
     const { q } = req.query;
     const { redis } = fastify;
-
     const cache = await redis.get(q);
     if (cache) {
       logging.info("search cache hit");
@@ -51,7 +44,7 @@ export default async (fastify, opts) => {
       return JSON.parse(cache);
     } else {
       const result = await ESclient.search({
-        index: "ss_index",
+        index: ELASTIC_INDEX,
         body: {
           query: {
             dis_max: {

@@ -17,10 +17,17 @@ export default async (fastify, opts) => {
         name: name,
         version: 1,
       });
-
-      //
-
-      //
+      ESclient.index({
+        index: ELASTIC_INDEX,
+        id: id,
+        document: {
+          docid: id,
+          suggest_name: name,
+          search_name: name,
+          suggest_body: "",
+          search_body: "",
+        },
+      });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
     } catch (err) {

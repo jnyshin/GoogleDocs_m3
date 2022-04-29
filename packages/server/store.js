@@ -5,6 +5,7 @@ import { connection } from "./app.js";
 import Docs from "./schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { ESclient } from "./app.js";
+import logging from "./logging.js";
 export const clients = [];
 
 export const ERROR_MESSAGE = (message) => {
@@ -12,6 +13,7 @@ export const ERROR_MESSAGE = (message) => {
 };
 const __filename = fileURLToPath(import.meta.url);
 export const SHARE_DB_NAME = "share_docs";
+export const ELASTIC_INDEX = "ss_index";
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
 export const currEditDoc = [];
@@ -64,7 +66,7 @@ export const elasticStringify = fastJson({
       {
         type: "object",
         properties: {
-          id: { type: "string" },
+          docid: { type: "string" },
           name: { type: "string" },
           body: { type: "string" },
         },
@@ -103,56 +105,28 @@ export const fetchDoc = (docId) => {
   return getDocPromise;
 };
 
-export const fetchAllDocs = () => {
-  const ret = [];
-  // const { name:"", op: "", docId: ""}
-  // const getDocNamePromise = new Promise(async (resolve, reject) => {
-  //   const docsNames = await Docs.find({}).select("name");
-  //   try {
-  //     resolve(docsNames);
-  //   } catch (err) {
-  //     reject(err);
-  //   }
-  // });
+export const updateAllDocs = () => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
     query.on("ready", () => {
       try {
-        const ret = [];
-        query.results.map((doc) => ret.push({ ops: doc.data.ops }));
-        resolve(ret);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  });
-  return Promise.all([getDocNamePromise, getDocPromise]).then((values) => {
-    const ret = [];
-    const nameAndIds = values[0];
-    const ops = values[1];
-    nameAndIds.map((value, index) => {
-      let html = new QuillDeltaToHtmlConverter(ops[index].ops, {}).convert();
-      let newhtml = html
-        .replaceAll(/<[\w]*>/gi, "")
-        .replaceAll(/<\/[\w]*>/gi, "")
-        .replaceAll(/<[\w]*\/>/gi, "");
-      const newObj = {
-        id: value._id,
-        name: value.name,
-        body: newhtml,
-      };
-      ret.push(newObj);
-    });
-    return ret;
-  });
-};
-
-export const fetchUpdateDocs = () => {
-  const query = connection.createFetchQuery(SHARE_DB_NAME);
-  const getDocPromise = new Promise((resolve, reject) => {
-    query.on("ready", () => {
-      try {
-        resolve(query.results);
+        query.results.map((doc) => {
+          const ops = doc.data.ops;
+          const body = new QuillDeltaToHtmlConverter(ops, {})
+            .convert()
+            .replaceAll(/<[\w]*>/gi, "")
+            .replaceAll(/<\/[\w]*>/gi, "")
+            .replaceAll(/<[\w]*\/>/gi, "");
+          ESclient.update({
+            index: ELASTIC_INDEX,
+            id: doc.id,
+            doc: {
+              suggest_body: body,
+              search_body: body,
+            },
+          });
+        });
+        resolve();
       } catch (err) {
         reject(err);
       }
