@@ -13,44 +13,39 @@ if (process.env.instance_var === "8") {
     try {
       const start = performance.now();
 
-      connection.createFetchQuery(
-        SHARE_DB_NAME,
-        {},
-        {},
-        async (err, results) => {
-          if (err) logging.error(err);
-          const ret = [];
-          results.map((doc) => {
-            const ops = doc.data.ops;
-            const body = new QuillDeltaToHtmlConverter(ops, {})
-              .convert()
-              .replaceAll(/<[\w]*>/gi, "")
-              .replaceAll(/<\/[\w]*>/gi, "")
-              .replaceAll(/<[\w]*\/>/gi, "");
+      connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
+        if (err) logging.error(err);
+        const ret = [];
+        results.map(async (doc) => {
+          const ops = doc.data.ops;
+          const body = new QuillDeltaToHtmlConverter(ops, {})
+            .convert()
+            .replaceAll(/<[\w]*>/gi, "")
+            .replaceAll(/<\/[\w]*>/gi, "")
+            .replaceAll(/<[\w]*\/>/gi, "");
 
-            ret.push(
-              { index: { _id: doc.id } },
-              { doc: { suggest_body: body, search_body: body } }
-            );
-            // await ESclient.update({
-            //   index: ELASTIC_INDEX,
-            //   id: doc.id,
-            //   doc: {
-            //     suggest_body: body,
-            //     search_body: body,
-            //   },
-            // });
+          // ret.push(
+          //   { index: { _id: doc.id } },
+          //   { doc: { suggest_body: body, search_body: body } }
+          // );
+          await ESclient.update({
+            index: ELASTIC_INDEX,
+            id: doc.id,
+            doc: {
+              suggest_body: body,
+              search_body: body,
+            },
           });
-          await ESclient.bulk({
-            index: "ss_index",
-            refresh: true,
-            ret,
-          });
-          const duration = performance.now() - start;
-          logging.info(`took ${duration}ms`);
-          logging.info("updated elastic search docs");
-        }
-      );
+        });
+        //   await ESclient.bulk({
+        //     index: "ss_index",
+        //     refresh: true,
+        //     ret,
+        //});
+        const duration = performance.now() - start;
+        logging.info(`took ${duration}ms`);
+        logging.info("updated elastic search docs");
+      });
     } catch (err) {
       logging.error("Error while updating");
       logging.error(err);
