@@ -3,16 +3,18 @@ import logging from "../logging.js";
 import { ESclient } from "../app.js";
 
 var freshData = [];
-setInterval(async function () {
-  try {
-    await updateAllDocs();
+if (process.env.instance_var === "8") {
+  setInterval(async function () {
+    try {
+      await updateAllDocs();
 
-    logging.info("updated elastic search docs");
-  } catch (err) {
-    logging.error("Error while updating");
-    logging.error(err);
-  }
-}, 5000);
+      logging.info("updated elastic search docs");
+    } catch (err) {
+      logging.error("Error while updating");
+      logging.error(err);
+    }
+  }, 5000);
+}
 
 const setIndex = async (index) => {
   console.log("setIndex reached");
