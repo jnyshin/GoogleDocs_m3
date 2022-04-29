@@ -10,9 +10,9 @@ import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
 if (process.env.instance_var === "8") {
   console.log("Set Interval called!");
-  setInterval(() => {
-    logging.info("updated elastic search")
-    await updateAllDocs()
+  setInterval(async () => {
+    logging.info("updated elastic search");
+    await updateAllDocs();
   }, 5000);
 }
 
