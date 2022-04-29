@@ -90,27 +90,27 @@ module.exports = {
       exec_mode: "fork",
       instances: "1",
     },
-    {
-      name: "API Server 9",
-      script: "packages/server/app.js",
-      instance_var: "9",
-      env: {
-        PORT: 8009,
-        NODE_ENV: "production",
-      },
-      exec_mode: "fork",
-      instances: "1",
-    },
-    {
-      name: "API Server 10",
-      script: "packages/server/app.js",
-      instance_var: "10",
-      env: {
-        PORT: 8010,
-        NODE_ENV: "production",
-      },
-      exec_mode: "fork",
-      instances: "1",
-    },
+    // {
+    //   name: "API Server 9",
+    //   script: "packages/server/app.js",
+    //   instance_var: "9",
+    //   env: {
+    //     PORT: 8009,
+    //     NODE_ENV: "production",
+    //   },
+    //   exec_mode: "fork",
+    //   instances: "1",
+    // },
+    // {
+    //   name: "API Server 10",
+    //   script: "packages/server/app.js",
+    //   instance_var: "10",
+    //   env: {
+    //     PORT: 8010,
+    //     NODE_ENV: "production",
+    //   },
+    //   exec_mode: "fork",
+    //   instances: "1",
+    // },
   ],
 };
