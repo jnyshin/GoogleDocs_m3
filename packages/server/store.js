@@ -172,4 +172,15 @@ export const resetIndex = async (index) => {
       },
     },
   });
+  await ESclient.index({
+    index: ELASTIC_INDEX,
+    id: "1",
+    document: {
+      docid: "1",
+      suggest_name: "1",
+      search_name: "1",
+      suggest_body: "",
+      search_body: "",
+    },
+  });
 };
