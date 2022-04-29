@@ -38,7 +38,7 @@ const backend = new ShareDB({
 });
 
 export const connection = backend.connect();
-
+process.setMaxListeners(20);
 class MySerializer extends Serializer {
   serialize(obj) {
     return elasticStringify(obj);
