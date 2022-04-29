@@ -1,5 +1,4 @@
 import { Client, Serializer } from "@elastic/elasticsearch";
-import url from "url";
 import { fetchAllDocs, elasticStringify, searchStringify } from "../store.js";
 import logging from "../logging.js";
 class MySerializer extends Serializer {
@@ -15,19 +14,28 @@ const clientOptions =
       }
     : {
         cloud: {
-          id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
+          id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
         },
         auth: {
           username: "elastic",
-          password: "gzq9AcKIBr3BKi7UXuvuutHr",
+          password: "GoitLPz9EOuuNiybaMBM6x47",
         },
         // Serializer: MySerializer,
       };
 
 const ESclient = new Client(clientOptions);
 
-let rmopen = /<[\w]*>/gi;
-let rmclose = /<\/[\w]*>/gi;
+var freshData = [];
+setInterval(async function () {
+  try {
+    freshData = await fetchAllDocs();
+    await setIndex("search_index");
+    await setIndex("suggest_index");
+    console.log("Fresh data updated");
+  } catch {
+    logging.warn("No income data yet");
+  }
+}, 7000);
 
 //call resetIndex(research_index) to reset it!!
 export const resetIndex = async (index) => {
@@ -42,7 +50,9 @@ export const resetIndex = async (index) => {
   });
 };
 
-const setIndex = async (index, freshData) => {
+const setIndex = async (index) => {
+  console.log("setIndex reached");
+  console.log(freshData);
   const operations = freshData.flatMap((doc) => [
     { index: { _id: doc.id } },
     doc,
@@ -61,26 +71,25 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    // const { q } = req.query;
-    const keyword = url.parse(req.url, true).query.q;
+    const { q } = req.query;
     const { redis } = fastify;
+
     const cache = await redis.get(q);
     if (cache) {
       logging.info("search cache hit");
       logging.info(cache);
       return JSON.parse(cache);
     } else {
-      const freshData = await fetchAllDocs();
-      await setIndex("search_index", freshData);
-      var re = new RegExp(keyword, "g");
+      //   const freshData = await fetchAllDocs();
+      //   await setIndex("search_index", freshData);
       const result = await ESclient.search({
         index: "search_index",
         body: {
           query: {
             dis_max: {
               queries: [
-                { match_phrase: { body: keyword } },
-                { match_phrase: { name: keyword } },
+                { match_phrase: { body: q } },
+                { match_phrase: { name: q } },
               ],
             },
           },
@@ -93,31 +102,28 @@ export default async (fastify, opts) => {
           },
         },
       });
+      console.log(result);
       const retlist = [];
       result.hits.hits.map((r) => {
         let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
         let arranged = {
           docid: r._source.id,
           name: r._source.name,
-          // snippet: s
-          //   .replaceAll(rmopen, "")
-          //   .replaceAll(rmclose, "")
-          //   .replaceAll(re, "<em>" + keyword + "</em>"),
           snippet: s,
         };
         retlist.push(arranged);
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      logging.info(`Result searching keyword = ${keyword}`);
+      logging.info(`Result searching keyword = ${q}`);
       logging.info(retlist);
-      // redis.setex(q, 3600, searchStringify(retlist));
+      redis.setex(q, 3600, searchStringify(retlist));
       return retlist;
     }
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    let freshData = await fetchAllDocs();
-    await setIndex("suggest_index", freshData);
+    // let freshData = await fetchAllDocs();
+    // await setIndex("suggest_index", freshData);
     const { q } = req.query;
     const result = await ESclient.search({
       index: "suggest_index",
