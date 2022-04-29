@@ -110,7 +110,7 @@ export const fetchDoc = (docId) => {
 export const updateAllDocs = () => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
-    query.on("ready", () => {
+    query.once("ready", () => {
       try {
         query.results.map((doc) => {
           const ops = doc.data.ops;

@@ -9,7 +9,6 @@ if (process.env.instance_var === "8") {
     try {
       console.log(process.listeners());
       await updateAllDocs();
-
       logging.info("updated elastic search docs");
     } catch (err) {
       logging.error("Error while updating");
