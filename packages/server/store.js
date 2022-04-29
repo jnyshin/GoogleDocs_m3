@@ -123,18 +123,19 @@ export const updateAllDocs = () => {
         });
         if (!ret.length) {
           reject("no data");
+        } else {
+          const operations = ret.flatMap((doc) => [
+            { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
+            {
+              doc: doc,
+            },
+          ]);
+          await ESclient.bulk({
+            index: ELASTIC_INDEX,
+            operations,
+          });
+          resolve("done!");
         }
-        const operations = ret.flatMap((doc) => [
-          { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
-          {
-            doc: doc,
-          },
-        ]);
-        await ESclient.bulk({
-          index: ELASTIC_INDEX,
-          operations,
-        });
-        resolve("done!");
       } catch (err) {
         logging.error(err);
         reject(err);
