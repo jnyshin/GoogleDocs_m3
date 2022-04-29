@@ -6,6 +6,8 @@ if (process.env.instance_var === "8") {
   console.log("Set Interval called!");
   setInterval(async () => {
     try {
+      const start = performance.now();
+
       connection.createFetchQuery(
         SHARE_DB_NAME,
         {},
@@ -39,6 +41,8 @@ if (process.env.instance_var === "8") {
             refresh: true,
             ret,
           });
+          const duration = performance.now() - start;
+          logging.info(`took ${duration}ms`);
           logging.info("updated elastic search docs");
         }
       );
