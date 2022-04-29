@@ -72,7 +72,7 @@ export default async (fastify, opts) => {
     // } else {
     const freshData = await fetchAllDocs();
     await setIndex("search_index", freshData);
-    var re = new RegExp(q, "g");
+    var re = new RegExp(keyword, "g");
     const result = await ESclient.search({
       index: "search_index",
       body: {
