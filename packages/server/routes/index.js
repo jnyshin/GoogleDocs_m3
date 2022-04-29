@@ -36,9 +36,6 @@ if (process.env.instance_var === "8") {
               suggest_body: body,
               search_body: body,
             },
-            script: {
-              lang: "painless",
-            },
           });
         });
         //   await ESclient.bulk({
