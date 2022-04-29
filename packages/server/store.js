@@ -122,7 +122,7 @@ export const updateAllDocs = () => {
           ret.push({ docid: doc.id, suggest_body: body, search_body: body });
         });
         if (!ret.length) {
-          return;
+          reject("no data");
         }
         const operations = ret.flatMap((doc) => [
           { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
@@ -134,8 +134,10 @@ export const updateAllDocs = () => {
           index: ELASTIC_INDEX,
           operations,
         });
+        resolve("done!");
       } catch (err) {
         logging.error(err);
+        reject(err);
       }
     });
   });
