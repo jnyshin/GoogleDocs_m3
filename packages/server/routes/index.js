@@ -4,6 +4,7 @@ import {
   updateAllDocs,
   SHARE_DB_NAME,
 } from "../store.js";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
