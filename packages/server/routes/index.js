@@ -1,34 +1,19 @@
 import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
 import logging from "../logging.js";
 import { ESclient } from "../app.js";
-
+// import debounce from "loadsh";
 var freshData = [];
-if (process.env.instance_var === "8") {
-  setInterval(async function () {
-    try {
-      await updateAllDocs();
-      logging.info("updated elastic search docs");
-    } catch (err) {
-      logging.error("Error while updating");
-      logging.error(err);
-    }
-  }, 5000);
-}
-
-const setIndex = async (index) => {
-  console.log("setIndex reached");
-  console.log(freshData);
-  const operations = freshData.flatMap((doc) => [
-    { index: { _id: doc.id } },
-    doc,
-  ]);
-  const upload = await ESclient.bulk({
-    refresh: true,
-    index: index,
-    operations,
-  });
-  logging.error(upload.errors);
-};
+// if (process.env.instance_var === "8") {
+//   setInterval(async function () {
+//     try {
+//       await updateAllDocs();
+//       logging.info("updated elastic search docs");
+//     } catch (err) {
+//       logging.error("Error while updating");
+//       logging.error(err);
+//     }
+//   }, 5000);
+// }
 
 export default async (fastify, opts) => {
   fastify.get("/info", async (req, res) => {
