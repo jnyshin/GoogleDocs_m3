@@ -96,7 +96,7 @@ export const searchStringify = fastJson({
 export const fetchDoc = (docId) => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
   const getDocPromise = new Promise((resolve, reject) => {
-    query.on("ready", () => {
+    query.once("ready", () => {
       try {
         resolve(query.results[0]);
       } catch (err) {
