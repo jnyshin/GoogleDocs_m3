@@ -4,9 +4,9 @@ import { ESclient } from "../app.js";
 // import debounce from "loadsh";
 var freshData = [];
 if (process.env.instance_var === "8") {
-  setInterval(() => {
+  setInterval(async () => {
     try {
-      updateAllDocs();
+      await updateAllDocs();
       logging.info("updated elastic search docs");
     } catch (err) {
       logging.error("Error while updating");

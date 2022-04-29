@@ -108,25 +108,29 @@ export const fetchDoc = (docId) => {
 };
 
 export const updateAllDocs = () => {
-  connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
-    if (err) console.log(err);
-    results.map(async (doc) => {
-      const ops = doc.data.ops;
-      const body = new QuillDeltaToHtmlConverter(ops, {})
-        .convert()
-        .replaceAll(/<[\w]*>/gi, "")
-        .replaceAll(/<\/[\w]*>/gi, "")
-        .replaceAll(/<[\w]*\/>/gi, "");
-      await ESclient.update({
-        index: ELASTIC_INDEX,
-        id: doc.id,
-        doc: {
-          suggest_body: body,
-          search_body: body,
-        },
+  const promise = new Promise((resolve, reject) => {
+    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
+      if (err) reject(err);
+      results.map(async (doc) => {
+        const ops = doc.data.ops;
+        const body = new QuillDeltaToHtmlConverter(ops, {})
+          .convert()
+          .replaceAll(/<[\w]*>/gi, "")
+          .replaceAll(/<\/[\w]*>/gi, "")
+          .replaceAll(/<[\w]*\/>/gi, "");
+        await ESclient.update({
+          index: ELASTIC_INDEX,
+          id: doc.id,
+          doc: {
+            suggest_body: body,
+            search_body: body,
+          },
+        });
+        resolve();
       });
     });
   });
+  return promise;
 };
 export const fetchCreateDocs = (docId) => {
   const share_doc = connection.get(SHARE_DB_NAME, docId);
