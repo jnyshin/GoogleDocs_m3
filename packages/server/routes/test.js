@@ -1,7 +1,7 @@
 import { ELASTIC_INDEX, updateAllDocs } from "../store.js";
 import { ESclient } from "../app.js";
 export default async (fastify, opts) => {
-  fastify.get(`/performace`, async (req, res) => {
+  fastify.get(`/performance`, async (req, res) => {
     const performanceCheck = await performaceSensitiveFunc();
     return { took: `${performanceCheck}ms` };
   });
