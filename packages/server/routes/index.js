@@ -26,6 +26,7 @@ if (process.env.instance_var === "8") {
               .replaceAll(/<[\w]*\/>/gi, "");
             ret.push({ docid: doc.id, suggest_body: body, search_body: body });
           });
+          logging.info(ret);
           const operations = ret.flatMap((doc) => [
             { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
             {
