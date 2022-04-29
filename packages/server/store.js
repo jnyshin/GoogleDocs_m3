@@ -119,7 +119,7 @@ export const updateAllDocs = () => {
             .replaceAll(/<[\w]*>/gi, "")
             .replaceAll(/<\/[\w]*>/gi, "")
             .replaceAll(/<[\w]*\/>/gi, "");
-          ESclient.update({
+          await ESclient.update({
             index: ELASTIC_INDEX,
             id: doc.id,
             doc: {

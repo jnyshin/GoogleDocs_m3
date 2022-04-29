@@ -5,9 +5,7 @@ import { ESclient } from "../app.js";
 var freshData = [];
 if (process.env.instance_var === "8") {
   setInterval(async function () {
-    logging.info(`listener = ${process.listenerCount()}`);
     try {
-      console.log(process.listeners());
       await updateAllDocs();
       logging.info("updated elastic search docs");
     } catch (err) {
