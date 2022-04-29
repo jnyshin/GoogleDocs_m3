@@ -61,7 +61,8 @@ export default async (fastify, opts) => {
     return response;
   });
   fastify.get(`/search`, async (req, res) => {
-    const { q } = req.query;
+    // const { q } = req.query;
+    const keyword = url.parse(req.url, true).query.q;
     const { redis } = fastify;
     // const cache = await redis.get(q);
     // if (cache) {
@@ -78,8 +79,8 @@ export default async (fastify, opts) => {
         query: {
           dis_max: {
             queries: [
-              { match_phrase: { body: q } },
-              { match_phrase: { name: q } },
+              { match_phrase: { body: keyword } },
+              { match_phrase: { name: keyword } },
             ],
           },
         },
@@ -107,7 +108,7 @@ export default async (fastify, opts) => {
       retlist.push(arranged);
     });
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-    logging.info(`Result searching keyword = ${q}`);
+    logging.info(`Result searching keyword = ${keyword}`);
     logging.info(retlist);
     // redis.setex(q, 3600, searchStringify(retlist));
     return retlist;
