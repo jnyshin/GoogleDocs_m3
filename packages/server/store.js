@@ -112,14 +112,14 @@ export const updateAllDocs = () => {
   const getDocPromise = new Promise((resolve, reject) => {
     query.on("ready", () => {
       try {
-        query.results.map(async (doc) => {
+        query.results.map((doc) => {
           const ops = doc.data.ops;
           const body = new QuillDeltaToHtmlConverter(ops, {})
             .convert()
             .replaceAll(/<[\w]*>/gi, "")
             .replaceAll(/<\/[\w]*>/gi, "")
             .replaceAll(/<[\w]*\/>/gi, "");
-          await ESclient.update({
+          ESclient.update({
             index: ELASTIC_INDEX,
             id: doc.id,
             doc: {
