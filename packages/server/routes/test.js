@@ -38,7 +38,6 @@ export default async (fastify, opts) => {
 
   fastify.get(`/sample`, async (req, res) => {
     updateAllDocs();
-    // await ESclient.indices.refresh({ index: "search_index" });
     return {};
   });
 };

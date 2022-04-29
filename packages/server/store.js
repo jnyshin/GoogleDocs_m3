@@ -67,8 +67,10 @@ export const elasticStringify = fastJson({
         type: "object",
         properties: {
           docid: { type: "string" },
-          name: { type: "string" },
-          body: { type: "string" },
+          suggest_name: { type: "string" },
+          search_name: { type: "string" },
+          suggest_body: { type: "string" },
+          search_name: { type: "string" },
         },
       },
     ],

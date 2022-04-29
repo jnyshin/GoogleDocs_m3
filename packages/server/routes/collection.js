@@ -1,7 +1,12 @@
 import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
-import { ERROR_MESSAGE, fetchCreateDocs, fetchDoc } from "../store.js";
+import {
+  ERROR_MESSAGE,
+  fetchCreateDocs,
+  fetchDoc,
+  ELASTIC_INDEX,
+} from "../store.js";
 import { ESclient } from "../app.js";
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
