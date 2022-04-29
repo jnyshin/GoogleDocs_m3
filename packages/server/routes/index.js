@@ -75,14 +75,11 @@ export default async (fastify, opts) => {
     var re = new RegExp(keyword, "g");
     const result = await ESclient.search({
       index: "search_index",
-      body: {
-        query: {
-          dis_max: {
-            queries: [
-              { match_phrase: { body: keyword } },
-              { match_phrase: { name: keyword } },
-            ],
-          },
+      query: {
+        multi_match: {
+          query: keyword,
+          type: "phrase",
+          fields: ["name", "body"],
         },
       },
       highlight: {
