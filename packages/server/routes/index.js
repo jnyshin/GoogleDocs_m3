@@ -20,14 +20,11 @@ if (process.env.instance_var === "8") {
               .replaceAll(/<[\w]*>/gi, "")
               .replaceAll(/<\/[\w]*>/gi, "")
               .replaceAll(/<[\w]*\/>/gi, "");
-            const obj = {
-              id: doc.id,
-              doc: {
-                suggest_body: body,
-                search_body: body,
-              },
-            };
-            ret.push(obj);
+
+            ret.push(
+              { update: { _id: doc.id } },
+              { doc: { suggest_body: body, search_body: body } }
+            );
             // await ESclient.update({
             //   index: ELASTIC_INDEX,
             //   id: doc.id,
