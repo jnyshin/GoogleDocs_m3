@@ -40,6 +40,9 @@ export default async (fastify, opts) => {
         });
       });
       await Promise.all(promises);
+      const duration = performance.now() - start;
+      logging.info(`took ${duration}ms`);
+      logging.info("updated elastic search docs");
       // connection.createFetchQuery(
       //   SHARE_DB_NAME,
       //   {},
