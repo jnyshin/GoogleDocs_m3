@@ -6,40 +6,45 @@ if (process.env.instance_var === "8") {
   console.log("Set Interval called!");
   setInterval(async () => {
     try {
-      connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
-        if (err) logging.error(err);
-        const ret = [];
-        results.map(async (doc) => {
-          const ops = doc.data.ops;
-          const body = new QuillDeltaToHtmlConverter(ops, {})
-            .convert()
-            .replaceAll(/<[\w]*>/gi, "")
-            .replaceAll(/<\/[\w]*>/gi, "")
-            .replaceAll(/<[\w]*\/>/gi, "");
-          const obj = {
-            id: doc.id,
-            doc: {
-              suggest_body: body,
-              search_body: body,
-            },
-          };
-          ret.push(obj)
-          // await ESclient.update({
-          //   index: ELASTIC_INDEX,
-          //   id: doc.id,
-          //   doc: {
-          //     suggest_body: body,
-          //     search_body: body,
-          //   },
-          // });
-        });
-        await ESclient.bulk({
+      connection.createFetchQuery(
+        SHARE_DB_NAME,
+        {},
+        {},
+        async (err, results) => {
+          if (err) logging.error(err);
+          const ret = [];
+          results.map((doc) => {
+            const ops = doc.data.ops;
+            const body = new QuillDeltaToHtmlConverter(ops, {})
+              .convert()
+              .replaceAll(/<[\w]*>/gi, "")
+              .replaceAll(/<\/[\w]*>/gi, "")
+              .replaceAll(/<[\w]*\/>/gi, "");
+            const obj = {
+              id: doc.id,
+              doc: {
+                suggest_body: body,
+                search_body: body,
+              },
+            };
+            ret.push(obj);
+            // await ESclient.update({
+            //   index: ELASTIC_INDEX,
+            //   id: doc.id,
+            //   doc: {
+            //     suggest_body: body,
+            //     search_body: body,
+            //   },
+            // });
+          });
+          await ESclient.bulk({
             index: "ss_index",
             refresh: true,
-            ret
-        })
-        logging.info("updated elastic search docs");
-      });
+            ret,
+          });
+          logging.info("updated elastic search docs");
+        }
+      );
     } catch (err) {
       logging.error("Error while updating");
       logging.error(err);
