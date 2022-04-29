@@ -1,68 +1,42 @@
-import {
-  ELASTIC_INDEX,
-  searchStringify,
-  updateAllDocs,
-  SHARE_DB_NAME,
-} from "../store.js";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
 import logging from "../logging.js";
-import { connection, ESclient } from "../app.js";
-// import debounce from "loadsh";
+import { ESclient } from "../app.js";
+
+var freshData = [];
 if (process.env.instance_var === "8") {
-  console.log("Set Interval called!");
-  setInterval(async () => {
-    logging.info("updated elastic search");
-    await updateAllDocs();
-  }, 5000);
-}
-
-export default async (fastify, opts) => {
-  fastify.get("/info", async (req, res) => {
+  setInterval(async function () {
+    logging.info(`listener = ${process.listenerCount()}`);
     try {
-      const start = performance.now();
-      const promises = [];
+      console.log(process.listeners());
+      await updateAllDocs();
 
-      // connection.createFetchQuery(
-      //   SHARE_DB_NAME,
-      //   {},
-      //   {},
-      //   async (err, results) => {
-      //     if (err) logging.error(err);
-      //     const ret = [];
-      //     results.map((doc) => {
-      //       const ops = doc.data.ops;
-      //       const body = new QuillDeltaToHtmlConverter(ops, {})
-      //         .convert()
-      //         .replaceAll(/<[\w]*>/gi, "")
-      //         .replaceAll(/<\/[\w]*>/gi, "")
-      //         .replaceAll(/<[\w]*\/>/gi, "");
-
-      //       ret.push({ docid: doc.id, suggest_body: body, search_body: body });
-      //     });
-      //     const operations = ret.flatMap((value) => [
-      //       {
-      //         id: value.id,
-      //         doc: {
-      //           suggest_body: value.suggest_body,
-      //           search_body: value.search_body,
-      //         },
-      //       },
-      //     ]);
-      //     await ESclient.bulk({
-      //       index: ELASTIC_INDEX,
-      //       refresh: true,
-      //       operations,
-      //     });
-      //     const duration = performance.now() - start;
-      //     logging.info(`took ${duration}ms`);
-      //     logging.info("updated elastic search docs");
-      //   }
-      // );
+      logging.info("updated elastic search docs");
     } catch (err) {
       logging.error("Error while updating");
       logging.error(err);
     }
-    return {};
+  }, 5000);
+}
+
+const setIndex = async (index) => {
+  console.log("setIndex reached");
+  console.log(freshData);
+  const operations = freshData.flatMap((doc) => [
+    { index: { _id: doc.id } },
+    doc,
+  ]);
+  const upload = await ESclient.bulk({
+    refresh: true,
+    index: index,
+    operations,
+  });
+  logging.error(upload.errors);
+};
+
+export default async (fastify, opts) => {
+  fastify.get("/info", async (req, res) => {
+    const response = await ESclient.info();
+    return response;
   });
   fastify.get(`/search`, async (req, res) => {
     const { q } = req.query;

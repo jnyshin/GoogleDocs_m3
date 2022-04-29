@@ -2,7 +2,6 @@ import path, { resolve } from "path";
 import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
 import { connection } from "./app.js";
-import Docs from "./schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { ESclient } from "./app.js";
 import logging from "./logging.js";
@@ -96,7 +95,7 @@ export const searchStringify = fastJson({
 export const fetchDoc = (docId) => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, { _id: docId });
   const getDocPromise = new Promise((resolve, reject) => {
-    query.once("ready", () => {
+    query.on("ready", () => {
       try {
         resolve(query.results[0]);
       } catch (err) {
@@ -110,7 +109,7 @@ export const fetchDoc = (docId) => {
 export const updateAllDocs = () => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
-    query.once("ready", () => {
+    query.on("ready", () => {
       try {
         query.results.map((doc) => {
           const ops = doc.data.ops;

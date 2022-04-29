@@ -38,7 +38,7 @@ const backend = new ShareDB({
 });
 
 export const connection = backend.connect();
-process.setMaxListeners(20);
+
 class MySerializer extends Serializer {
   serialize(obj) {
     return elasticStringify(obj);
@@ -174,7 +174,6 @@ start();
 process.on("SIGINT", function () {
   process.exit(0);
 });
-process.on("warning", (e) => console.warn(e.stack));
 
 const deleteAll = async () => {
   try {
