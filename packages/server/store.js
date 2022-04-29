@@ -109,8 +109,9 @@ export const fetchDoc = (docId) => {
 export const updateAllDocs = () => {
   const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
-    query.on("ready", () => {
+    query.on("ready", async () => {
       try {
+        const ret = [];
         query.results.map((doc) => {
           const ops = doc.data.ops;
           const body = new QuillDeltaToHtmlConverter(ops, {})
@@ -118,21 +119,27 @@ export const updateAllDocs = () => {
             .replaceAll(/<[\w]*>/gi, "")
             .replaceAll(/<\/[\w]*>/gi, "")
             .replaceAll(/<[\w]*\/>/gi, "");
-          ESclient.update({
-            index: ELASTIC_INDEX,
-            id: doc.id,
-            doc: {
-              suggest_body: body,
-              search_body: body,
-            },
-          });
+          ret.push({ docid: doc.id, suggest_body: body, search_body: body });
         });
-        resolve();
+        if (!ret.length) {
+          return;
+        }
+        const operations = ret.flatMap((doc) => [
+          { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
+          {
+            doc: doc,
+          },
+        ]);
+        await ESclient.bulk({
+          index: ELASTIC_INDEX,
+          operations,
+        });
       } catch (err) {
-        reject(err);
+        logging.error(err);
       }
     });
   });
+
   return getDocPromise;
 };
 export const fetchCreateDocs = (docId) => {
