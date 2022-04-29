@@ -110,14 +110,14 @@ export const fetchDoc = (docId) => {
 export const updateAllDocs = () => {
   connection.createFetchQuery(SHARE_DB_NAME, {}, {}, (err, results) => {
     if (err) console.log(err);
-    results.map((doc) => {
+    results.map(async (doc) => {
       const ops = doc.data.ops;
       const body = new QuillDeltaToHtmlConverter(ops, {})
         .convert()
         .replaceAll(/<[\w]*>/gi, "")
         .replaceAll(/<\/[\w]*>/gi, "")
         .replaceAll(/<[\w]*\/>/gi, "");
-      ESclient.update({
+      await ESclient.update({
         index: ELASTIC_INDEX,
         id: doc.id,
         doc: {
