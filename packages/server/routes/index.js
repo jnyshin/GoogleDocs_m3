@@ -35,7 +35,7 @@ setInterval(async function () {
   } catch {
     logging.warn("No income data yet");
   }
-}, 7000);
+}, 5000);
 
 //call resetIndex(research_index) to reset it!!
 export const resetIndex = async (index) => {
@@ -102,7 +102,7 @@ export default async (fastify, opts) => {
           },
         },
       });
-      console.log(result);
+      console.log("CHECK SEARCHERROR: ", result);
       const retlist = [];
       result.hits.hits.map((r) => {
         let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];

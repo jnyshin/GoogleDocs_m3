@@ -112,9 +112,9 @@ export default async (fastify, opts) => {
       };
       clients.push(newClient);
       logging.info(`New client connected!`);
-      logging.info(newClient);
+      //logging.info(newClient);
       logging.info(`Current Clients = `);
-      logging.info(clients);
+      //logging.info(clients);
       logging.info(
         `Current connected clients = ${clients.length} for docId = ${docId}`
       );
@@ -163,9 +163,11 @@ export default async (fastify, opts) => {
         clients.forEach((client) => {
           if (client.id === id) {
             client.res.write(`data: ${ackStringify(ack)}\n\n`);
+            logging.info("ack sent to ", client.id);
           }
           if (client.docId === docId && client.id !== id) {
             client.res.write(`data: ${opStringify(op)}\n\n`);
+            logging.info("op sent to ", client.id);
           }
         });
 
