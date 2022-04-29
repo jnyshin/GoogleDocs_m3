@@ -5,7 +5,7 @@ import { ESclient } from "../app.js";
 var freshData = [];
 setInterval(async function () {
   try {
-    // await updateAllDocs();
+    await updateAllDocs();
 
     logging.info("updated elastic search docs");
   } catch (err) {
