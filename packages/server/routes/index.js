@@ -1,4 +1,9 @@
-import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
+import {
+  ELASTIC_INDEX,
+  searchStringify,
+  updateAllDocs,
+  SHARE_DB_NAME,
+} from "../store.js";
 import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 // import debounce from "loadsh";
