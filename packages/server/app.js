@@ -174,6 +174,7 @@ start();
 process.on("SIGINT", function () {
   process.exit(0);
 });
+process.on("warning", (e) => console.warn(e.stack));
 
 const deleteAll = async () => {
   try {
