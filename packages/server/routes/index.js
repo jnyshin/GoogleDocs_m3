@@ -23,6 +23,7 @@ if (process.env.instance_var === "8") {
               search_body: body,
             },
           };
+          ret.push(obj)
           // await ESclient.update({
           //   index: ELASTIC_INDEX,
           //   id: doc.id,
@@ -32,6 +33,11 @@ if (process.env.instance_var === "8") {
           //   },
           // });
         });
+        await ESclient.bulk({
+            index: "ss_index",
+            refresh: true,
+            ret
+        })
         logging.info("updated elastic search docs");
       });
     } catch (err) {
