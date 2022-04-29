@@ -1,15 +1,43 @@
-import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
+import {
+  ELASTIC_INDEX,
+  searchStringify,
+  SHARE_DB_NAME,
+  updateAllDocs,
+} from "../store.js";
 import logging from "../logging.js";
-import { ESclient } from "../app.js";
+import { connection, ESclient } from "../app.js";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
-var freshData = [];
 if (process.env.instance_var === "8") {
   setInterval(async function () {
-    logging.info(`listener = ${process.listenerCount()}`);
     try {
-      console.log(process.listeners());
-      await updateAllDocs();
-
+      connection.createFetchQuery(
+        SHARE_DB_NAME,
+        {},
+        {},
+        async (err, results) => {
+          const ret = [];
+          results.map((doc) => {
+            const ops = doc.data.ops;
+            const body = new QuillDeltaToHtmlConverter(ops, {})
+              .convert()
+              .replaceAll(/<[\w]*>/gi, "")
+              .replaceAll(/<\/[\w]*>/gi, "")
+              .replaceAll(/<[\w]*\/>/gi, "");
+            ret.push({ docid: doc.id, suggest_body: body, search_body: body });
+          });
+          const operations = ret.flatMap((doc) => [
+            { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
+            {
+              doc: doc,
+            },
+          ]);
+          await ESclient.bulk({
+            index: ELASTIC_INDEX,
+            operations,
+          });
+        }
+      );
       logging.info("updated elastic search docs");
     } catch (err) {
       logging.error("Error while updating");
@@ -17,21 +45,6 @@ if (process.env.instance_var === "8") {
     }
   }, 5000);
 }
-
-const setIndex = async (index) => {
-  console.log("setIndex reached");
-  console.log(freshData);
-  const operations = freshData.flatMap((doc) => [
-    { index: { _id: doc.id } },
-    doc,
-  ]);
-  const upload = await ESclient.bulk({
-    refresh: true,
-    index: index,
-    operations,
-  });
-  logging.error(upload.errors);
-};
 
 export default async (fastify, opts) => {
   fastify.get("/info", async (req, res) => {

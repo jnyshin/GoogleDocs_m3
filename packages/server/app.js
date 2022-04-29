@@ -162,8 +162,8 @@ const start = async () => {
     logging.info(`* Server started ${IP}:${PORT} `);
     if (process.env.instance_var === "1") {
       logging.info("Clear elastic search");
-      await resetIndex(ELASTIC_INDEX);
     }
+    await resetIndex(ELASTIC_INDEX);
   } catch (err) {
     console.log(err);
     fastify.log.error(err);
