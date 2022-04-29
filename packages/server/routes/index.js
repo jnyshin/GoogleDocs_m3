@@ -1,9 +1,4 @@
-import {
-  ELASTIC_INDEX,
-  searchStringify,
-  SHARE_DB_NAME,
-  updateAllDocs,
-} from "../store.js";
+import { ELASTIC_INDEX, searchStringify, SHARE_DB_NAME } from "../store.js";
 import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
@@ -11,8 +6,39 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 if (process.env.instance_var === "8") {
   setInterval(async function () {
     try {
-      await updateAllDocs();
-      logging.info("updated elastic search docs");
+      const start = performance.now();
+      connection.createFetchQuery(
+        SHARE_DB_NAME,
+        {},
+        {},
+        async (err, results) => {
+          const ret = [];
+          results.map((doc) => {
+            const ops = doc.data.ops;
+            const body = new QuillDeltaToHtmlConverter(ops, {})
+              .convert()
+              .replaceAll(/<[\w]*>/gi, "")
+              .replaceAll(/<\/[\w]*>/gi, "")
+              .replaceAll(/<[\w]*\/>/gi, "");
+            ret.push({ docid: doc.id, suggest_body: body, search_body: body });
+          });
+          if (!ret.length) {
+            return;
+          }
+          const operations = ret.flatMap((doc) => [
+            { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
+            {
+              doc: doc,
+            },
+          ]);
+          await ESclient.bulk({
+            index: ELASTIC_INDEX,
+            operations,
+          });
+          const duration = performance.now() - start;
+          logging.info(`Updaing elastic search took ${duration}ms`);
+        }
+      );
     } catch (err) {
       logging.error("Error while updating");
       logging.error(err);

@@ -1,4 +1,4 @@
-import { ELASTIC_INDEX, SHARE_DB_NAME, updateAllDocs } from "../store.js";
+import { ELASTIC_INDEX, SHARE_DB_NAME } from "../store.js";
 import { connection, ESclient } from "../app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 export default async (fastify, opts) => {
@@ -53,14 +53,12 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/sample`, async (req, res) => {
-    updateAllDocs();
     return {};
   });
 };
 
 async function performaceSensitiveFunc() {
   const start = performance.now();
-  await updateAllDocs();
   const duration = performance.now() - start;
   return duration;
 }
