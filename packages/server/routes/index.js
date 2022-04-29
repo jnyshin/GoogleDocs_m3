@@ -2,8 +2,8 @@ import { ELASTIC_INDEX, searchStringify, updateAllDocs } from "../store.js";
 import logging from "../logging.js";
 import { ESclient } from "../app.js";
 // import debounce from "loadsh";
-var freshData = [];
 if (process.env.instance_var === "8") {
+  console.log("Set Interval called!");
   setInterval(async () => {
     try {
       await updateAllDocs();
