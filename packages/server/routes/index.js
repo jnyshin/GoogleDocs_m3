@@ -30,7 +30,7 @@ if (process.env.instance_var === "8") {
 
             ret.push(
               { update: { _id: doc.id } },
-              { doc: { suggest_body: body, search_body: body } }
+              { suggest_body: body, search_body: body }
             );
             // await ESclient.update({
             //   index: ELASTIC_INDEX,
