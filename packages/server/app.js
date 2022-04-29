@@ -131,8 +131,8 @@ const start = async () => {
     await Docs.deleteMany({});
     if (process.env.instance_var === "1") {
       logging.info("Clear elastic search");
-      await resetIndex("search_index");
-      await resetIndex("suggest_index");
+      //await resetIndex("search_index");
+      //await resetIndex("suggest_index");
     }
   } catch (err) {
     console.log(err);
