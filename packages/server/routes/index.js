@@ -7,7 +7,7 @@ setInterval(async function () {
   try {
     await updateAllDocs();
 
-    logging.info("updated elastic search docs!");
+    logging.info("updated elastic search docs!!");
   } catch (err) {
     logging.error("Error while updating");
     logging.error(err);
