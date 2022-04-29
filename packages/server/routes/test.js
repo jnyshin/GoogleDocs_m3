@@ -1,11 +1,23 @@
 import { fetchAllDocs } from "../store.js";
-
+import { ESclient } from "../app.js";
 export default async (fastify, opts) => {
   fastify.get(`/`, async (req, res) => {
     const performanceCheck = await performaceSensitiveFunc();
     return { took: `${performanceCheck}ms` };
   });
-  fastify.post(`/pub`, async (req, res) => {
+  fastify.post(`/updateIndex`, async (req, res) => {
+    const id = "test";
+    const name = "this is a test";
+    ESclient.indices({
+      index: "search_index",
+      id: id,
+      document: {
+        docid: id,
+        name: name,
+        body: "",
+      },
+    });
+    // await ESclient.indices.refresh({ index: "search_index" });
     return {};
   });
 };

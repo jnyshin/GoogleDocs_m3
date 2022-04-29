@@ -1,14 +1,8 @@
 import Docs from "../schema/docs.js";
 import { v4 as uuidv4 } from "uuid";
 import logging from "../logging.js";
-import {
-  ERROR_MESSAGE,
-  fetchCreateDocs,
-  fetchDoc,
-  SHARE_DB_NAME,
-} from "../store.js";
-import { connection } from "../app.js";
-import IORedis from "ioredis";
+import { ERROR_MESSAGE, fetchCreateDocs, fetchDoc } from "../store.js";
+import { ESclient } from "../app.js";
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
     logging.info("[/collection/create] Route");
@@ -24,6 +18,9 @@ export default async (fastify, opts) => {
         version: 1,
       });
 
+      //
+
+      //
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
     } catch (err) {

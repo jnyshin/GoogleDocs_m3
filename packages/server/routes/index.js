@@ -1,29 +1,12 @@
-import { Client, Serializer } from "@elastic/elasticsearch";
+import { Serializer } from "@elastic/elasticsearch";
 import { fetchAllDocs, elasticStringify, searchStringify } from "../store.js";
 import logging from "../logging.js";
+import { ESclient } from "../app.js";
 class MySerializer extends Serializer {
   serialize(obj) {
     return elasticStringify(obj);
   }
 }
-const clientOptions =
-  process.env.NODE_ENV === "production"
-    ? {
-        node: "http://localhost:9200",
-        // Serializer: MySerializer,
-      }
-    : {
-        cloud: {
-          id: "ES_m3:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDMyOWUxMWRiODdjZTRhM2Q5MTE0MjcwZDhiMmEzYmVjJDEyNDY5ZWFhNjVlZjQ5ODBhY2U2YzRmNGI3NjZlNzVj",
-        },
-        auth: {
-          username: "elastic",
-          password: "GoitLPz9EOuuNiybaMBM6x47",
-        },
-        // Serializer: MySerializer,
-      };
-
-const ESclient = new Client(clientOptions);
 
 var freshData = [];
 setInterval(async function () {
@@ -36,19 +19,6 @@ setInterval(async function () {
     logging.warn("No income data yet");
   }
 }, 5000);
-
-//call resetIndex(research_index) to reset it!!
-export const resetIndex = async (index) => {
-  logging.info("resetIndex Reached");
-  await ESclient.deleteByQuery({
-    index: index,
-    body: {
-      query: {
-        match_all: {},
-      },
-    },
-  });
-};
 
 const setIndex = async (index) => {
   console.log("setIndex reached");

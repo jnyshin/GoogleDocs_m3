@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import ShareDB from "sharedb";
 import MongoShareDB from "sharedb-mongo";
-import { ERROR_MESSAGE, __dirname } from "./store.js";
+import { ERROR_MESSAGE, resetIndex, __dirname } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
 import fastifySession from "@fastify/session";
@@ -17,13 +17,12 @@ import { join } from "path";
 import richText from "rich-text";
 import Docs from "./schema/docs.js";
 import { v4 as uuid } from "uuid";
-import { resetIndex } from "./routes/index.js";
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
-
+import { Client } from "@elastic/elasticsearch";
 ShareDB.types.register(richText.type);
 const docsDB = MongoShareDB("mongodb://localhost/docs_clone");
 const backend = new ShareDB({
@@ -33,6 +32,25 @@ const backend = new ShareDB({
 });
 
 export const connection = backend.connect();
+
+const clientOptions =
+  process.env.NODE_ENV === "production"
+    ? {
+        node: "http://localhost:9200",
+        // Serializer: MySerializer,
+      }
+    : {
+        cloud: {
+          id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
+        },
+        auth: {
+          username: "elastic",
+          password: "gzq9AcKIBr3BKi7UXuvuutHr",
+        },
+        // Serializer: MySerializer,
+      };
+
+export const ESclient = new Client(clientOptions);
 
 fastify.register(fastifyCors, {});
 fastify.register(fastifyCookie, {
