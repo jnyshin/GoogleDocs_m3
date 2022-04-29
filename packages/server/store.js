@@ -4,6 +4,7 @@ import fastJson from "fast-json-stringify";
 import { connection } from "./app.js";
 import Docs from "./schema/docs.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { ESclient } from "./app.js";
 export const clients = [];
 
 export const ERROR_MESSAGE = (message) => {
@@ -105,14 +106,14 @@ export const fetchDoc = (docId) => {
 export const fetchAllDocs = () => {
   const ret = [];
   // const { name:"", op: "", docId: ""}
-  const getDocNamePromise = new Promise(async (resolve, reject) => {
-    const docsNames = await Docs.find({}).select("name");
-    try {
-      resolve(docsNames);
-    } catch (err) {
-      reject(err);
-    }
-  });
+  // const getDocNamePromise = new Promise(async (resolve, reject) => {
+  //   const docsNames = await Docs.find({}).select("name");
+  //   try {
+  //     resolve(docsNames);
+  //   } catch (err) {
+  //     reject(err);
+  //   }
+  // });
   const query = connection.createFetchQuery(SHARE_DB_NAME, {});
   const getDocPromise = new Promise((resolve, reject) => {
     query.on("ready", () => {
@@ -183,4 +184,17 @@ export const docSubmitOp = (document, op, id) => {
     });
   });
   return docSubmitOpPromise;
+};
+
+//call resetIndex(research_index) to reset it!!
+export const resetIndex = async (index) => {
+  logging.info("resetIndex Reached");
+  await ESclient.deleteByQuery({
+    index: index,
+    body: {
+      query: {
+        match_all: {},
+      },
+    },
+  });
 };
