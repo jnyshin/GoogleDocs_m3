@@ -29,8 +29,8 @@ if (process.env.instance_var === "8") {
               .replaceAll(/<[\w]*\/>/gi, "");
 
             ret.push(
-              { update: { _id: doc.id } },
-              { suggest_body: body, search_body: body }
+              { index: { _id: doc.id } },
+              { doc: { suggest_body: body, search_body: body } }
             );
             // await ESclient.update({
             //   index: ELASTIC_INDEX,
