@@ -50,16 +50,14 @@ export default async (fastify, opts) => {
       logging.info(cache);
       return JSON.parse(cache);
     } else {
-      //   const freshData = await fetchAllDocs();
-      //   await setIndex("search_index", freshData);
       const result = await ESclient.search({
-        index: "search_index",
+        index: "ss_index",
         body: {
           query: {
             dis_max: {
               queries: [
-                { match_phrase: { body: q } },
-                { match_phrase: { name: q } },
+                { match_phrase: { search_body: q } },
+                { match_phrase: { search_name: q } },
               ],
             },
           },
@@ -67,18 +65,20 @@ export default async (fastify, opts) => {
         highlight: {
           fragment_size: 100,
           fields: {
-            body: { fragmenter: "span", type: "fvh" },
-            name: { fragmenter: "span", type: "fvh" },
+            search_body: { fragmenter: "span", type: "fvh" },
+            search_name: { fragmenter: "span", type: "fvh" },
           },
         },
       });
-      console.log("CHECK SEARCHERROR: ", result);
+      //console.log("CHECK SEARCHERROR: ", result);
       const retlist = [];
       result.hits.hits.map((r) => {
-        let s = r.highlight.body ? r.highlight.body[0] : r.highlight.name[0];
+        let s = r.highlight.search_body
+          ? r.highlight.search_body[0]
+          : r.highlight.search_name[0];
         let arranged = {
           docid: r._source.id,
-          name: r._source.name,
+          name: r._source.search_name,
           snippet: s,
         };
         retlist.push(arranged);
@@ -92,31 +92,29 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/suggest`, async (req, res) => {
-    // let freshData = await fetchAllDocs();
-    // await setIndex("suggest_index", freshData);
     const { q } = req.query;
     const result = await ESclient.search({
-      index: "suggest_index",
+      index: "ss_index",
       query: {
         multi_match: {
           query: q,
-          fields: ["body", "name"],
+          fields: ["suggest_body", "suggest_name"],
         },
       },
       highlight: {
         fragment_size: 50,
         fields: {
-          body: {},
-          name: {},
+          suggest_body: {},
+          suggest_name: {},
         },
       },
     });
     const retlist = [];
     let regexp = /<em>([\d\w]+)<\/em>/;
     result.hits.hits.map((r) => {
-      let sugg = r.highlight.body
-        ? r.highlight.body[0].match(regexp)
-        : r.highlight.name[0].match(regexp);
+      let sugg = r.highlight.suggest_body
+        ? r.highlight.suggest_body[0].match(regexp)
+        : r.highlight.suggest_name[0].match(regexp);
       retlist.push(sugg[1].toLowerCase());
     });
     let remdup = [...new Set(retlist)];
