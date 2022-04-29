@@ -103,6 +103,13 @@ export default async (fastify, opts) => {
 
   fastify.get(`/suggest`, async (req, res) => {
     const { q } = req.query;
+    const { redis } = fastify;
+    const cache = await redis.get(q);
+    if (cache) {
+      logging.info("search cache hit");
+      logging.info(cache);
+      return JSON.parse(cache);
+    }
     const result = await ESclient.search({
       index: "ss_index",
       query: {
@@ -132,6 +139,7 @@ export default async (fastify, opts) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
+    redis.setex(q, 3600, searchStringify(retlist));
     return rmshorter;
   });
 };
