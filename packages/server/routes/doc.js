@@ -163,11 +163,9 @@ export default async (fastify, opts) => {
         clients.forEach((client) => {
           if (client.id === id) {
             client.res.write(`data: ${ackStringify(ack)}\n\n`);
-            logging.info("ack sent to ", client.id);
           }
           if (client.docId === docId && client.id !== id) {
             client.res.write(`data: ${opStringify(op)}\n\n`);
-            logging.info("op sent to ", client.id);
           }
         });
 
