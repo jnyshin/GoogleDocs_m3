@@ -8,7 +8,7 @@ export default async (fastify, opts) => {
   fastify.post(`/updateIndex`, async (req, res) => {
     const id = "test";
     const name = "this is a test";
-    ESclient.indices({
+    ESclient.index({
       index: "search_index",
       id: id,
       document: {
