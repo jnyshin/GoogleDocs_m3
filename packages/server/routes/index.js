@@ -109,6 +109,15 @@ export default async (fastify, opts) => {
   fastify.get(`/suggest`, async (req, res) => {
     const { q } = req.query;
     const start = performance.now();
+    const { redis } = fastify;
+    const cache = await redis.get(q);
+    if (cache) {
+      logging.info("search cache hit");
+      logging.info(cache);
+      const duration = performance.now() - start;
+      logging.info(`Suggestion took ${duration}ms`);
+      return JSON.parse(cache);
+    }
     const result = await ESclient.search({
       index: "ss_index",
       query: {
@@ -140,6 +149,7 @@ export default async (fastify, opts) => {
     logging.info(retlist);
     const duration = performance.now() - start;
     logging.info(`Suggestion took ${duration}ms`);
+    redis.setex(q, 3600, searchStringify(retlist));
     return rmshorter;
   });
 };
