@@ -88,7 +88,7 @@ export default async (fastify, opts) => {
         //   ? r.highlight.search_body[0]
         //   : r.highlight.search_name[0];
         let arranged = {
-          docid: r._source.id,
+          docid: r._source.docid,
           name: r._source.search_name,
           snippet: r.highlight.search_mix[0],
         };
