@@ -139,7 +139,7 @@ export default async (fastify, opts) => {
     logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
     const duration = performance.now() - start;
-    logging.info(`Updaing elastic search took ${duration}ms`);
+    logging.info(`Suggestion took ${duration}ms`);
     return rmshorter;
   });
 };
