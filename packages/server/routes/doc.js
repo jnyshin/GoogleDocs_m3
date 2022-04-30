@@ -12,7 +12,6 @@ import {
   presenceStringify,
 } from "../store.js";
 import User from "../schema/user.js";
-import IORedis from "ioredis";
 
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {

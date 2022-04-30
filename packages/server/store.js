@@ -6,7 +6,7 @@ import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { ESclient } from "./app.js";
 import logging from "./logging.js";
 export const clients = [];
-
+export const connectedDocId = [];
 export const ERROR_MESSAGE = (message) => {
   return { error: true, message: message };
 };
