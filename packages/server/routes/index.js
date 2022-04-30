@@ -41,7 +41,7 @@ if (process.env.instance_var === "8") {
             operations,
           });
           const duration = performance.now() - start;
-          //logging.info(`Updaing elastic search took ${duration}ms`);
+          logging.info(`Updaing elastic search took ${duration}ms`);
         }
       );
     } catch (err) {
@@ -59,6 +59,7 @@ export default async (fastify, opts) => {
   fastify.get(`/search`, async (req, res) => {
     const { q } = req.query;
     const { redis } = fastify;
+    const start = performance.now();
     const cache = await redis.get(q);
     if (cache) {
       logging.info("search cache hit");
@@ -95,6 +96,8 @@ export default async (fastify, opts) => {
         retlist.push(arranged);
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      const duration = performance.now() - start;
+      logging.info(`Suggestion took ${duration}ms`);
       logging.info(`Result searching keyword = ${q}`);
       logging.info(retlist);
       redis.setex(q, 3600, searchStringify(retlist));
@@ -142,8 +145,8 @@ export default async (fastify, opts) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
-    //const duration = performance.now() - start;
-    //logging.info(`Suggestion took ${duration}ms`);
+    const duration = performance.now() - start;
+    logging.info(`Suggestion took ${duration}ms`);
     if (retlist.length) {
       redis.setex(q, 3600, searchStringify(retlist));
     }
