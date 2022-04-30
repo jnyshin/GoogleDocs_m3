@@ -38,6 +38,7 @@ if (process.env.instance_var === "8") {
           ]);
           await ESclient.bulk({
             index: ELASTIC_INDEX,
+            refresh: true,
             operations,
           });
           const duration = performance.now() - start;
@@ -97,7 +98,7 @@ export default async (fastify, opts) => {
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       const duration = performance.now() - start;
-      logging.info(`Suggestion took ${duration}ms`);
+      logging.info(`Search took ${duration}ms`);
       logging.info(`Result searching keyword = ${q}`);
       logging.info(retlist);
       redis.setex(q, 3600, searchStringify(retlist));
