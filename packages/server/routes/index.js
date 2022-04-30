@@ -115,7 +115,7 @@ export default async (fastify, opts) => {
       logging.info("search cache hit");
       //logging.info(cache);
       const duration = performance.now() - start;
-      //logging.info(`Suggestion took ${duration}ms`);
+      logging.info(`Suggestion took ${duration}ms`);
       return JSON.parse(cache);
     }
     const result = await ESclient.search({
@@ -149,7 +149,7 @@ export default async (fastify, opts) => {
     const duration = performance.now() - start;
     logging.info(`Suggestion took ${duration}ms`);
     if (retlist.length) {
-      redis.setex(q, 3600, searchStringify(retlist));
+      redis.setex(q, 3600, suggestStringify(retlist));
     }
     return rmshorter;
   });
