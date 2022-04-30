@@ -46,11 +46,44 @@ module.exports = {
       exec_mode: "fork",
       instances: "1",
     },
-
     {
       name: "API Server 5",
       script: "packages/server/app.js",
       instance_var: "5",
+      env: {
+        PORT: 8005,
+        NODE_ENV: "production",
+      },
+      exec_mode: "fork",
+      instances: "1",
+    },
+    {
+      name: "API Server 6",
+      script: "packages/server/app.js",
+      instance_var: "6",
+      env: {
+        PORT: 8006,
+        NODE_ENV: "production",
+      },
+      exec_mode: "fork",
+      instances: "1",
+    },
+    {
+      name: "API Server 7",
+      script: "packages/server/app.js",
+      instance_var: "7",
+      env: {
+        PORT: 8007,
+        NODE_ENV: "production",
+      },
+      exec_mode: "fork",
+      instances: "1",
+    },
+
+    {
+      name: "API Server 8",
+      script: "packages/server/app.js",
+      instance_var: "8",
       env: {
         PORT: 8008,
         NODE_ENV: "production",
@@ -58,27 +91,5 @@ module.exports = {
       exec_mode: "fork",
       instances: "1",
     },
-    // {
-    //   name: "API Server 9",
-    //   script: "packages/server/app.js",
-    //   instance_var: "9",
-    //   env: {
-    //     PORT: 8009,
-    //     NODE_ENV: "production",
-    //   },
-    //   exec_mode: "fork",
-    //   instances: "1",
-    // },
-    // {
-    //   name: "API Server 10",
-    //   script: "packages/server/app.js",
-    //   instance_var: "10",
-    //   env: {
-    //     PORT: 8010,
-    //     NODE_ENV: "production",
-    //   },
-    //   exec_mode: "fork",
-    //   instances: "1",
-    // },
   ],
 };

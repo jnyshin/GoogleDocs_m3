@@ -8,7 +8,7 @@ import logging from "../logging.js";
 import { connection, ESclient } from "../app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 
-if (process.env.instance_var === "5") {
+if (process.env.instance_var === "8") {
   setInterval(async function () {
     try {
       const start = performance.now();
