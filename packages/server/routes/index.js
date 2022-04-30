@@ -101,7 +101,9 @@ export default async (fastify, opts) => {
       logging.info(`Search took ${duration}ms`);
       logging.info(`Result searching keyword = ${q}`);
       logging.info(retlist);
-      redis.setex(q, 3600, searchStringify(retlist));
+      if (retlist.length) {
+        redis.setex(q, 3600, searchStringify(retlist));
+      }
       return retlist;
     }
   });

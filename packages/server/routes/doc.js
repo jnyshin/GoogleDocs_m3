@@ -141,17 +141,12 @@ export default async (fastify, opts) => {
     try {
       const document = await fetchDoc(docId);
       if (version !== document.version) {
-        // logging.info(
-        //   `Version is not matched. client = ${version}, server=${document.version}.`,
-        //   id
-        // );
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("{ status: retry }", id);
+        logging.info("Version not matched: { status: retry }", id);
         return { status: "retry" };
       } else if (document.preventCompose) {
-        //logging.info("Someone is currently editing");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("{ status: retry }", id);
+        logging.info("Disrupting editing: { status: retry }", id);
         return { status: "retry" };
       } else {
         document.preventCompose = true;
@@ -159,6 +154,7 @@ export default async (fastify, opts) => {
         await Docs.findByIdAndUpdate(docId, {
           $inc: { version: 1 },
         });
+        // as
         clients.forEach((client) => {
           if (client.id === id) {
             client.res.write(`data: ${ackStringify(ack)}\n\n`);
