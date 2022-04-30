@@ -149,7 +149,9 @@ export default async (fastify, opts) => {
     logging.info(retlist);
     const duration = performance.now() - start;
     logging.info(`Suggestion took ${duration}ms`);
-    redis.setex(q, 3600, searchStringify(retlist));
+    if (!retlist.length) {
+      redis.setex(q, 3600, searchStringify(retlist));
+    }
     return rmshorter;
   });
 };
