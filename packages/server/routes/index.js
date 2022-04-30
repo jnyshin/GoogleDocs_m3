@@ -69,32 +69,28 @@ export default async (fastify, opts) => {
         index: ELASTIC_INDEX,
         body: {
           query: {
-            dis_max: {
-              queries: [
-                { match_phrase: { search_body: q } },
-                { match_phrase: { search_name: q } },
-              ],
+            match_phrase: {
+              search_mix: q,
             },
           },
         },
         highlight: {
           fragment_size: 100,
           fields: {
-            search_body: { fragmenter: "span", type: "fvh" },
-            search_name: { fragmenter: "span", type: "fvh" },
+            search_mix: { type: "fvh" },
           },
         },
       });
       //console.log("CHECK SEARCHERROR: ", result);
       const retlist = [];
       result.hits.hits.map((r) => {
-        let s = r.highlight.search_body
-          ? r.highlight.search_body[0]
-          : r.highlight.search_name[0];
+        // let s = r.highlight.search_body
+        //   ? r.highlight.search_body[0]
+        //   : r.highlight.search_name[0];
         let arranged = {
           docid: r._source.docid,
           name: r._source.search_name,
-          snippet: s,
+          snippet: r.highlight.search_mix[0],
         };
         retlist.push(arranged);
       });
@@ -121,25 +117,24 @@ export default async (fastify, opts) => {
     const result = await ESclient.search({
       index: "ss_index",
       query: {
-        multi_match: {
-          query: q,
-          fields: ["suggest_body", "suggest_name"],
+        match: {
+          suggest_mix: q,
         },
       },
       highlight: {
         fragment_size: 50,
         fields: {
-          suggest_body: {},
-          suggest_name: {},
+          suggest_mix: {},
         },
       },
     });
     const retlist = [];
     let regexp = /<em>([\d\w]+)<\/em>/;
     result.hits.hits.map((r) => {
-      let sugg = r.highlight.suggest_body
-        ? r.highlight.suggest_body[0].match(regexp)
-        : r.highlight.suggest_name[0].match(regexp);
+      //   let sugg = r.highlight.suggest_body
+      //     ? r.highlight.suggest_body[0].match(regexp)
+      //     : r.highlight.suggest_name[0].match(regexp);
+      let sugg = r.highlight.suggest_mix[0].match(regexp);
       retlist.push(sugg[1].toLowerCase());
     });
     let remdup = [...new Set(retlist)];
@@ -147,7 +142,7 @@ export default async (fastify, opts) => {
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     logging.info(`Result Suggestions for keyword = ${q}`);
     logging.info(retlist);
-    const duration = performance.now() - start;
+    //const duration = performance.now() - start;
     //logging.info(`Suggestion took ${duration}ms`);
     if (retlist.length) {
       redis.setex(q, 3600, searchStringify(retlist));
