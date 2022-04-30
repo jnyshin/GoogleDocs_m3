@@ -29,8 +29,8 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     const id = req.params.UID;
     const { index, length } = req.body;
-    logging.info("[/doc/presence/:DOCID/:UID] Route", id);
-    logging.info(`Request with index=${index}, length=${length}`, id);
+    //logging.info("[/doc/presence/:DOCID/:UID] Route", id);
+    //logging.info(`Request with index=${index}, length=${length}`, id);
     try {
       const _id = req.session.user.id;
       const user = await User.findById(_id);
@@ -47,15 +47,15 @@ export default async (fastify, opts) => {
       };
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
-          logging.info(`sent message to UID = ${client.id}`, id);
+          //logging.info(`sent message to UID = ${client.id}`, id);
           client.res.write(`data: ${presenceStringify(presence)}\n\n`);
         }
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
-      logging.error("Failed to send presence");
-      logging.error(err);
+      //logging.error("Failed to send presence");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Failed to send presence");
     }
@@ -65,19 +65,19 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     // Not sure what uid is for
     const uid = req.params.UID;
-    logging.info("[/doc/get/:DOCID/:UID] Route", uid);
+    //logging.info("[/doc/get/:DOCID/:UID] Route", uid);
     try {
       const document = await fetchDoc(docId);
       const ops = document.data.ops;
       const converter = new QuillDeltaToHtmlConverter(ops, {});
       const html = converter.convert();
-      logging.info("Sending HTML: ", uid);
-      logging.info(html);
+      //logging.info("Sending HTML: ", uid);
+      //logging.info(html);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return html;
     } catch (err) {
-      logging.error("fail to convert to HTML Format");
-      logging.error(err);
+      //logging.error("fail to convert to HTML Format");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("fail to convert to HTML Format");
     }
@@ -86,10 +86,10 @@ export default async (fastify, opts) => {
   fastify.get("/connect/:DOCID/:UID", async (req, res) => {
     const docId = req.params.DOCID;
     const id = req.params.UID;
-    logging.info("[/doc/connect/:DOCID/:UID] Route", id);
+    //logging.info("[/doc/connect/:DOCID/:UID] Route", id);
     try {
       const document = await fetchDoc(docId);
-      logging.info("fetched Doc", id);
+      //logging.info("fetched Doc", id);
       const headers = {
         "Content-Type": "text/event-stream",
         Connection: "keep-alive",
@@ -101,8 +101,8 @@ export default async (fastify, opts) => {
         content: document.data.ops,
         version: document.version,
       };
-      logging.info(`Content and Version:`, id);
-      logging.info(payload, id);
+      //logging.info(`Content and Version:`, id);
+      //logging.info(payload, id);
       res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
       const newClient = {
         id: id,
@@ -134,22 +134,22 @@ export default async (fastify, opts) => {
 
   fastify.post("/op/:DOCID/:UID", async (req, res) => {
     const id = req.params.UID;
-    logging.info("[/doc/op/:DOCID/:UID] Route", id);
+    //logging.info("[/doc/op/:DOCID/:UID] Route", id);
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
     try {
       const document = await fetchDoc(docId);
       if (version !== document.version) {
-        logging.info(
-          `Version is not matched. client = ${version}, server=${document.version}.`,
-          id
-        );
+        // logging.info(
+        //   `Version is not matched. client = ${version}, server=${document.version}.`,
+        //   id
+        // );
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
       } else if (document.preventCompose) {
-        logging.info("Someone is currently editing");
+        //logging.info("Someone is currently editing");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("{ status: retry }", id);
         return { status: "retry" };
