@@ -1,4 +1,4 @@
-// import mongoose from "mongoose";
+import mongoose from "mongoose";
 // import ShareDB from "sharedb";
 // import MongoShareDB from "sharedb-mongo";
 // import {
@@ -155,11 +155,10 @@ fastify.register((fastifyInstance, options, done) => {
 const start = async () => {
   try {
     await fastify.listen(PORT, IP);
-
     logging.info(`* Server started ${IP}:${PORT} `);
     if (process.env.instance_var === "1") {
       logging.info("Clear elastic search");
-      await resetIndex(ELASTIC_INDEX);
+      // await resetIndex(ELASTIC_INDEX);
     }
   } catch (err) {
     console.log(err);
@@ -172,33 +171,33 @@ process.on("SIGINT", function () {
   process.exit(0);
 });
 
-const deleteAll = async () => {
-  try {
-    const connection = mongoose.connection;
-    const share_docs = connection.db.collection("share_docs");
-    const o_share_docs = connection.db.collection("o_share_docs");
-    const docs = connection.db.collection("docs");
-    const image = connection.db.collection("images");
-    const users = connection.db.collection("users");
-    share_docs.deleteMany({});
-    o_share_docs.deleteMany({});
-    docs.deleteMany({});
-    image.deleteMany({});
-    users.deleteMany({});
-    users.insertOne({
-      _id: uuid(),
-      email: "admin",
-      password: "admin",
-      name: "admin",
-      enable: true,
-    });
-    if (NODE_ENV === "production") {
-      await ioredis.flushall();
-    }
-    return { status: "ok" };
-  } catch (err) {
-    logging.error(err);
-    logging.error("Failed to delete");
-    return ERROR_MESSAGE("Failed to delete all");
-  }
-};
+// const deleteAll = async () => {
+//   try {
+//     const connection = mongoose.connection;
+//     const share_docs = connection.db.collection("share_docs");
+//     const o_share_docs = connection.db.collection("o_share_docs");
+//     const docs = connection.db.collection("docs");
+//     const image = connection.db.collection("images");
+//     const users = connection.db.collection("users");
+//     share_docs.deleteMany({});
+//     o_share_docs.deleteMany({});
+//     docs.deleteMany({});
+//     image.deleteMany({});
+//     users.deleteMany({});
+//     users.insertOne({
+//       _id: uuid(),
+//       email: "admin",
+//       password: "admin",
+//       name: "admin",
+//       enable: true,
+//     });
+//     if (NODE_ENV === "production") {
+//       await ioredis.flushall();
+//     }
+//     return { status: "ok" };
+//   } catch (err) {
+//     logging.error(err);
+//     logging.error("Failed to delete");
+//     return ERROR_MESSAGE("Failed to delete all");
+//   }
+// };
