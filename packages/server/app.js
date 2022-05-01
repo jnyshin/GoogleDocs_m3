@@ -137,12 +137,12 @@ const IP = "127.0.0.1";
 
 fastify.register((fastifyInstance, options, done) => {
   mongoose
-    .connect("mongodb://10.9.4.238:27017/docs_clone", {
+    .connect("mongodb://194.113.75.5/docs_clone", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
     .then(() => {
-      deleteAll();
+      // deleteAll();
       console.log("mongoose connected");
     })
     .catch((err) => {
