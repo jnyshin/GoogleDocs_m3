@@ -131,10 +131,6 @@ fastify.addHook("preHandler", (req, res, next) => {
 fastify.register(import("./routes/test.js"), {
   prefix: "/test",
 });
-fastify.get("/test", async (req, res) => {
-  console.log(req.ip);
-  console.log("HERE");
-});
 
 // fastify.post("/deleteAll", async () => {
 //   deleteAll();

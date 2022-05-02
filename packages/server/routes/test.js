@@ -4,6 +4,7 @@ import {
   ESclient,
 } from "../app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import logging from "../logging.js";
 export default async (fastify, opts) => {
   fastify.get(`/performance`, async (req, res) => {
     const performanceCheck = await performaceSensitiveFunc();
@@ -11,18 +12,22 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/update`, async (req, res) => {
-    console.log("HERE");
-    ESclient.index({
-      index: ELASTIC_INDEX,
-      id: "1",
-      document: {
-        docid: "1",
-        suggest_name: "test",
-        search_name: "test",
-        suggest_body: "",
-        search_body: "",
-      },
-    });
+    try {
+      await ESclient.index({
+        index: ELASTIC_INDEX,
+        id: "1",
+        document: {
+          docid: "1",
+          suggest_name: "test",
+          search_name: "test",
+          suggest_body: "",
+          search_body: "",
+        },
+      });
+    } catch (err) {
+      logging.error(err);
+    }
+    logging.info("HERE");
     return {};
   });
 
