@@ -143,7 +143,7 @@ fastify.register((fastifyInstance, options, done) => {
       useUnifiedTopology: true,
     })
     .then(() => {
-      // deleteAll();
+      deleteAll();
       console.log("* Mongoose connected");
     })
     .catch((err) => {
@@ -159,7 +159,7 @@ const start = async () => {
     logging.info(`* Server started ${IP}:${PORT} `);
     if (process.env.instance_var === "1") {
       logging.info("Clear elastic search");
-      // await resetIndex(ELASTIC_INDEX);
+      await resetIndex(ELASTIC_INDEX);
     }
   } catch (err) {
     console.log(err);
