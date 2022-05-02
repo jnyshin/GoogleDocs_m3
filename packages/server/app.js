@@ -39,6 +39,15 @@ const MongoURL =
       ? "mongodb://localhost/docs_clone"
       : "mongodb://10.9.4.238:27017/docs_clone"
     : "mongodb://localhost:27017/docs_clone";
+const RedisURL =
+  NODE_ENV === "production"
+    ? process.env.instance_var === "9" ||
+      process.env.instance_var === "10" ||
+      process.env.instance_var === "11" ||
+      process.env.instance_var === "12"
+      ? "10.9.4.204"
+      : "127.0.0.1"
+    : "127.0.0.1";
 const docsDB = MongoShareDB(MongoURL);
 const backend = new ShareDB({
   db: docsDB,
@@ -97,7 +106,7 @@ fastify.register(fastifyStatic, {
 
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
-  host: "127.0.0.1",
+  host: RedisURL,
   port: 6379, // Redis port
   family: 4, // 4 (IPv4) or 6 (IPv6)
 });
@@ -105,7 +114,7 @@ fastify.register(fastifyUrlData);
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from [${req.url}]`);
   if (
-    // req.url.startsWith("/doc") ||
+    req.url.startsWith("/doc") ||
     req.url.startsWith("/collection") ||
     req.url.startsWith("/home") ||
     req.url.startsWith("/media")
