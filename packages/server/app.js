@@ -131,6 +131,10 @@ fastify.addHook("preHandler", (req, res, next) => {
 fastify.register(import("./routes/test.js"), {
   prefix: "/test",
 });
+fastify.get("/test", async (req, res) => {
+  console.log(req.ip);
+  console.log("HERE");
+});
 
 // fastify.post("/deleteAll", async () => {
 //   deleteAll();
@@ -144,7 +148,7 @@ fastify.register((fastifyInstance, options, done) => {
     })
     .then(() => {
       // deleteAll();
-      console.log("mongoose connected");
+      console.log("* Mongoose connected");
     })
     .catch((err) => {
       console.error("failed to connect with MongoDB", err);
