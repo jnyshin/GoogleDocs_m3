@@ -13,17 +13,13 @@ export default async (fastify, opts) => {
 
   fastify.get(`/update`, async (req, res) => {
     try {
-      await ESclient.index({
+      const result = await ESclient.search({
         index: ELASTIC_INDEX,
-        id: "1",
-        document: {
-          docid: "1",
-          suggest_name: "test",
-          search_name: "test",
-          suggest_body: "",
-          search_body: "",
+        query: {
+          match: {},
         },
       });
+      console.log(result);
     } catch (err) {
       logging.error(err);
     }
