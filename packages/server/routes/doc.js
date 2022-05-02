@@ -6,6 +6,7 @@ import {
   clients,
   currDocDict,
   docSubmitOp,
+  ELASTIC_INDEX,
   ERROR_MESSAGE,
   fetchDoc,
   opStringify,
@@ -167,43 +168,31 @@ export default async (fastify, opts) => {
         if (document.version % 10 == 0) {
           try {
             const start = performance.now();
-            connection.createFetchQuery(
-              SHARE_DB_NAME,
-              {},
-              {},
-              async (err, results) => {
-                const ret = [];
-                results.map((doc) => {
-                  const ops = doc.data.ops;
-                  const body = new QuillDeltaToHtmlConverter(ops, {})
-                    .convert()
-                    .replaceAll(/<[\w]*>/gi, "")
-                    .replaceAll(/<\/[\w]*>/gi, "")
-                    .replaceAll(/<[\w]*\/>/gi, "");
-                  ret.push({
-                    docid: doc.id,
-                    suggest_body: body,
-                    search_body: body,
-                  });
-                });
-                if (!ret.length) {
-                  return;
-                }
-                const operations = ret.flatMap((doc) => [
-                  { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
-                  {
-                    doc: doc,
-                  },
-                ]);
-                await ESclient.bulk({
-                  index: ELASTIC_INDEX,
-                  refresh: true,
-                  operations,
-                });
-                const duration = performance.now() - start;
-                logging.info(`Updaing elastic search took ${duration}ms`);
-              }
-            );
+            const ops = document.data.ops;
+            const body = new QuillDeltaToHtmlConverter(ops, {})
+              .convert()
+              .replaceAll(/<[\w]*>/gi, "")
+              .replaceAll(/<\/[\w]*>/gi, "")
+              .replaceAll(/<[\w]*\/>/gi, "");
+            const doc = {
+              docid: document.id,
+              suggest_body: body,
+              search_body: body,
+            };
+
+            const operations = [
+              { update: { _id: document.id, _index: ELASTIC_INDEX } },
+              {
+                doc: doc,
+              },
+            ];
+            await ESclient.bulk({
+              index: ELASTIC_INDEX,
+              refresh: true,
+              operations,
+            });
+            const duration = performance.now() - start;
+            logging.info(`Updaing elastic search took ${duration}ms`);
           } catch (err) {
             logging.error("Error while updating");
             logging.error(err);

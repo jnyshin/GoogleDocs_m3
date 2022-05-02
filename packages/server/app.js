@@ -30,7 +30,11 @@ const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
 
 ShareDB.types.register(richText.type);
-const docsDB = MongoShareDB("mongodb://10.9.4.238:27017/docs_clone");
+const MongoURL =
+  NODE_ENV === "production"
+    ? "mongodb://10.9.4.238:27017/docs_clone"
+    : "mongodb://localhost:27017/docs_clone";
+const docsDB = MongoShareDB(MongoURL);
 const backend = new ShareDB({
   db: docsDB,
   presence: true,
@@ -45,7 +49,7 @@ class MySerializer extends Serializer {
   }
 }
 const clientOptions =
-  process.env.NODE_ENV === "production"
+  NODE_ENV === "production"
     ? {
         node: "http://10.9.4.238:9200",
         Serializer: MySerializer,
@@ -137,7 +141,7 @@ fastify.post("/deleteAll", async () => {
 
 fastify.register((fastifyInstance, options, done) => {
   mongoose
-    .connect("mongodb://10.9.4.238/docs_clone", {
+    .connect(MongoURL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
