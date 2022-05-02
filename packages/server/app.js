@@ -62,7 +62,10 @@ const clientOptions =
         Serializer: MySerializer,
       };
 
-export const ESclient = new Client(clientOptions);
+export const ESclient = new Client({
+  node: "http://10.9.4.238",
+  Serializer: MySerializer,
+});
 
 // fastify.register(fastifyCors, {});
 // fastify.register(fastifyCookie, {
