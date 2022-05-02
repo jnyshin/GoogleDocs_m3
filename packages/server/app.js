@@ -105,7 +105,7 @@ fastify.register(fastifyUrlData);
 fastify.addHook("preHandler", (req, res, next) => {
   logging.info(`incoming request from [${req.url}]`);
   if (
-    req.url.startsWith("/doc") ||
+    // req.url.startsWith("/doc") ||
     req.url.startsWith("/collection") ||
     req.url.startsWith("/home") ||
     req.url.startsWith("/media")
