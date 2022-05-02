@@ -152,7 +152,7 @@ fastify.register((fastifyInstance, options, done) => {
     })
     .then(() => {
       deleteAll();
-      console.log("* Mongoose connected");
+      console.log(`* Mongoose connected to ${MongoURL}`);
     })
     .catch((err) => {
       console.error("failed to connect with MongoDB", err);
