@@ -26,9 +26,10 @@ import logging from "./logging.js";
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
+import { Client, Serializer } from "@elastic/elasticsearch";
 // const RedisStore = connectRedis(fastifySession);
 // const ioredis = new IORedis();
-// import { Client, Serializer } from "@elastic/elasticsearch";
+
 // ShareDB.types.register(richText.type);
 // const docsDB = MongoShareDB("mongodb://10.9.4.238:27017/docs_clone");
 // const backend = new ShareDB({
@@ -39,29 +40,29 @@ const IP = "127.0.0.1";
 
 // export const connection = backend.connect();
 
-// class MySerializer extends Serializer {
-//   serialize(obj) {
-//     return elasticStringify(obj);
-//   }
-// }
-// const clientOptions =
-//   process.env.NODE_ENV === "production"
-//     ? {
-//         node: "http://localhost:9200",
-//         Serializer: MySerializer,
-//       }
-//     : {
-//         cloud: {
-//           id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
-//         },
-//         auth: {
-//           username: "elastic",
-//           password: "gzq9AcKIBr3BKi7UXuvuutHr",
-//         },
-//         Serializer: MySerializer,
-//       };
+class MySerializer extends Serializer {
+  serialize(obj) {
+    return elasticStringify(obj);
+  }
+}
+const clientOptions =
+  process.env.NODE_ENV === "production"
+    ? {
+        node: "http://10.9.4.238:9200",
+        Serializer: MySerializer,
+      }
+    : {
+        cloud: {
+          id: "My_deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDNkOWI2NmViOTVkMTQ3MmI5YmFhYjQ4NGFhNDhkMmZjJDcwZDk2ZGFiMTJjYjQyZmFiOGJiMTU2NmJkMWM1MGQw",
+        },
+        auth: {
+          username: "elastic",
+          password: "gzq9AcKIBr3BKi7UXuvuutHr",
+        },
+        Serializer: MySerializer,
+      };
 
-// export const ESclient = new Client(clientOptions);
+export const ESclient = new Client(clientOptions);
 
 // fastify.register(fastifyCors, {});
 // fastify.register(fastifyCookie, {
