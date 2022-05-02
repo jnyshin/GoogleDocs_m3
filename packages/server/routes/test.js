@@ -19,7 +19,7 @@ export default async (fastify, opts) => {
           match_all: {},
         },
       });
-      console.log(result.hits.hits._source);
+      console.log(result.hits.hits[0]._source);
     } catch (err) {
       logging.error(err);
     }
