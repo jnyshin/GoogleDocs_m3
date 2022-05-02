@@ -97,6 +97,7 @@ export default async (fastify, opts) => {
         Connection: "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "X-CSE356": "61f9f57373ba724f297db6ba",
+        "X-Accel-Buffering": "no",
       };
       res.raw.writeHead(200, headers);
       const payload = {
