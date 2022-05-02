@@ -186,7 +186,7 @@ export default async (fastify, opts) => {
                 doc: doc,
               },
             ];
-            await ESclient.bulk({
+            ESclient.bulk({
               index: ELASTIC_INDEX,
               refresh: true,
               operations,
