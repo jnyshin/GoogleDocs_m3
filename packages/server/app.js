@@ -47,13 +47,23 @@ const RedisURL =
       ? "10.9.4.204"
       : "127.0.0.1"
     : "127.0.0.1";
+
+const RedisPort =
+  NODE_ENV === "production"
+    ? process.env.instance_var === "9" ||
+      process.env.instance_var === "10" ||
+      process.env.instance_var === "11" ||
+      process.env.instance_var === "12"
+      ? 3333
+      : 6379
+    : 6379;
 const docsDB = MongoShareDB(MongoURL);
 const backend = new ShareDB({
   db: docsDB,
   presence: true,
   doNotForwardSendPresenceErrorsToClient: true,
 });
-const ioredis = new IORedis(6379, RedisURL);
+const ioredis = new IORedis(RedisPort, RedisURL);
 export const connection = backend.connect();
 
 class MySerializer extends Serializer {
@@ -106,7 +116,7 @@ fastify.register(fastifyStatic, {
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
   host: RedisURL,
-  port: 6379, // Redis port
+  port: RedisPort, // Redis port
   family: 4, // 4 (IPv4) or 6 (IPv6)
 });
 fastify.register(fastifyUrlData);
