@@ -48,7 +48,7 @@ class MySerializer extends Serializer {
 const clientOptions =
   process.env.NODE_ENV === "production"
     ? {
-        node: "http://194.113.75.5",
+        node: "http://10.9.4.238",
         Serializer: MySerializer,
       }
     : {
