@@ -128,9 +128,9 @@ export const ESclient = new Client(clientOptions);
 // fastify.register(import("./routes/media.js"), {
 //   prefix: "/media",
 // });
-// fastify.register(import("./routes/test.js"), {
-//   prefix: "/test",
-// });
+fastify.register(import("./routes/test.js"), {
+  prefix: "/test",
+});
 
 // fastify.post("/deleteAll", async () => {
 //   deleteAll();
