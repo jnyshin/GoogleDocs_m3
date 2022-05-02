@@ -16,7 +16,7 @@ export default async (fastify, opts) => {
       const result = await ESclient.search({
         index: ELASTIC_INDEX,
         query: {
-          match: {},
+          match_all: {},
         },
       });
       console.log(result);
