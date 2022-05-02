@@ -63,7 +63,7 @@ const clientOptions =
       };
 
 export const ESclient = new Client({
-  node: "http://10.9.4.238",
+  node: "http://194.113.75.5",
   Serializer: MySerializer,
 });
 
