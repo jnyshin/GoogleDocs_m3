@@ -11,6 +11,7 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/update`, async (req, res) => {
+    console.log("HERE");
     ESclient.index({
       index: ELASTIC_INDEX,
       id: "1",
