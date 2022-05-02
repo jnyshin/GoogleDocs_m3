@@ -32,10 +32,10 @@ const ioredis = new IORedis();
 ShareDB.types.register(richText.type);
 const MongoURL =
   NODE_ENV === "production"
-    ? instance_var === "9" ||
-      instance_var === "10" ||
-      instance_var === "11" ||
-      instance_var === "12"
+    ? process.env.instance_var === "9" ||
+      process.env.instance_var === "10" ||
+      process.env.instance_var === "11" ||
+      process.env.instance_var === "12"
       ? "mongodb://localhost/docs_clone"
       : "mongodb://10.9.4.238:27017/docs_clone"
     : "mongodb://localhost:27017/docs_clone";
