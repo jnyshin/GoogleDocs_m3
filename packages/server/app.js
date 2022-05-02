@@ -27,7 +27,6 @@ const fastify = Fastify();
 const IP = "127.0.0.1";
 import { Client, Serializer } from "@elastic/elasticsearch";
 const RedisStore = connectRedis(fastifySession);
-const ioredis = new IORedis();
 
 ShareDB.types.register(richText.type);
 const MongoURL =
@@ -54,7 +53,7 @@ const backend = new ShareDB({
   presence: true,
   doNotForwardSendPresenceErrorsToClient: true,
 });
-
+const ioredis = new IORedis(6349, RedisURL);
 export const connection = backend.connect();
 
 class MySerializer extends Serializer {
