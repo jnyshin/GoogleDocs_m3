@@ -53,7 +53,7 @@ const backend = new ShareDB({
   presence: true,
   doNotForwardSendPresenceErrorsToClient: true,
 });
-const ioredis = new IORedis(6349, RedisURL);
+const ioredis = new IORedis(6379, RedisURL);
 export const connection = backend.connect();
 
 class MySerializer extends Serializer {
