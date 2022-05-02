@@ -175,10 +175,15 @@ export default async (fastify, opts) => {
               .replaceAll(/<[\w]*>/gi, "")
               .replaceAll(/<\/[\w]*>/gi, "")
               .replaceAll(/<[\w]*\/>/gi, "");
+            // const doc = {
+            //   docid: document.id,
+            //   suggest_body: body,
+            //   search_body: body,
+            // };
             const doc = {
               docid: document.id,
-              suggest_body: body,
-              search_body: body,
+              suggest_mix: body,
+              search_mix: body,
             };
 
             const operations = [
