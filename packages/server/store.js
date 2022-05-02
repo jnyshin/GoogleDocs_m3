@@ -1,8 +1,7 @@
 import path, { resolve } from "path";
 import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
-// import { connection } from "./app.js";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
+import { connection } from "./app.js";
 import { ESclient } from "./app.js";
 import logging from "./logging.js";
 export const clients = [];
@@ -15,7 +14,7 @@ export const SHARE_DB_NAME = "share_docs";
 export const ELASTIC_INDEX = "ss_index";
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
-export const currEditDoc = [];
+export const currDocDict = {};
 export const payloadStringify = fastJson({
   title: "initial content w/ version",
   type: "object",

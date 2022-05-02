@@ -41,7 +41,6 @@ export default async (fastify, opts) => {
             index: index,
             length: length,
             name: user.name,
-            // name: "hasung",
           },
         },
       };

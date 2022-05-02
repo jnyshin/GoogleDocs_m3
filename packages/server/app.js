@@ -21,7 +21,6 @@ import logging from "./logging.js";
 import fastifyRedis from "fastify-redis";
 import { join } from "path";
 import richText from "rich-text";
-import Docs from "./schema/docs.js";
 import { v4 as uuid } from "uuid";
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
