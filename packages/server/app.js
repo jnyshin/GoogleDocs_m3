@@ -24,13 +24,7 @@ import richText from "rich-text";
 import { v4 as uuid } from "uuid";
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
-const IP =
-  process.env.instance_var === "9" ||
-  process.env.instance_var === "10" ||
-  process.env.instance_var === "11" ||
-  process.env.instance_var === "12"
-    ? "10.9.4.238"
-    : "127.0.0.1";
+const IP = "127.0.0.1";
 import { Client, Serializer } from "@elastic/elasticsearch";
 const RedisStore = connectRedis(fastifySession);
 const ioredis = new IORedis();
