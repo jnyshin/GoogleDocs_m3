@@ -11,7 +11,8 @@ export const ERROR_MESSAGE = (message) => {
 };
 const __filename = fileURLToPath(import.meta.url);
 export const SHARE_DB_NAME = "share_docs";
-export const ELASTIC_INDEX = "ss_index";
+// export const ELASTIC_INDEX = "ss_index";
+export const ELASTIC_INDEX = "test";
 // 👇️ "/home/john/Desktop/javascript"
 export const __dirname = path.dirname(__filename);
 export const currDocDict = {};
