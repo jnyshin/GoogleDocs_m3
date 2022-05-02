@@ -32,7 +32,9 @@ const ioredis = new IORedis();
 ShareDB.types.register(richText.type);
 const MongoURL =
   NODE_ENV === "production"
-    ? "mongodb://10.9.4.238:27017/docs_clone"
+    ? IP === 9000 || 9001
+      ? "mongodb://localhost/docs_clone"
+      : "mongodb://10.9.4.238:27017/docs_clone"
     : "mongodb://localhost:27017/docs_clone";
 const docsDB = MongoShareDB(MongoURL);
 const backend = new ShareDB({
