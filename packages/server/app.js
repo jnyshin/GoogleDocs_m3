@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 // import ShareDB from "sharedb";
 // import MongoShareDB from "sharedb-mongo";
-// import {
-//   ERROR_MESSAGE,
-//   resetIndex,
-//   __dirname,
-//   elasticStringify,
-//   ELASTIC_INDEX,
-// } from "./store.js";
+import {
+  ERROR_MESSAGE,
+  resetIndex,
+  __dirname,
+  elasticStringify,
+  ELASTIC_INDEX,
+} from "./store.js";
 // import fastifyCookie from "fastify-cookie";
 // import fastifyCors from "fastify-cors";
 // import fastifySession from "@fastify/session";
