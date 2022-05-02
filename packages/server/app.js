@@ -112,7 +112,7 @@ fastify.register(fastifySession, {
 fastify.register(fastifyStatic, {
   root: process.env.NODE_ENV === "production" ? "/" : join(__dirname, "dist"),
 });
-
+logging.info(`${RedisURL}:${RedisPort})
 fastify.register(fastifyMultipart);
 fastify.register(fastifyRedis, {
   host: RedisURL,
