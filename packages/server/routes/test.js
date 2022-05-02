@@ -1,5 +1,8 @@
 import { ELASTIC_INDEX, SHARE_DB_NAME } from "../store.js";
-import { connection, ESclient } from "../app.js";
+import {
+  // connection,
+  ESclient,
+} from "../app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 export default async (fastify, opts) => {
   fastify.get(`/performance`, async (req, res) => {
