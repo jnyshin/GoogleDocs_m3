@@ -8,12 +8,15 @@ export default async (fastify, opts) => {
   });
 
   fastify.get(`/update`, async (req, res) => {
-    const id = "test";
-    ESclient.update({
+    ESclient.index({
       index: ELASTIC_INDEX,
-      id: id,
-      doc: {
-        body: "hello world",
+      id: "1",
+      document: {
+        docid: "1",
+        suggest_name: "test",
+        search_name: "test",
+        suggest_body: "",
+        search_body: "",
       },
     });
     return {};
