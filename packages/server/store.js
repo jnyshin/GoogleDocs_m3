@@ -1,7 +1,7 @@
 import path, { resolve } from "path";
 import { fileURLToPath } from "url";
 import fastJson from "fast-json-stringify";
-import { connection } from "./app.js";
+// import { connection } from "./app.js";
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { ESclient } from "./app.js";
 import logging from "./logging.js";
