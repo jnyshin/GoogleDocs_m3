@@ -17,7 +17,7 @@ import mongoose from "mongoose";
 // import IORedis from "ioredis";
 // import connectRedis from "connect-redis";
 import Fastify from "fastify";
-// import logging from "./logging.js";
+import logging from "./logging.js";
 // import fastifyRedis from "fastify-redis";
 // import { join } from "path";
 // import richText from "rich-text";
@@ -137,7 +137,7 @@ const IP = "127.0.0.1";
 
 fastify.register((fastifyInstance, options, done) => {
   mongoose
-    .connect("mongodb://194.113.75.5/docs_clone", {
+    .connect("mongodb://10.9.4.238/docs_clone", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
