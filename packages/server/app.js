@@ -155,10 +155,10 @@ fastify.register(import("./routes/test.js"), {
 fastify.post("/deleteAll", async () => {
   deleteAll();
 });
-fastify.register((fastify, opts, done) => {
-  startUpdating();
-  done();
-});
+// fastify.register((fastify, opts, done) => {
+//   startUpdating();
+//   done();
+// });
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect(MongoURL, {
