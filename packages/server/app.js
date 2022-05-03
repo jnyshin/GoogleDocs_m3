@@ -173,25 +173,6 @@ fastify.register((fastifyInstance, options, done) => {
     .finally(() => done());
 });
 
-const start = async () => {
-  try {
-    await fastify.listen(PORT, IP);
-    logging.info(`* Server started ${IP}:${PORT} `);
-    if (process.env.instance_var === "1") {
-      logging.info("Clear elastic search");
-      await resetIndex(ELASTIC_INDEX);
-    }
-  } catch (err) {
-    console.log(err);
-    fastify.log.error(err);
-  }
-};
-start();
-
-process.on("SIGINT", function () {
-  process.exit(0);
-});
-
 let curr = 1;
 setInterval(async function () {
   if (process.env.instance_var === String(curr)) {
@@ -241,6 +222,25 @@ const updateES = () => {
     logging.error(err);
   }
 };
+
+const start = async () => {
+  try {
+    await fastify.listen(PORT, IP);
+    logging.info(`* Server started ${IP}:${PORT} `);
+    if (process.env.instance_var === "1") {
+      logging.info("Clear elastic search");
+      await resetIndex(ELASTIC_INDEX);
+    }
+  } catch (err) {
+    console.log(err);
+    fastify.log.error(err);
+  }
+};
+start();
+
+process.on("SIGINT", function () {
+  process.exit(0);
+});
 
 const deleteAll = async () => {
   try {
