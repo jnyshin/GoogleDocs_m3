@@ -27,6 +27,7 @@ const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
 import { Client, Serializer } from "@elastic/elasticsearch";
+import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { strictEqual } from "assert";
 const RedisStore = connectRedis(fastifySession);
 
@@ -193,7 +194,6 @@ process.on("SIGINT", function () {
 
 let curr = 1;
 setInterval(async function () {
-  console.log(process.env.instance_var);
   if (process.env.instance_var === String(curr)) {
     logging.info(`instance number matched ${String(curr)}`);
     await updateES();
@@ -203,7 +203,6 @@ setInterval(async function () {
   } else {
     curr += 1;
   }
-  //logging.info(`current process for udpating: ${curr}`);
 }, 5000);
 
 const updateES = () => {
@@ -219,7 +218,7 @@ const updateES = () => {
           .replaceAll(/<[\w]*>/gi, "")
           .replaceAll(/<\/[\w]*>/gi, "")
           .replaceAll(/<[\w]*\/>/gi, "");
-        ret.push({ docid: doc.id, suggest_body: body, search_body: body });
+        ret.push({ docid: doc.id, suggest_mix: body, search_mix: body });
       });
       if (!ret.length) {
         return;
