@@ -24,7 +24,7 @@ import { join } from "path";
 import richText from "rich-text";
 import { v4 as uuid } from "uuid";
 import { Client, Serializer } from "@elastic/elasticsearch";
-import { startUpdating } from "./updateElastic.js";
+// import { startUpdating } from "./updateElastic.js";
 
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
