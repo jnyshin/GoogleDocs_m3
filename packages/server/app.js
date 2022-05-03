@@ -23,12 +23,12 @@ import fastifyRedis from "fastify-redis";
 import { join } from "path";
 import richText from "rich-text";
 import { v4 as uuid } from "uuid";
+import { Client, Serializer } from "@elastic/elasticsearch";
+import { startUpdating } from "./updateElastic.js";
+
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
-import { Client, Serializer } from "@elastic/elasticsearch";
-import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
-import { strictEqual } from "assert";
 const RedisStore = connectRedis(fastifySession);
 
 ShareDB.types.register(richText.type);
@@ -155,7 +155,10 @@ fastify.register(import("./routes/test.js"), {
 fastify.post("/deleteAll", async () => {
   deleteAll();
 });
-
+fastify.register((fastify, opts, done) => {
+  startUpdating();
+  done();
+});
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect(MongoURL, {
@@ -187,19 +190,6 @@ const start = async () => {
   }
 };
 start();
-
-let curr = 1;
-setInterval(function () {
-  if (process.env.instance_var === String(curr)) {
-    logging.info(`instance number matched ${String(curr)}`);
-    updateES();
-  }
-  if (curr === 8) {
-    curr = 0;
-  } else {
-    curr += 1;
-  }
-}, 5000);
 
 process.on("SIGINT", function () {
   process.exit(0);
@@ -233,42 +223,5 @@ const deleteAll = async () => {
     logging.error(err);
     logging.error("Failed to delete");
     return ERROR_MESSAGE("Failed to delete all");
-  }
-};
-
-const updateES = () => {
-  try {
-    logging.info("updateES reached");
-    const start = performance.now();
-    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, async (err, results) => {
-      const ret = [];
-      results.map((doc) => {
-        const ops = doc.data.ops;
-        const body = new QuillDeltaToHtmlConverter(ops, {})
-          .convert()
-          .replaceAll(/<[\w]*>/gi, "")
-          .replaceAll(/<\/[\w]*>/gi, "")
-          .replaceAll(/<[\w]*\/>/gi, "");
-        ret.push({ docid: doc.id, suggest_mix: body, search_mix: body });
-      });
-      if (!ret.length) {
-        return;
-      }
-      const operations = ret.flatMap((doc) => [
-        { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
-        {
-          doc: doc,
-        },
-      ]);
-      await ESclient.bulk({
-        index: ELASTIC_INDEX,
-        operations,
-      });
-      const duration = performance.now() - start;
-      logging.info(`Updaing elastic search took ${duration}ms`);
-    });
-  } catch (err) {
-    logging.error("Error while updating");
-    logging.error(err);
   }
 };
