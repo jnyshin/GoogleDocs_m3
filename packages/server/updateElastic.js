@@ -1,6 +1,7 @@
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { connection, ESclient } from "./app.js";
 import logging from "./logging.js";
+import { SHARE_DB_NAME } from "./store.js";
 let curr = 1;
 export const startUpdating = () => {
   setInterval(function () {
