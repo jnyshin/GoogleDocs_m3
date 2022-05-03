@@ -122,14 +122,15 @@ export default async (fastify, opts) => {
     }
   });
 
-  fastify.post("/op/:DOCID/:UID", async (req, res) => {
+  fastify.post("/op/:DOCID/:UID", (req, res) => {
     const id = req.params.UID;
     //logging.info("[/doc/op/:DOCID/:UID] Route", id);
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
     try {
-      const document = await fetchDoc(docId);
+      //const document = await fetchDoc(docId);
+      const document = fetchDoc(docId);
       if (version !== document.version) {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("Version not matched: { status: retry }", id);
@@ -140,7 +141,8 @@ export default async (fastify, opts) => {
         return { status: "retry" };
       } else {
         document.preventCompose = true;
-        const ack = await docSubmitOp(document, op, id);
+        // const ack = await docSubmitOp(document, op, id);
+        const ack = docSubmitOp(document, op, id);
         // await Docs.findByIdAndUpdate(docId, {
         //   $inc: { version: 1 },
         // });
