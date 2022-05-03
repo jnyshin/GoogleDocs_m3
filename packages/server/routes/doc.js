@@ -19,7 +19,6 @@ import { connection, ESclient } from "../app.js";
 export default async (fastify, opts) => {
   fastify.get("/edit/:DOCID", async (req, res, next) => {
     const docId = req.params.DOCID;
-    logging.info("[/doc/edit/:DOCID] Route");
     res.header("X-CSE356", "61f9f57373ba724f297db6ba");
     return res.sendFile(
       process.env.NODE_ENV === "production"
@@ -32,8 +31,6 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     const id = req.params.UID;
     const { index, length } = req.body;
-    //logging.info("[/doc/presence/:DOCID/:UID] Route", id);
-    //logging.info(`Request with index=${index}, length=${length}`, id);
     try {
       const _id = req.session.user.id;
       const user = await User.findById(_id);
@@ -49,15 +46,14 @@ export default async (fastify, opts) => {
       };
       clients.forEach((client) => {
         if (client.id !== id && client.docId === docId) {
-          //logging.info(`sent message to UID = ${client.id}`, id);
           client.res.write(`data: ${presenceStringify(presence)}\n\n`);
         }
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
-      //logging.error("Failed to send presence");
-      //logging.error(err);
+      logging.error("Failed to send presence");
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Failed to send presence");
     }
@@ -67,19 +63,16 @@ export default async (fastify, opts) => {
     const docId = req.params.DOCID;
     // Not sure what uid is for
     const uid = req.params.UID;
-    //logging.info("[/doc/get/:DOCID/:UID] Route", uid);
     try {
       const document = await fetchDoc(docId);
       const ops = document.data.ops;
       const converter = new QuillDeltaToHtmlConverter(ops, {});
       const html = converter.convert();
-      //logging.info("Sending HTML: ", uid);
-      //logging.info(html);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return html;
     } catch (err) {
-      //logging.error("fail to convert to HTML Format");
-      //logging.error(err);
+      logging.error("fail to convert to HTML Format");
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("fail to convert to HTML Format");
     }
@@ -104,8 +97,6 @@ export default async (fastify, opts) => {
         content: document.data.ops,
         version: document.version,
       };
-      //logging.info(`Content and Version:`, id);
-      //logging.info(payload, id);
       res.raw.write(`data: ${payloadStringify(payload)}\n\n`);
       const newClient = {
         id: id,
@@ -113,10 +104,6 @@ export default async (fastify, opts) => {
         res: res.raw,
       };
       clients.push(newClient);
-      logging.info(`New client connected!`);
-      //logging.info(newClient);
-      //logging.info(`Current Clients = ${clients}`);
-      //logging.info(clients);
       logging.info(
         `Current connected clients = ${clients.length} for docId = ${docId}`
       );
@@ -160,11 +147,9 @@ export default async (fastify, opts) => {
         clients.forEach((client) => {
           if (client.id === id) {
             client.res.write(`data: ${ackStringify(ack)}\n\n`);
-            logging.info(`sent ack to ${id}`);
           }
           if (client.docId === docId && client.id !== id) {
             client.res.write(`data: ${opStringify(op)}\n\n`);
-            logging.info(`sent op to ${client.id}`);
           }
         });
         logging.info("{ status: ok }", id);

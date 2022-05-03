@@ -13,7 +13,6 @@ const userRouter = async (fastify, opts) => {
     );
   });
   fastify.post("/login", async (req, res) => {
-    logging.info("[/user/login] Route");
     const { email, password } = req.body;
     logging.info(`Requested Login for email=${email} password=${password}`);
     try {
@@ -27,17 +26,14 @@ const userRouter = async (fastify, opts) => {
         } else {
           //verified
           if (req.session.authenticated) {
-            logging.info("User already logged in");
             res.header("X-CSE356", "61f9f57373ba724f297db6ba");
             return { name: user.name };
           } else if (user.password === password) {
-            logging.info("User first time logging in");
             req.session.authenticated = true;
             req.session.user = { id: user._id, email: email };
             res.header("X-CSE356", "61f9f57373ba724f297db6ba");
             return { name: user.name };
           } else {
-            logging.info(`${email} failed to logged in (mismatch password)`);
             res.header("X-CSE356", "61f9f57373ba724f297db6ba");
             return ERROR_MESSAGE("password not matched");
           }
@@ -55,11 +51,9 @@ const userRouter = async (fastify, opts) => {
     }
   });
   fastify.post("/logout", async (req, res) => {
-    logging.info("[/user/logout] Route");
     if (req.session.authenticated) {
       try {
         await req.session.destroy();
-        logging.info("logged out");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { message: "logged out" };
       } catch (err) {
@@ -71,18 +65,13 @@ const userRouter = async (fastify, opts) => {
     }
   });
   fastify.post("/signup", async (req, res) => {
-    logging.info("[/users/signup] Route");
     const { name, email, password } = req.body;
-    logging.info(
-      `Signing up for name=${name} email=${email} password=${password}`
-    );
     const user = await User.findOne({ email: email });
     if (user) {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("already registered with same email");
     } else {
       try {
-        logging.info(`received new user with this email: ${email}`);
         const userId = uuid();
         await User.create({
           _id: userId,
@@ -110,20 +99,17 @@ const userRouter = async (fastify, opts) => {
         };
         const transporter = nodemailer.createTransport(mailOption);
         transporter.sendMail(info);
-        logging.info(`Message sent to: ${email}`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       } catch (err) {
-        console.log(err);
+        logging.error(err);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE("failed to send email");
       }
     }
   });
   fastify.get("/verify", async (req, res) => {
-    logging.info("[/users/verify] Route");
     const { key } = req.query;
-    logging.info(`Requested querystring is key=${key}`);
     try {
       const user = await User.findById(key);
       if (user && key === user.key) {

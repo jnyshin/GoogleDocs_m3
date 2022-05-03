@@ -10,7 +10,6 @@ import {
 import { ESclient } from "../app.js";
 export default async (fastify, opts) => {
   fastify.post("/create", async (req, res) => {
-    logging.info("[/collection/create] Route");
     const name = req.body.name;
     const id = uuidv4();
     try {
@@ -46,11 +45,9 @@ export default async (fastify, opts) => {
   });
 
   fastify.post("/delete", async (req, res) => {
-    logging.info("[/collection/delete] Route");
     const docId = req.body.docid;
     try {
       await Docs.findByIdAndDelete(docId);
-      logging.info(`deleted doc id=${docId} route`);
       const document = await fetchDoc(docId);
       document.del();
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
@@ -63,7 +60,6 @@ export default async (fastify, opts) => {
     }
   });
   fastify.get("/list", async (req, res) => {
-    logging.info("[/collection/list] Route");
     try {
       const docs = await Docs.find().sort({ updatedAt: -1 }).limit(10);
       const ret = [];
@@ -74,8 +70,6 @@ export default async (fastify, opts) => {
         };
         ret.push(ele);
       }
-      logging.info(`sent docs list`);
-      logging.info(ret);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ret;
     } catch (err) {

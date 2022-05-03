@@ -6,7 +6,6 @@ let curr = 1;
 export const startUpdating = () => {
   setInterval(function () {
     if (process.env.instance_var === String(curr)) {
-      logging.info(`instance number matched ${String(curr)}`);
       updateES();
     }
     if (curr === 8) {
@@ -18,7 +17,6 @@ export const startUpdating = () => {
 };
 const updateES = () => {
   try {
-    logging.info("updateES reached");
     const start = performance.now();
     connection.createFetchQuery(SHARE_DB_NAME, {}, {}, async (err, results) => {
       const ret = [];

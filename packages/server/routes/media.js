@@ -25,14 +25,12 @@ export default async (fastify, opts) => {
     "/upload",
     { preHandler: upload.single("file") },
     async (req, res) => {
-      logging.info("[media/upload] Route");
       const file = req.file;
       if (!file) {
         logging.error("Did not upload a file");
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE("Please upload a file");
       }
-      logging.info(file);
       if (
         file.mimetype === "image/png" ||
         file.mimetype === "image/jpeg" ||
@@ -48,7 +46,6 @@ export default async (fastify, opts) => {
                 : `/uploads/${file.filename}`,
             mime: file.mimetype,
           });
-          logging.info(`Created image with _id = ${mediaId}`);
           res.header("X-CSE356", "61f9f57373ba724f297db6ba");
           return { mediaid: mediaId };
         } catch (err) {
@@ -69,7 +66,6 @@ export default async (fastify, opts) => {
   );
   fastify.get("/access/:mediaID", async (req, res) => {
     try {
-      logging.info("[/access/:mediaID] Route");
       const mediaID = req.params.mediaID;
       const { redis } = fastify;
       const cache = await redis.get(mediaID);
@@ -79,7 +75,6 @@ export default async (fastify, opts) => {
       } else {
         const image = await Images.findById(mediaID);
         redis.setex(mediaID, 3600, image.file);
-
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return res.sendFile(image.file);
       }
