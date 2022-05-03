@@ -173,18 +173,18 @@ fastify.register((fastifyInstance, options, done) => {
     .finally(() => done());
 });
 
-let curr = 1;
-setInterval(function () {
-  if (process.env.instance_var === String(curr)) {
-    logging.info(`instance number matched ${String(curr)}`);
-    updateES();
-  }
-  if (curr === 8) {
-    curr = 0;
-  } else {
-    curr += 1;
-  }
-}, 5000);
+// let curr = 1;
+// setInterval(function () {
+//   if (process.env.instance_var === String(curr)) {
+//     logging.info(`instance number matched ${String(curr)}`);
+//     updateES();
+//   }
+//   if (curr === 8) {
+//     curr = 0;
+//   } else {
+//     curr += 1;
+//   }
+// }, 5000);
 
 const updateES = () => {
   try {
