@@ -7,7 +7,6 @@ import {
   __dirname,
   elasticStringify,
   ELASTIC_INDEX,
-  SHARE_DB_NAME,
 } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
@@ -24,7 +23,7 @@ import { join } from "path";
 import richText from "rich-text";
 import { v4 as uuid } from "uuid";
 import { Client, Serializer } from "@elastic/elasticsearch";
-// import { startUpdating } from "./updateElastic.js";
+import { startUpdating } from "./updateElastic.js";
 
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
