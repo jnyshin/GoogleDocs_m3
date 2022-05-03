@@ -7,6 +7,7 @@ import {
   __dirname,
   elasticStringify,
   ELASTIC_INDEX,
+  SHARE_DB_NAME,
 } from "./store.js";
 import fastifyCookie from "fastify-cookie";
 import fastifyCors from "fastify-cors";
@@ -197,7 +198,7 @@ setInterval(async function () {
     logging.info("instance number matched");
     await updateES();
   }
-  if (curr === 3) {
+  if (curr === 8) {
     curr = 0;
   } else {
     curr += 1;
