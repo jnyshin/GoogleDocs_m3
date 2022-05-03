@@ -10,6 +10,8 @@ module.exports = {
       },
       exec_mode: "fork",
       instances: "1",
+      out_file: "/dev/null",
+      error_file: "/dev/null",
     },
     {
       name: "API Server 2",
@@ -21,6 +23,8 @@ module.exports = {
       },
       exec_mode: "fork",
       instances: "1",
+      out_file: "/dev/null",
+      error_file: "/dev/null",
     },
 
     {
@@ -33,6 +37,8 @@ module.exports = {
       },
       exec_mode: "fork",
       instances: "1",
+      out_file: "/dev/null",
+      error_file: "/dev/null",
     },
 
     {
@@ -45,6 +51,8 @@ module.exports = {
       },
       exec_mode: "fork",
       instances: "1",
+      out_file: "/dev/null",
+      error_file: "/dev/null",
     },
   ],
 };
