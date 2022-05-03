@@ -24,7 +24,8 @@
     "nodemailer": "^6.7.3",
     "sharedb": "^2.2.5",
     "sharedb-mongo": "^1.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "ws": "^8.6.0"
   },
   "scripts": {
     "dev": "PORT=8000 NODE_ENV=development nodemon app.js",

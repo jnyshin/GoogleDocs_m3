@@ -24,6 +24,7 @@ import richText from "rich-text";
 import { v4 as uuid } from "uuid";
 import { Client, Serializer } from "@elastic/elasticsearch";
 import { startUpdating } from "./updateElastic.js";
+import WebSocket from "ws";
 
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
@@ -31,6 +32,7 @@ const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 
 ShareDB.types.register(richText.type);
+const socket = new WebSocket("127");
 const MongoURL =
   NODE_ENV === "production"
     ? process.env.instance_var === "9" ||
@@ -153,10 +155,10 @@ fastify.register(import("./routes/test.js"), {
 fastify.post("/deleteAll", async () => {
   deleteAll();
 });
-fastify.register((fastify, opts, done) => {
-  startUpdating();
-  done();
-});
+// fastify.register((fastify, opts, done) => {
+//   startUpdating();
+//   done();
+// });
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect(MongoURL, {
