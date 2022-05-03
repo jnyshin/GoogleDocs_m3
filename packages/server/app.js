@@ -32,7 +32,6 @@ const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
 
 ShareDB.types.register(richText.type);
-const socket = new WebSocket("127");
 const MongoURL =
   NODE_ENV === "production"
     ? process.env.instance_var === "9" ||
