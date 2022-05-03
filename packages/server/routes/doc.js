@@ -141,9 +141,9 @@ export default async (fastify, opts) => {
       } else {
         document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
-        await Docs.findByIdAndUpdate(docId, {
-          $inc: { version: 1 },
-        });
+        // await Docs.findByIdAndUpdate(docId, {
+        //   $inc: { version: 1 },
+        // });
         clients.forEach((client) => {
           if (client.id === id) {
             client.res.write(`data: ${ackStringify(ack)}\n\n`);
