@@ -195,7 +195,7 @@ let curr = 1;
 setInterval(async function () {
   console.log(process.env.instance_var);
   if (process.env.instance_var === String(curr)) {
-    logging.info("instance number matched");
+    logging.info(`instance number matched ${String(curr)}`);
     await updateES();
   }
   if (curr === 8) {
@@ -203,7 +203,7 @@ setInterval(async function () {
   } else {
     curr += 1;
   }
-  logging.info(`current process for udpating: ${curr}`);
+  //logging.info(`current process for udpating: ${curr}`);
 }, 5000);
 
 const updateES = () => {
