@@ -52,8 +52,8 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
-      logging.error("Failed to send presence");
-      logging.error(err);
+      //logging.error("Failed to send presence");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Failed to send presence");
     }
@@ -71,8 +71,8 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return html;
     } catch (err) {
-      logging.error("fail to convert to HTML Format");
-      logging.error(err);
+      //logging.error("fail to convert to HTML Format");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("fail to convert to HTML Format");
     }
@@ -104,9 +104,9 @@ export default async (fastify, opts) => {
         res: res.raw,
       };
       clients.push(newClient);
-      logging.info(
-        `Current connected clients = ${clients.length} for docId = ${docId}`
-      );
+      // logging.info(
+      //   `Current connected clients = ${clients.length} for docId = ${docId}`
+      // );
       req.raw.on("close", () => {
         logging.info(`UID = ${id} connection closed`);
         clients.map((c, index) =>
@@ -115,8 +115,8 @@ export default async (fastify, opts) => {
         logging.info(`remaining clients = ${clients.length}`);
       });
     } catch (err) {
-      logging.error("fail to create event stream connection");
-      logging.error(err);
+      //logging.error("fail to create event stream connection");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(err);
     }

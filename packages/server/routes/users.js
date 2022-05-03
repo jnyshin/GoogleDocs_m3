@@ -14,13 +14,13 @@ const userRouter = async (fastify, opts) => {
   });
   fastify.post("/login", async (req, res) => {
     const { email, password } = req.body;
-    logging.info(`Requested Login for email=${email} password=${password}`);
+    //logging.info(`Requested Login for email=${email} password=${password}`);
     try {
       const user = await User.findOne({ email: email });
       if (user) {
         if (!user.enable) {
           //not verified
-          logging.error("Failed to verify");
+          //logging.error("Failed to verify");
           res.header("X-CSE356", "61f9f57373ba724f297db6ba");
           return ERROR_MESSAGE("did not verify");
         } else {
@@ -39,13 +39,13 @@ const userRouter = async (fastify, opts) => {
           }
         }
       } else {
-        logging.error(`User with email = ${email} does not exist`);
+        //logging.error(`User with email = ${email} does not exist`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE("user does not exist");
       }
     } catch (err) {
-      logging.error("Error in logging in");
-      logging.error(err);
+      //logging.error("Error in logging in");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Error in logged in");
     }
@@ -102,7 +102,7 @@ const userRouter = async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       } catch (err) {
-        logging.error(err);
+        //logging.error(err);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return ERROR_MESSAGE("failed to send email");
       }
@@ -121,7 +121,7 @@ const userRouter = async (fastify, opts) => {
         return ERROR_MESSAGE(`email verification failed`);
       }
     } catch (err) {
-      logging.error(err);
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Error while verify");
     }

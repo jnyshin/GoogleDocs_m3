@@ -43,7 +43,7 @@ const updateES = () => {
         operations,
       });
       const duration = performance.now() - start;
-      logging.info(`Updaing elastic search took ${duration}ms`);
+      //logging.info(`Updaing elastic search took ${duration}ms`);
     });
   } catch (err) {
     logging.error("Error while updating");

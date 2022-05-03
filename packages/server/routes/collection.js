@@ -13,7 +13,7 @@ export default async (fastify, opts) => {
     const name = req.body.name;
     const id = uuidv4();
     try {
-      logging.info(`created new doc id=${id} route`);
+      //logging.info(`created new doc id=${id} route`);
       await fetchCreateDocs(id);
       await Docs.create({
         _id: id,
@@ -37,7 +37,7 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return { docid: id };
     } catch (err) {
-      logging.error(`failed to created doc with id = ${id}`);
+      //logging.error(`failed to created doc with id = ${id}`);
       logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(`failed to created doc with id = ${id}`);
@@ -53,8 +53,8 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
-      logging.error(`failed to delete doc id = ${docId}`);
-      logging.error(err);
+      //logging.error(`failed to delete doc id = ${docId}`);
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(`failed to delete doc id = ${docId}`);
     }
@@ -73,8 +73,8 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ret;
     } catch (err) {
-      logging.error("failed find all docs");
-      logging.error(err);
+      //logging.error("failed find all docs");
+      //logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("failed find all docs");
     }
