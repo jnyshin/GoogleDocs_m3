@@ -173,6 +173,21 @@ fastify.register((fastifyInstance, options, done) => {
     .finally(() => done());
 });
 
+const start = async () => {
+  try {
+    await fastify.listen(PORT, IP);
+    logging.info(`* Server started ${IP}:${PORT} `);
+    if (process.env.instance_var === "1") {
+      logging.info("Clear elastic search");
+      await resetIndex(ELASTIC_INDEX);
+    }
+  } catch (err) {
+    console.log(err);
+    fastify.log.error(err);
+  }
+};
+start();
+
 let curr = 1;
 setInterval(function () {
   if (process.env.instance_var === String(curr)) {
@@ -185,6 +200,41 @@ setInterval(function () {
     curr += 1;
   }
 }, 5000);
+
+process.on("SIGINT", function () {
+  process.exit(0);
+});
+
+const deleteAll = async () => {
+  try {
+    const connection = mongoose.connection;
+    const share_docs = connection.db.collection("share_docs");
+    const o_share_docs = connection.db.collection("o_share_docs");
+    const docs = connection.db.collection("docs");
+    const image = connection.db.collection("images");
+    const users = connection.db.collection("users");
+    share_docs.deleteMany({});
+    o_share_docs.deleteMany({});
+    docs.deleteMany({});
+    image.deleteMany({});
+    users.deleteMany({});
+    users.insertOne({
+      _id: uuid(),
+      email: "admin",
+      password: "admin",
+      name: "admin",
+      enable: true,
+    });
+    if (NODE_ENV === "production") {
+      await ioredis.flushall();
+    }
+    return { status: "ok" };
+  } catch (err) {
+    logging.error(err);
+    logging.error("Failed to delete");
+    return ERROR_MESSAGE("Failed to delete all");
+  }
+};
 
 const updateES = () => {
   try {
@@ -220,55 +270,5 @@ const updateES = () => {
   } catch (err) {
     logging.error("Error while updating");
     logging.error(err);
-  }
-};
-
-const start = async () => {
-  try {
-    await fastify.listen(PORT, IP);
-    logging.info(`* Server started ${IP}:${PORT} `);
-    if (process.env.instance_var === "1") {
-      logging.info("Clear elastic search");
-      await resetIndex(ELASTIC_INDEX);
-    }
-  } catch (err) {
-    console.log(err);
-    fastify.log.error(err);
-  }
-};
-start();
-
-process.on("SIGINT", function () {
-  process.exit(0);
-});
-
-const deleteAll = async () => {
-  try {
-    const connection = mongoose.connection;
-    const share_docs = connection.db.collection("share_docs");
-    const o_share_docs = connection.db.collection("o_share_docs");
-    const docs = connection.db.collection("docs");
-    const image = connection.db.collection("images");
-    const users = connection.db.collection("users");
-    share_docs.deleteMany({});
-    o_share_docs.deleteMany({});
-    docs.deleteMany({});
-    image.deleteMany({});
-    users.deleteMany({});
-    users.insertOne({
-      _id: uuid(),
-      email: "admin",
-      password: "admin",
-      name: "admin",
-      enable: true,
-    });
-    if (NODE_ENV === "production") {
-      await ioredis.flushall();
-    }
-    return { status: "ok" };
-  } catch (err) {
-    logging.error(err);
-    logging.error("Failed to delete");
-    return ERROR_MESSAGE("Failed to delete all");
   }
 };
