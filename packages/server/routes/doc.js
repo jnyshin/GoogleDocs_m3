@@ -115,8 +115,8 @@ export default async (fastify, opts) => {
         logging.info(`remaining clients = ${clients.length}`);
       });
     } catch (err) {
-      //logging.error("fail to create event stream connection");
-      //logging.error(err);
+      logging.error("fail to create event stream connection");
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE(err);
     }
@@ -139,6 +139,7 @@ export default async (fastify, opts) => {
         logging.info("Disrupting editing: { status: retry }", id);
         return { status: "retry" };
       } else {
+        const start = performance.now();
         document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
         // await Docs.findByIdAndUpdate(docId, {
@@ -154,6 +155,8 @@ export default async (fastify, opts) => {
         });
         logging.info("{ status: ok }", id);
         document.preventCompose = false;
+        const duration = performance.now() - start;
+        logging.info(`OP took ${duration}ms`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         return { status: "ok" };
       }
