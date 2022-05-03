@@ -26,6 +26,7 @@ const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
 import { Client, Serializer } from "@elastic/elasticsearch";
+import { strictEqual } from "assert";
 const RedisStore = connectRedis(fastifySession);
 
 ShareDB.types.register(richText.type);
@@ -188,6 +189,58 @@ start();
 process.on("SIGINT", function () {
   process.exit(0);
 });
+
+let curr = 1;
+setInterval(async function () {
+  console.log(process.env.instance_var);
+  if (process.env.instance_var === String(curr)) {
+    logging.info("instance number matched");
+    await updateES();
+  }
+  if (curr === 3) {
+    curr = 0;
+  } else {
+    curr += 1;
+  }
+  logging.info(`current process for udpating: ${curr}`);
+}, 5000);
+
+const updateES = () => {
+  try {
+    logging.info("updateES reached");
+    const start = performance.now();
+    connection.createFetchQuery(SHARE_DB_NAME, {}, {}, async (err, results) => {
+      const ret = [];
+      results.map((doc) => {
+        const ops = doc.data.ops;
+        const body = new QuillDeltaToHtmlConverter(ops, {})
+          .convert()
+          .replaceAll(/<[\w]*>/gi, "")
+          .replaceAll(/<\/[\w]*>/gi, "")
+          .replaceAll(/<[\w]*\/>/gi, "");
+        ret.push({ docid: doc.id, suggest_body: body, search_body: body });
+      });
+      if (!ret.length) {
+        return;
+      }
+      const operations = ret.flatMap((doc) => [
+        { update: { _id: doc.docid, _index: ELASTIC_INDEX } },
+        {
+          doc: doc,
+        },
+      ]);
+      await ESclient.bulk({
+        index: ELASTIC_INDEX,
+        operations,
+      });
+      const duration = performance.now() - start;
+      logging.info(`Updaing elastic search took ${duration}ms`);
+    });
+  } catch (err) {
+    logging.error("Error while updating");
+    logging.error(err);
+  }
+};
 
 const deleteAll = async () => {
   try {

@@ -166,44 +166,39 @@ export default async (fastify, opts) => {
             client.res.write(`data: ${opStringify(op)}\n\n`);
           }
         });
-        if (document.version % 10 == 0) {
-          try {
-            const start = performance.now();
-            const ops = document.data.ops;
-            const body = new QuillDeltaToHtmlConverter(ops, {})
-              .convert()
-              .replaceAll(/<[\w]*>/gi, "")
-              .replaceAll(/<\/[\w]*>/gi, "")
-              .replaceAll(/<[\w]*\/>/gi, "");
-            // const doc = {
-            //   docid: document.id,
-            //   suggest_body: body,
-            //   search_body: body,
-            // };
-            const doc = {
-              docid: document.id,
-              suggest_mix: body,
-              search_mix: body,
-            };
+        // if (document.version % 10 == 0) {
+        //   try {
+        //     const start = performance.now();
+        //     const ops = document.data.ops;
+        //     const body = new QuillDeltaToHtmlConverter(ops, {})
+        //       .convert()
+        //       .replaceAll(/<[\w]*>/gi, "")
+        //       .replaceAll(/<\/[\w]*>/gi, "")
+        //       .replaceAll(/<[\w]*\/>/gi, "");
+        //     const doc = {
+        //       docid: document.id,
+        //       suggest_mix: body,
+        //       search_mix: body,
+        //     };
 
-            const operations = [
-              { update: { _id: document.id, _index: ELASTIC_INDEX } },
-              {
-                doc: doc,
-              },
-            ];
-            ESclient.bulk({
-              index: ELASTIC_INDEX,
-              refresh: true,
-              operations,
-            });
-            const duration = performance.now() - start;
-            logging.info(`Updaing elastic search took ${duration}ms`);
-          } catch (err) {
-            logging.error("Error while updating");
-            logging.error(err);
-          }
-        }
+        //     const operations = [
+        //       { update: { _id: document.id, _index: ELASTIC_INDEX } },
+        //       {
+        //         doc: doc,
+        //       },
+        //     ];
+        //     ESclient.bulk({
+        //       index: ELASTIC_INDEX,
+        //       refresh: true,
+        //       operations,
+        //     });
+        //     const duration = performance.now() - start;
+        //     logging.info(`Updaing elastic search took ${duration}ms`);
+        //   } catch (err) {
+        //     logging.error("Error while updating");
+        //     logging.error(err);
+        //   }
+        // }
         logging.info("{ status: ok }", id);
         document.preventCompose = false;
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
