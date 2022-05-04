@@ -11,14 +11,14 @@ export default async (fastify, opts) => {
     return { took: `${performanceCheck}ms` };
   });
 
-  fastify.get(`/test1`, async (req, res) => {
+  fastify.post(`/test1`, async (req, res) => {
     const docId = req.body.docId;
     const document = await fetchDoc(docId);
     document.preventCompose = true;
     return {};
   });
 
-  fastify.get(`/test2`, async (req, res) => {
+  fastify.post(`/test2`, async (req, res) => {
     const docId = req.body.docId;
     const document = await fetchDoc(docId);
     console.log(document.preventCompose);
