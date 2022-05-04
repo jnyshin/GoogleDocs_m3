@@ -26,9 +26,9 @@ import { Client, Serializer } from "@elastic/elasticsearch";
 import WebSocket from "ws";
 import { Connection } from "sharedb/lib/client/index.js";
 
+const { NODE_ENV, PORT, WS_PORT } = process.env;
 const socket = new WebSocket(`ws://10.9.4.238:${WS_PORT}`);
 export const connection = new Connection(socket);
-const { NODE_ENV, PORT, WS_PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
 const RedisStore = connectRedis(fastifySession);
