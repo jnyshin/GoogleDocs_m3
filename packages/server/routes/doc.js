@@ -129,36 +129,36 @@ export default async (fastify, opts) => {
     const op = req.body.op;
     try {
       const document = await fetchDoc(docId);
-      if (version !== document.version) {
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info(
-          `Client v=${version} != doc v=${document.version}: { status: retry }`,
-          id
-        );
-        return { status: "retry" };
-      } else if (document.preventCompose) {
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("Disrupting editing: { status: retry }", id);
-        return { status: "retry" };
-      } else {
-        logging.info(`doc v=${document.version}`);
-        document.preventCompose = true;
-        const ack = await docSubmitOp(document, op, id);
-        clients.forEach((client) => {
-          if (client.id === id) {
-            client.res.write(`data: ${ackStringify(ack)}\n\n`);
-          }
-          if (client.docId === docId && client.id !== id) {
-            client.res.write(`data: ${opStringify(op)}\n\n`);
-          }
-        });
-        logging.info("{ status: ok }", id);
-        document.preventCompose = false;
-        const duration = performance.now() - start;
-        logging.info(`OP took ${duration}ms`);
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        return { status: "ok" };
-      }
+      // if (version !== document.version) {
+      //   res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      //   logging.info(
+      //     `Client v=${version} != doc v=${document.version}: { status: retry }`,
+      //     id
+      //   );
+      //   return { status: "retry" };
+      // } else if (document.preventCompose) {
+      //   res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      //   logging.info("Disrupting editing: { status: retry }", id);
+      //   return { status: "retry" };
+      // } else {
+      logging.info(`doc v=${document.version}`);
+      // document.preventCompose = true;
+      const ack = await docSubmitOp(document, op, id);
+      clients.forEach((client) => {
+        if (client.id === id) {
+          client.res.write(`data: ${ackStringify(ack)}\n\n`);
+        }
+        if (client.docId === docId && client.id !== id) {
+          client.res.write(`data: ${opStringify(op)}\n\n`);
+        }
+      });
+      logging.info("{ status: ok }", id);
+      // document.preventCompose = false;
+      const duration = performance.now() - start;
+      logging.info(`OP took ${duration}ms`);
+      res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      return { status: "ok" };
+      // }
     } catch (err) {
       logging.error("failed to update OP", id);
       logging.error(err);
