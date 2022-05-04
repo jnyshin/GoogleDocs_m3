@@ -27,7 +27,7 @@ import { startUpdating } from "./updateElastic.js";
 import WebSocket from "ws";
 import { Connection } from "sharedb/lib/client/index.js";
 
-const socket = new WebSocket("ws:10.9.4.238//:8080");
+const socket = new WebSocket("ws://10.9.4.238:8080");
 export const connection = new Connection(socket);
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
