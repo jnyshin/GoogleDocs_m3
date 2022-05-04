@@ -136,15 +136,13 @@ export default async (fastify, opts) => {
           id
         );
         return { status: "retry" };
-      }
-      // else if (document.preventCompose) {
-      //   res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-      //   logging.info("Disrupting editing: { status: retry }", id);
-      //   return { status: "retry" };
-      // }
-      else {
+      } else if (document.preventCompose) {
+        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+        logging.info("Disrupting editing: { status: retry }", id);
+        return { status: "retry" };
+      } else {
         logging.info(`doc v=${document.version}`);
-        // document.preventCompose = true;
+        document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
         clients.forEach((client) => {
           if (client.id === id) {
@@ -155,7 +153,7 @@ export default async (fastify, opts) => {
           }
         });
         logging.info("{ status: ok }", id);
-        // document.preventCompose = false;
+        document.preventCompose = false;
         const duration = performance.now() - start;
         logging.info(`OP took ${duration}ms`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
