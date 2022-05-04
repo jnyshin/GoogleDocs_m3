@@ -1,4 +1,4 @@
-import { ELASTIC_INDEX, SHARE_DB_NAME } from "../store.js";
+import { ELASTIC_INDEX, fetchDoc, SHARE_DB_NAME } from "../store.js";
 import {
   // connection,
   ESclient,
@@ -11,34 +11,17 @@ export default async (fastify, opts) => {
     return { took: `${performanceCheck}ms` };
   });
 
-  fastify.get(`/update`, async (req, res) => {
-    try {
-      const result = await ESclient.search({
-        index: ELASTIC_INDEX,
-        query: {
-          match_all: {},
-        },
-      });
-      console.log(result);
-    } catch (err) {
-      logging.error(err);
-    }
-    logging.info("HERE");
+  fastify.get(`/test1`, async (req, res) => {
+    const docId = req.body.docId;
+    const document = await fetchDoc(docId);
+    document.preventCompose = true;
     return {};
   });
 
-  fastify.get(`/index`, async (req, res) => {
-    ESclient.index({
-      index: ELASTIC_INDEX,
-      id: "1",
-      document: {
-        docid: "1",
-        suggest_name: "hasung",
-        search_name: "hasung",
-        suggest_body: "",
-        search_body: "",
-      },
-    });
+  fastify.get(`/test2`, async (req, res) => {
+    const docId = req.body.docId;
+    const document = await fetchDoc(docId);
+    console.log(document.preventCompose);
 
     return {};
   });
