@@ -25,7 +25,10 @@ import { v4 as uuid } from "uuid";
 import { Client, Serializer } from "@elastic/elasticsearch";
 import { startUpdating } from "./updateElastic.js";
 import WebSocket from "ws";
+import { Connection } from "sharedb/lib/client/index.js";
 
+const socket = new WebSocket("ws:10.9.4.238//:8080");
+export const connection = new Connection(socket);
 const { NODE_ENV, PORT } = process.env;
 const fastify = Fastify();
 const IP = "127.0.0.1";
@@ -51,14 +54,7 @@ const RedisURL =
       : "127.0.0.1"
     : "127.0.0.1";
 
-const docsDB = MongoShareDB(MongoURL);
-const backend = new ShareDB({
-  db: docsDB,
-  presence: true,
-  doNotForwardSendPresenceErrorsToClient: true,
-});
 const ioredis = new IORedis(6379, RedisURL);
-export const connection = backend.connect();
 
 class MySerializer extends Serializer {
   serialize(obj) {
