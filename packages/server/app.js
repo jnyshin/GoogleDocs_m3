@@ -26,9 +26,11 @@ import { Client, Serializer } from "@elastic/elasticsearch";
 import WebSocket from "ws";
 import { Connection } from "sharedb/lib/client/index.js";
 
-const { NODE_ENV, PORT, WS_PORT } = process.env;
-const socket = new WebSocket(`ws://10.9.4.238:${WS_PORT}`);
-logging.info(`Web Socket Connected to 10.9.4.238:${WS_PORT}`);
+const { NODE_ENV, PORT, WS_PORT, WS_IP, MONGO_IP } = process.env;
+
+const socket = new WebSocket(`ws://${WS_IP}:${WS_PORT}`);
+
+logging.info(`Web Socket Connected to ${WS_IP}:${WS_PORT}`);
 export const connection = new Connection(socket);
 const fastify = Fastify();
 const IP = "127.0.0.1";
@@ -36,9 +38,7 @@ const RedisStore = connectRedis(fastifySession);
 
 ShareDB.types.register(richText.type);
 const MongoURL =
-  NODE_ENV === "production"
-    ? "mongodb://10.9.4.238:27017/docs_clone"
-    : "mongodb://localhost:27017/docs_clone";
+  NODE_ENV === "production" ? MONGO_IP : "mongodb://localhost:27017/docs_clone";
 const RedisURL = NODE_ENV === "production" ? "127.0.0.1" : "127.0.0.1";
 
 const ioredis = new IORedis(6379, RedisURL);
