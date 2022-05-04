@@ -1,5 +1,6 @@
 import { ELASTIC_INDEX, fetchDoc, SHARE_DB_NAME } from "../store.js";
 import {
+  connection,
   // connection,
   ESclient,
 } from "../app.js";
@@ -13,15 +14,18 @@ export default async (fastify, opts) => {
 
   fastify.post(`/test1`, async (req, res) => {
     const docId = req.body.docId;
-    const document = await fetchDoc(docId);
-    document.preventCompose = true;
+    const query = connection.createFetchQuery(SHARE_DB_NAME, {});
+    query.on("ready", () => {
+      query.results.map((val) => {
+        console.log(val);
+      });
+    });
     return {};
   });
 
   fastify.post(`/test2`, async (req, res) => {
     const docId = req.body.docId;
-    const document = await fetchDoc(docId);
-    console.log(document.preventCompose);
+
     return {};
   });
 
