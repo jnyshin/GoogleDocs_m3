@@ -28,6 +28,7 @@ import { Connection } from "sharedb/lib/client/index.js";
 
 const { NODE_ENV, PORT, WS_PORT } = process.env;
 const socket = new WebSocket(`ws://10.9.4.238:${WS_PORT}`);
+logging.info(`Web Socket Connected to 10.9.4.238:${WS_PORT}`);
 export const connection = new Connection(socket);
 const fastify = Fastify();
 const IP = "127.0.0.1";
