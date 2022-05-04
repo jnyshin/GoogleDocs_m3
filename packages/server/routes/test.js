@@ -22,7 +22,6 @@ export default async (fastify, opts) => {
     const docId = req.body.docId;
     const document = await fetchDoc(docId);
     console.log(document.preventCompose);
-
     return {};
   });
 

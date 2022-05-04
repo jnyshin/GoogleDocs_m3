@@ -37,22 +37,9 @@ const RedisStore = connectRedis(fastifySession);
 ShareDB.types.register(richText.type);
 const MongoURL =
   NODE_ENV === "production"
-    ? process.env.instance_var === "9" ||
-      process.env.instance_var === "10" ||
-      process.env.instance_var === "11" ||
-      process.env.instance_var === "12"
-      ? "mongodb://localhost/docs_clone"
-      : "mongodb://10.9.4.238:27017/docs_clone"
+    ? "mongodb://10.9.4.238:27017/docs_clone"
     : "mongodb://localhost:27017/docs_clone";
-const RedisURL =
-  NODE_ENV === "production"
-    ? process.env.instance_var === "9" ||
-      process.env.instance_var === "10" ||
-      process.env.instance_var === "11" ||
-      process.env.instance_var === "12"
-      ? "10.9.4.204"
-      : "127.0.0.1"
-    : "127.0.0.1";
+const RedisURL = NODE_ENV === "production" ? "127.0.0.1" : "127.0.0.1";
 
 const ioredis = new IORedis(6379, RedisURL);
 
