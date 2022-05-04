@@ -141,7 +141,6 @@ export default async (fastify, opts) => {
       //   logging.info("Disrupting editing: { status: retry }", id);
       //   return { status: "retry" };
       // } else {
-      logging.info(`doc v=${document.version}`);
       // document.preventCompose = true;
       const ack = await docSubmitOp(document, op, id);
       clients.forEach((client) => {
