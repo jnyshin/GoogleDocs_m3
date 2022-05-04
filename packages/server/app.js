@@ -23,7 +23,6 @@ import { join } from "path";
 import richText from "rich-text";
 import { v4 as uuid } from "uuid";
 import { Client, Serializer } from "@elastic/elasticsearch";
-import { startUpdating } from "./updateElastic.js";
 import WebSocket from "ws";
 import { Connection } from "sharedb/lib/client/index.js";
 
@@ -150,10 +149,7 @@ fastify.register(import("./routes/test.js"), {
 fastify.post("/deleteAll", async () => {
   deleteAll();
 });
-fastify.register((fastify, opts, done) => {
-  startUpdating();
-  done();
-});
+
 fastify.register((fastifyInstance, options, done) => {
   mongoose
     .connect(MongoURL, {
