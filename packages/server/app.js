@@ -39,7 +39,7 @@ const RedisStore = connectRedis(fastifySession);
 ShareDB.types.register(richText.type);
 const MongoURL =
   NODE_ENV === "production" ? MONGO_IP : "mongodb://localhost:27017/docs_clone";
-const RedisURL = NODE_ENV === "production" ? "127.0.0.1" : "127.0.0.1";
+const RedisURL = NODE_ENV === "production" ? "10.9.4.204" : "127.0.0.1";
 
 const ioredis = new IORedis(6379, RedisURL);
 
