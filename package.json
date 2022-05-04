@@ -10,7 +10,6 @@
     "dev": "concurrently \"yarn workspace server dev\" ",
     "production": "concurrently \"yarn workspace client build\" \"yarn workspace server production\" ",
     "pm": "concurrently \"pm2 start ecosystem.config.js --attach\"",
-    "second": "concurrently \"pm2 start main2.config.js --attach\"",
     "pm-dev": "concurrently \"yarn workspace server pm-dev\"",
     "del": "concurrently \"pm2 delete all\"",
     "client-build": "concurrently \"yarn workspace client build\""
