@@ -134,13 +134,15 @@ export default async (fastify, opts) => {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
         logging.info("Version not matched: { status: retry }", id);
         return { status: "retry" };
-      } else if (document.preventCompose) {
-        res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("Disrupting editing: { status: retry }", id);
-        return { status: "retry" };
-      } else {
+      }
+      // else if (document.preventCompose) {
+      //   res.header("X-CSE356", "61f9f57373ba724f297db6ba");
+      //   logging.info("Disrupting editing: { status: retry }", id);
+      //   return { status: "retry" };
+      // }
+      else {
         const start = performance.now();
-        document.preventCompose = true;
+        // document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
         // await Docs.findByIdAndUpdate(docId, {
         //   $inc: { version: 1 },
@@ -154,7 +156,7 @@ export default async (fastify, opts) => {
           }
         });
         logging.info("{ status: ok }", id);
-        document.preventCompose = false;
+        // document.preventCompose = false;
         const duration = performance.now() - start;
         logging.info(`OP took ${duration}ms`);
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
