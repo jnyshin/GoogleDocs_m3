@@ -52,8 +52,8 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return {};
     } catch (err) {
-      //logging.error("Failed to send presence");
-      //logging.error(err);
+      logging.error("Failed to send presence");
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("Failed to send presence");
     }
@@ -71,8 +71,8 @@ export default async (fastify, opts) => {
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return html;
     } catch (err) {
-      //logging.error("fail to convert to HTML Format");
-      //logging.error(err);
+      logging.error("fail to convert to HTML Format");
+      logging.error(err);
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");
       return ERROR_MESSAGE("fail to convert to HTML Format");
     }
@@ -90,7 +90,6 @@ export default async (fastify, opts) => {
         Connection: "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "X-CSE356": "61f9f57373ba724f297db6ba",
-        "X-Accel-Buffering": "no",
       };
       res.raw.writeHead(200, headers);
       const payload = {
@@ -123,8 +122,8 @@ export default async (fastify, opts) => {
   });
 
   fastify.post("/op/:DOCID/:UID", async (req, res) => {
+    const start = performance.now();
     const id = req.params.UID;
-    //logging.info("[/doc/op/:DOCID/:UID] Route", id);
     const docId = req.params.DOCID;
     const version = req.body.version;
     const op = req.body.op;
@@ -144,12 +143,9 @@ export default async (fastify, opts) => {
       //   return { status: "retry" };
       // }
       else {
-        const start = performance.now();
+        logging.info(`doc v=${document.version}`);
         // document.preventCompose = true;
         const ack = await docSubmitOp(document, op, id);
-        // await Docs.findByIdAndUpdate(docId, {
-        //   $inc: { version: 1 },
-        // });
         clients.forEach((client) => {
           if (client.id === id) {
             client.res.write(`data: ${ackStringify(ack)}\n\n`);
