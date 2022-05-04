@@ -30,8 +30,6 @@ export default async (fastify, opts) => {
           search_name: name,
           suggest_mix: "",
           search_mix: "",
-          // suggest_body: "",
-          // search_body: "",
         },
       });
       res.header("X-CSE356", "61f9f57373ba724f297db6ba");

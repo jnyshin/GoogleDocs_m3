@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import ShareDB from "sharedb";
-import MongoShareDB from "sharedb-mongo";
 import {
   ERROR_MESSAGE,
   resetIndex,

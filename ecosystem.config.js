@@ -73,8 +73,8 @@ module.exports = {
       env: {
         PORT: 8005,
         WS_PORT: 8080,
-        WS_IP: "10.9.8.168",
-        MONGO_IP: "mongodb://10.9.8.168:27017/docs_clone",
+        WS_IP: "10.9.4.238",
+        MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -89,8 +89,8 @@ module.exports = {
       env: {
         PORT: 8006,
         WS_PORT: 8081,
-        WS_IP: "10.9.8.168",
-        MONGO_IP: "mongodb://10.9.8.168:27017/docs_clone",
+        WS_IP: "10.9.4.238",
+        MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -105,8 +105,8 @@ module.exports = {
       env: {
         PORT: 8007,
         WS_PORT: 8082,
-        WS_IP: "10.9.8.168",
-        MONGO_IP: "mongodb://10.9.8.168:27017/docs_clone",
+        WS_IP: "10.9.4.238",
+        MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -121,8 +121,8 @@ module.exports = {
       env: {
         PORT: 8008,
         WS_PORT: 8083,
-        WS_IP: "10.9.8.168",
-        MONGO_IP: "mongodb://10.9.8.168:27017/docs_clone",
+        WS_IP: "10.9.4.238",
+        MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
         NODE_ENV: "production",
       },
       exec_mode: "fork",
