@@ -6,6 +6,7 @@ module.exports = {
       instance_var: "1",
       env: {
         PORT: 8000,
+        WS_PORT: 8080,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -19,6 +20,7 @@ module.exports = {
       instance_var: "2",
       env: {
         PORT: 8001,
+        WS_PORT: 8080,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -33,6 +35,7 @@ module.exports = {
       instance_var: "3",
       env: {
         PORT: 8002,
+        WS_PORT: 8081,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -47,6 +50,7 @@ module.exports = {
       instance_var: "4",
       env: {
         PORT: 8003,
+        WS_PORT: 8081,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -60,6 +64,7 @@ module.exports = {
       instance_var: "5",
       env: {
         PORT: 8005,
+        WS_PORT: 8082,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -73,6 +78,7 @@ module.exports = {
       instance_var: "6",
       env: {
         PORT: 8006,
+        WS_PORT: 8082,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -86,6 +92,7 @@ module.exports = {
       instance_var: "7",
       env: {
         PORT: 8007,
+        WS_PORT: 8083,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
@@ -100,6 +107,7 @@ module.exports = {
       instance_var: "8",
       env: {
         PORT: 8008,
+        WS_PORT: 8083,
         NODE_ENV: "production",
       },
       exec_mode: "fork",
