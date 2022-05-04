@@ -132,7 +132,10 @@ export default async (fastify, opts) => {
       const document = await fetchDoc(docId);
       if (version !== document.version) {
         res.header("X-CSE356", "61f9f57373ba724f297db6ba");
-        logging.info("Version not matched: { status: retry }", id);
+        logging.info(
+          `Client v=${version} != doc v=${document.version}: { status: retry }`,
+          id
+        );
         return { status: "retry" };
       }
       // else if (document.preventCompose) {
