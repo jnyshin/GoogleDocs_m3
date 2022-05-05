@@ -200,7 +200,7 @@ module.exports = {
       script: "packages/server/app.js",
       instance_var: "13",
       env: {
-        PORT: 8012,
+        PORT: 8013,
         WS_PORT: 8086,
         WS_IP: "10.9.8.168",
         MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
@@ -216,7 +216,7 @@ module.exports = {
       script: "packages/server/app.js",
       instance_var: "14",
       env: {
-        PORT: 8012,
+        PORT: 8014,
         WS_PORT: 8087,
         WS_IP: "10.9.8.168",
         MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
@@ -232,7 +232,7 @@ module.exports = {
       script: "packages/server/app.js",
       instance_var: "15",
       env: {
-        PORT: 8010,
+        PORT: 8015,
         WS_PORT: 8086,
         WS_IP: "10.9.4.238",
         MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
@@ -248,7 +248,7 @@ module.exports = {
       script: "packages/server/app.js",
       instance_var: "16",
       env: {
-        PORT: 8010,
+        PORT: 8016,
         WS_PORT: 8087,
         WS_IP: "10.9.4.238",
         MONGO_IP: "mongodb://10.9.4.238:27017/docs_clone",
